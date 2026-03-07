@@ -1,3 +1,4 @@
+// ProductList.js
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -39,16 +40,24 @@ const ProductList = () => {
   });
   const [appliedFilters, setAppliedFilters] = useState({});
 
-  const [allProducts, setAllProducts] = useState([]); // Все продукты
-  const [displayedProducts, setDisplayedProducts] = useState([]); // Продукты для текущей страницы
+  const [allProducts, setAllProducts] = useState([]);
+  const [displayedProducts, setDisplayedProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Количество элементов на странице
+  const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "/default-product.jpg";
+    if (imagePath.startsWith("http")) return imagePath;
+    return `http://127.0.0.1:8000${
+      imagePath.startsWith("/") ? "" : "/"
+    }${imagePath}`;
+  };
 
   const getUniqueValues = (products, key) => {
     const values = products.map((product) => product[key]);
@@ -65,11 +74,6 @@ const ProductList = () => {
       params.category = categoryId;
     }
 
-    // Удаляем параметры пагинации
-    delete params.page;
-    delete params.page_size;
-
-    // Удаляем пустые параметры
     Object.keys(params).forEach((key) => {
       if (params[key] === "" || params[key] == null) {
         delete params[key];
@@ -80,10 +84,19 @@ const ProductList = () => {
       .get("http://127.0.0.1:8000/api/products/", { params })
       .then((response) => {
         if (response.data) {
-          const products = response.data.results || [];
-          setAllProducts(products);
-          setWoodTypes(getUniqueValues(products, "wood_type"));
-          setGrades(getUniqueValues(products, "grade"));
+          const productsData = response.data.results || [];
+          // Нормализуем изображения
+          const normalizedProducts = productsData.map((product) => ({
+            ...product,
+            main_image: getImageUrl(product.main_image),
+            images: product.images?.map((img) => ({
+              ...img,
+              image: getImageUrl(img.image),
+            })),
+          }));
+          setAllProducts(normalizedProducts);
+          setWoodTypes(getUniqueValues(normalizedProducts, "wood_type"));
+          setGrades(getUniqueValues(normalizedProducts, "grade"));
         }
       })
       .catch((error) => {
@@ -199,7 +212,7 @@ const ProductList = () => {
         <CircularProgress size={80} />
       </Box>
     );
-  if (error) return <div>{error}</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="product-list">
@@ -307,16 +320,12 @@ const ProductList = () => {
       {/* Список товаров */}
       <div className="products-grid">
         {displayedProducts.map((product) => (
-          <Card
-            key={product.id}
-            className="product-card"
-            sx={{ cursor: "pointer" }}
-          >
+          <Card key={product.id} className="product-card">
             <CardContent>
               <Typography variant="h5" component="div">
                 {product.name}
               </Typography>
-              <Typography variant="h6">Цена: {product.price} руб.</Typography>
+              <Typography variant="h6">{product.price} руб.</Typography>
               <Typography variant="body2">
                 Категория: {product.category}
               </Typography>
@@ -333,7 +342,9 @@ const ProductList = () => {
                   <img
                     src={product.main_image}
                     alt={product.name}
-                    style={{ maxWidth: "100%", maxHeight: "150px" }}
+                    onError={(e) => {
+                      e.target.src = "/default-product.jpg";
+                    }}
                   />
                 ) : (
                   <Typography variant="body2">
@@ -341,32 +352,21 @@ const ProductList = () => {
                   </Typography>
                 )}
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                  marginTop: "10px",
+              <Button
+                variant="contained"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart(product.id);
                 }}
               >
-                <Button
-                  variant="contained"
-                  style={{ backgroundColor: "#4caf50", color: "white" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(product.id);
-                  }}
-                >
-                  Добавить в корзину
-                </Button>
-                <Button
-                  variant="outlined"
-                  style={{ borderColor: "#4caf50", color: "#4caf50" }}
-                  onClick={() => openProductModal(product)}
-                >
-                  Подробнее
-                </Button>
-              </div>
+                Добавить в корзину
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => openProductModal(product)}
+              >
+                Подробнее
+              </Button>
             </CardContent>
           </Card>
         ))}
@@ -394,11 +394,12 @@ const ProductList = () => {
                     src={selectedProduct.main_image}
                     alt={selectedProduct.name}
                     className="main-image"
+                    onError={(e) => {
+                      e.target.src = "/default-product.jpg";
+                    }}
                   />
                 ) : (
-                  <Typography variant="body2">
-                    Изображения отсутствуют
-                  </Typography>
+                  <Typography>Изображения отсутствуют</Typography>
                 )}
               </div>
 
@@ -406,7 +407,8 @@ const ProductList = () => {
                 <h2>{selectedProduct.name}</h2>
                 <div className="product-details">
                   <p>
-                    <strong>Описание:</strong> {selectedProduct.description}
+                    <strong>Описание:</strong>{" "}
+                    {selectedProduct.description || "Описание отсутствует"}
                   </p>
                   <p>
                     <strong>Категория:</strong> {selectedProduct.category}

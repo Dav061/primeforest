@@ -20,7 +20,7 @@ const Contacts = () => {
           <div className="contact-icon">📞</div>
           <h2 className="contact-heading">Телефон</h2>
           <p className="contact-text">
-            <a href="tel:+74951234567">+7 (495) 123-45-67</a>
+            <a href="tel:+79990000629">+7 (999) 000-06-29</a>
           </p>
         </div>
 
@@ -43,9 +43,9 @@ const Contacts = () => {
         {/* вотсап */}
         <div className="contact-card">
           <div className="contact-icon">📲</div>
-          <h2 className="contact-heading">WhatsApp</h2>
+          <h2 className="contact-heading">Telegram</h2>
           <p className="contact-text">
-            <a href="whatsapp://send?phone=+79999849269">Написать сообщение</a>
+            <a href="https://t.me/+79999849269">Написать сообщение</a>
           </p>
         </div>
       </div>
@@ -54,8 +54,8 @@ const Contacts = () => {
       <div className="map-container">
         <iframe
           src="https://yandex.ru/map-widget/v1/?um=constructor%3A3792a5734fa6d5c57aa9332ad2188d98524cef7048e58c69584f3d51d96f5a2c&amp;source=constructor"
-          width="1540"
-          height="400"
+          width="944"
+          height="342"
           frameborder="0"
         ></iframe>
       </div>
@@ -66,22 +66,22 @@ const Contacts = () => {
           <h2 className="section-title">Реквизиты компании</h2>
           <div className="requisites-content">
             <p>
-              <strong>ИНН:</strong> 1234567890
+              <strong>ИНН:</strong> \
             </p>
             <p>
-              <strong>КПП:</strong> 987654321
+              <strong>КПП:</strong> \
             </p>
             <p>
-              <strong>ОГРН:</strong> 1234567890123
+              <strong>ОГРН:</strong> \
             </p>
             <p>
               <strong>Банк:</strong> ПАО Сбербанк
             </p>
             <p>
-              <strong>Р/с:</strong> 40702810123456789012
+              <strong>Р/с:</strong> \
             </p>
             <p>
-              <strong>БИК:</strong> 044525225
+              <strong>БИК:</strong> \
             </p>
           </div>
         </div>

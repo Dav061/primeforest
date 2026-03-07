@@ -10,6 +10,8 @@ import FormLabel from "@mui/material/FormLabel";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import "../styles.scss";
 
 const Checkout = () => {
@@ -17,10 +19,12 @@ const Checkout = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [addressSuggestions, setAddressSuggestions] = useState([]);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
 
   const timeIntervals = [
@@ -45,7 +49,7 @@ const Checkout = () => {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
-              Authorization: "Token YOUR_DADATA_API_KEY",
+              Authorization: "Token YOUR_DADATA_API_KEY", // Замените на ваш API ключ
             },
           }
         )
@@ -67,13 +71,22 @@ const Checkout = () => {
       return;
     }
 
+    // Простая валидация телефона
+    const phoneRegex =
+      /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      setError("Пожалуйста, введите корректный номер телефона");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
 
-      const response = await axios.post(
+      // 1. Создаем заказ
+      const orderResponse = await axios.post(
         "http://127.0.0.1:8000/api/orders/",
         {
           address: address,
@@ -90,22 +103,57 @@ const Checkout = () => {
         }
       );
 
-      // Успешное создание заказа
+      // 2. Отправляем уведомление в Telegram
+      // try {
+      //   await axios.post(
+      //     "http://127.0.0.1:8000/api/telegram-notification/",
+      //     {
+      //       order_id: orderResponse.data.id,
+      //     },
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //       },
+      //     }
+      //   );
+      //   console.log("✅ Уведомление в Telegram отправлено");
+      // } catch (telegramError) {
+      //   // Не блокируем оформление заказа, если Telegram не отправился
+      //   console.error("❌ Ошибка отправки в Telegram:", telegramError);
+      // }
+
+      // 3. Очищаем корзину
       await axios.delete("http://127.0.0.1:8000/api/carts/clear/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      navigate("/profile", { state: { orderSuccess: true } });
+      // 4. Показываем сообщение об успехе
+      setSuccessMessage(`Заказ #${orderResponse.data.id} успешно оформлен!`);
+      setSnackbarOpen(true);
+
+      // 5. Перенаправляем в профиль через 2 секунды
+      setTimeout(() => {
+        navigate("/profile", {
+          state: { orderSuccess: true, orderId: orderResponse.data.id },
+        });
+      }, 2000);
     } catch (error) {
       console.error("Ошибка при оформлении заказа:", error);
 
       let errorMessage = "Произошла ошибка при оформлении заказа";
-      if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error.response?.data?.detail) {
-        errorMessage = error.response.data.detail;
+
+      if (error.response?.data) {
+        if (typeof error.response.data === "string") {
+          errorMessage = error.response.data;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response.data.detail) {
+          errorMessage = error.response.data.detail;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -116,11 +164,32 @@ const Checkout = () => {
     }
   };
 
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
   const isFormValid = address && phoneNumber && deliveryDate && deliveryTime;
 
   return (
     <div className="checkout">
       <h1>Оформление заказа</h1>
+
+      {/* Snackbar для уведомлений */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
+
       <div className="form-container">
         <Autocomplete
           freeSolo
@@ -136,6 +205,8 @@ const Checkout = () => {
               fullWidth
               margin="normal"
               required
+              error={error && !address}
+              helperText={error && !address ? "Адрес обязателен" : ""}
             />
           )}
         />
@@ -147,6 +218,9 @@ const Checkout = () => {
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
+          placeholder="+7 (999) 123-45-67"
+          error={error && !phoneNumber}
+          helperText={error && !phoneNumber ? "Телефон обязателен" : ""}
         />
 
         <TextField
@@ -161,6 +235,8 @@ const Checkout = () => {
           inputProps={{
             min: new Date().toISOString().split("T")[0],
           }}
+          error={error && !deliveryDate}
+          helperText={error && !deliveryDate ? "Дата доставки обязательна" : ""}
         />
 
         <TextField
@@ -171,6 +247,10 @@ const Checkout = () => {
           value={deliveryTime}
           onChange={(e) => setDeliveryTime(e.target.value)}
           required
+          error={error && !deliveryTime}
+          helperText={
+            error && !deliveryTime ? "Временной интервал обязателен" : ""
+          }
         >
           {timeIntervals.map((interval) => (
             <MenuItem key={interval.value} value={interval.value}>
@@ -204,11 +284,16 @@ const Checkout = () => {
           className="submit-button"
           fullWidth
           size="large"
+          sx={{ mt: 2 }}
         >
           {loading ? "Оформление..." : "Оформить заказ"}
         </Button>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+// ProductDetail.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -22,8 +23,6 @@ const ProductDetail = () => {
         );
         const productData = response.data;
 
-        console.log("Product data from API:", productData); // Логируем полученные данные
-
         // Функция для создания полного URL изображения
         const getImageUrl = (imagePath) => {
           if (!imagePath) return "/default-product.jpg";
@@ -39,7 +38,6 @@ const ProductDetail = () => {
           category: productData.category || "Не указана",
           wood_type: productData.wood_type || "Не указана",
           grade: productData.grade || "Не указан",
-          // Обрабатываем изображения
           main_image: getImageUrl(
             productData.main_image || productData.images?.[0]?.image
           ),
@@ -129,26 +127,26 @@ const ProductDetail = () => {
               alt={product.name}
               className="main-image"
               onError={(e) => {
-                console.error("Error loading image:", e.target.src);
                 e.target.src = "/default-product.jpg";
               }}
             />
 
-            <div className="thumbnail-container">
-              {product.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img.image}
-                  alt={`${product.name} ${index + 1}`}
-                  className="thumbnail"
-                  onClick={() => setMainImage(img.image)}
-                  onError={(e) => {
-                    console.error("Error loading thumbnail:", e.target.src);
-                    e.target.src = "/default-product.jpg";
-                  }}
-                />
-              ))}
-            </div>
+            {product.images.length > 0 && (
+              <div className="thumbnail-container">
+                {product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img.image}
+                    alt={`${product.name} ${index + 1}`}
+                    className="thumbnail"
+                    onClick={() => setMainImage(img.image)}
+                    onError={(e) => {
+                      e.target.src = "/default-product.jpg";
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="product-info">
@@ -169,14 +167,14 @@ const ProductDetail = () => {
                 <span className="meta-value">{product.category}</span>
               </div>
 
-              {product.wood_type && (
+              {product.wood_type && product.wood_type !== "Не указана" && (
                 <div className="meta-item">
                   <span className="meta-label">Порода дерева:</span>
                   <span className="meta-value">{product.wood_type}</span>
                 </div>
               )}
 
-              {product.grade && (
+              {product.grade && product.grade !== "Не указан" && (
                 <div className="meta-item">
                   <span className="meta-label">Сорт:</span>
                   <span className="meta-value">{product.grade}</span>
@@ -185,7 +183,7 @@ const ProductDetail = () => {
             </div>
 
             <button className="add-to-cart-btn" onClick={addToCart}>
-              <ShoppingCart size={20} style={{ marginRight: "10px" }} />
+              <ShoppingCart size={20} />
               Добавить в корзину
             </button>
           </div>
