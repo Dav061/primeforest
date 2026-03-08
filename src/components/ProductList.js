@@ -81,7 +81,7 @@ const ProductList = () => {
     });
 
     axios
-      .get("http://127.0.0.1:8000/api/products/", { params })
+      .get("https://prime-forest.ru/api/products/", { params })
       .then((response) => {
         if (response.data) {
           const productsData = response.data.results || [];
@@ -179,7 +179,7 @@ const ProductList = () => {
     } else {
       axios
         .post(
-          "http://127.0.0.1:8000/api/carts/add_to_cart/",
+          "https://prime-forest.ru/api/carts/add_to_cart/",
           { product_id: productId, quantity: 1 },
           { headers: { Authorization: `Bearer ${token}` } }
         )

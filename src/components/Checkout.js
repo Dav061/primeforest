@@ -87,7 +87,7 @@ const Checkout = () => {
 
       // 1. Создаем заказ
       const orderResponse = await axios.post(
-        "http://127.0.0.1:8000/api/orders/",
+        "https://prime-forest.ru/api/orders/",
         {
           address: address,
           phone_number: phoneNumber,
@@ -123,7 +123,7 @@ const Checkout = () => {
       // }
 
       // 3. Очищаем корзину
-      await axios.delete("http://127.0.0.1:8000/api/carts/clear/", {
+      await axios.delete("https://prime-forest.ru/api/carts/clear/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
