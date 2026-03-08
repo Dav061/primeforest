@@ -15,7 +15,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://https://prime-forest.ru/api/register/", {
+      const response = await axios.post("https://prime-forest.ru/api/register/", {
         username,
         password,
         email,

@@ -77,7 +77,7 @@ const ProductList = () => {
     });
 
     axios
-      .get("http://https://prime-forest.ru/api/products/", { params })
+      .get("https://prime-forest.ru/api/products/", { params })
       .then((response) => {
         if (response.data) {
           const products = response.data.results || [];
@@ -166,7 +166,7 @@ const ProductList = () => {
     } else {
       axios
         .post(
-          "http://https://prime-forest.ru/api/carts/add_to_cart/",
+          "https://prime-forest.ru/api/carts/add_to_cart/",
           { product_id: productId, quantity: 1 },
           { headers: { Authorization: `Bearer ${token}` } }
         )

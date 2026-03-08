@@ -26,7 +26,7 @@ const Navbar = () => {
   // Загрузка количества товаров в корзине
   const fetchCartCount = () => {
     axios
-      .get("http://https://prime-forest.ru/api/carts/", {
+      .get("https://prime-forest.ru/api/carts/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

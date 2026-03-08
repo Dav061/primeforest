@@ -74,7 +74,7 @@ const Checkout = () => {
       const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
 
       const response = await axios.post(
-        "http://https://prime-forest.ru/api/orders/",
+        "https://prime-forest.ru/api/orders/",
         {
           address: address,
           phone_number: phoneNumber,
@@ -91,7 +91,7 @@ const Checkout = () => {
       );
 
       // Успешное создание заказа
-      await axios.delete("http://https://prime-forest.ru/api/carts/clear/", {
+      await axios.delete("https://prime-forest.ru/api/carts/clear/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

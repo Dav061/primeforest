@@ -21,7 +21,7 @@ const Cart = () => {
 
       try {
         const response = await axios.get(
-          "http://https://prime-forest.ru/api/carts/my_cart/",
+          "https://prime-forest.ru/api/carts/my_cart/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const Cart = () => {
 
   const removeFromCart = async (itemId) => {
     try {
-      await axios.delete(`http://https://prime-forest.ru/api/cartitems/${itemId}/`, {
+      await axios.delete(`https://prime-forest.ru/api/cartitems/${itemId}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -82,7 +82,7 @@ const Cart = () => {
   const updateQuantity = async (itemId, newQuantity) => {
     try {
       await axios.patch(
-        `http://https://prime-forest.ru/api/cartitems/${itemId}/`,
+        `https://prime-forest.ru/api/cartitems/${itemId}/`,
         { quantity: newQuantity },
         {
           headers: {

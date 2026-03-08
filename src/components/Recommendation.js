@@ -140,7 +140,7 @@ export const getRecommendations = async (userAnswers) => {
     });
 
     const response = await axios.post(
-      "http://https://prime-forest.ru/api/recommendations/",
+      "https://prime-forest.ru/api/recommendations/",
       {
         answers: preparedAnswers,
       }
@@ -177,7 +177,7 @@ export const RecommendationModal = ({
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://https://prime-forest.ru${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };

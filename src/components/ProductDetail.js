@@ -18,7 +18,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://https://prime-forest.ru/api/products/${id}/`
+          `https://prime-forest.ru/api/products/${id}/`
         );
         const productData = response.data;
 
@@ -28,7 +28,7 @@ const ProductDetail = () => {
         const getImageUrl = (imagePath) => {
           if (!imagePath) return "/default-product.jpg";
           if (imagePath.startsWith("http")) return imagePath;
-          return `http://https://prime-forest.ru${
+          return `https://prime-forest.ru${
             imagePath.startsWith("/") ? "" : "/"
           }${imagePath}`;
         };
@@ -72,7 +72,7 @@ const ProductDetail = () => {
 
     try {
       await axios.post(
-        "http://https://prime-forest.ru/api/carts/add_to_cart/",
+        "https://prime-forest.ru/api/carts/add_to_cart/",
         {
           product_id: product.id,
           quantity: 1,
