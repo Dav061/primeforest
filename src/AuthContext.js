@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   // Функция для получения данных пользователя (обернута в useCallback)
   const fetchUserData = useCallback(async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/user/");
+      const response = await axios.get("http://https://prime-forest.ru/api/user/");
       setUser({ ...response.data, token: localStorage.getItem("token") });
     } catch (error) {
       console.error("Ошибка при загрузке данных пользователя:", error);
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   // В методе login AuthContext
   const login = async (username, password) => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+      const response = await axios.post("http://https://prime-forest.ru/api/token/", {
         username,
         password,
       });

@@ -35,7 +35,7 @@ const Profile = () => {
           setError(null);
 
           const response = await axios.get(
-            "http://127.0.0.1:8000/api/orders/",
+            "http://https://prime-forest.ru/api/orders/",
             {
               headers: {
                 Authorization: `Bearer ${user.token}`,
@@ -77,7 +77,7 @@ const Profile = () => {
       // Проверяем, есть ли уже данные о товарах
       if (!order.items || order.items.length === 0) {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/orders/${order.id}/`,
+          `http://https://prime-forest.ru/api/orders/${order.id}/`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
