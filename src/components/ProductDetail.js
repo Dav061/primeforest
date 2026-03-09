@@ -1,11 +1,13 @@
-// ProductDetail.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Minus, Plus } from "lucide-react";
+import { CartContext } from "../CartContext";
+import "../styles.scss";
+import { IconButton } from "@mui/material";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,24 +17,26 @@ const ProductDetail = () => {
   const [mainImage, setMainImage] = useState("");
   const navigate = useNavigate();
 
+  const { addToCart, updateCartItem, getItemQuantity } =
+    useContext(CartContext);
+  const quantity = getItemQuantity(parseInt(id));
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `https://prime-forest.ru/api/products/${id}/`
+          `http://127.0.0.1:8000/api/products/${id}/`
         );
         const productData = response.data;
 
-        // Функция для создания полного URL изображения
         const getImageUrl = (imagePath) => {
           if (!imagePath) return "/default-product.jpg";
           if (imagePath.startsWith("http")) return imagePath;
-          return `https://prime-forest.ru${
+          return `http://127.0.0.1:8000${
             imagePath.startsWith("/") ? "" : "/"
           }${imagePath}`;
         };
 
-        // Нормализация данных продукта
         const normalizedProduct = {
           ...productData,
           category: productData.category || "Не указана",
@@ -61,47 +65,25 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  const addToCart = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+  const handleAddToCart = async () => {
+    await addToCart(product.id, 1);
+  };
 
-    try {
-      await axios.post(
-        "https://prime-forest.ru/api/carts/add_to_cart/",
-        {
-          product_id: product.id,
-          quantity: 1,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      alert("Товар добавлен в корзину!");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      if (error.response?.status === 401) {
-        navigate("/login");
-      } else {
-        setError("Ошибка при добавлении товара в корзину: " + error.message);
-      }
-    }
+  const handleIncrease = async () => {
+    await updateCartItem(product.id, quantity + 1);
+  };
+
+  const handleDecrease = async () => {
+    await updateCartItem(product.id, quantity - 1);
+  };
+
+  const handleGoToCart = () => {
+    navigate("/cart");
   };
 
   if (loading)
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
+      <Box className="loading-container">
         <CircularProgress size={80} />
       </Box>
     );
@@ -138,7 +120,9 @@ const ProductDetail = () => {
                     key={index}
                     src={img.image}
                     alt={`${product.name} ${index + 1}`}
-                    className="thumbnail"
+                    className={`thumbnail ${
+                      mainImage === img.image ? "active" : ""
+                    }`}
                     onClick={() => setMainImage(img.image)}
                     onError={(e) => {
                       e.target.src = "/default-product.jpg";
@@ -182,10 +166,41 @@ const ProductDetail = () => {
               )}
             </div>
 
-            <button className="add-to-cart-btn" onClick={addToCart}>
-              <ShoppingCart size={20} />
-              Добавить в корзину
-            </button>
+            {quantity === 0 ? (
+              <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                <ShoppingCart size={20} />
+                Добавить в корзину
+              </button>
+            ) : (
+              <div className="cart-controls">
+                <div className="cart-counter">
+                  <IconButton
+                    size="small"
+                    onClick={handleDecrease}
+                    className="counter-btn"
+                  >
+                    <Minus size={16} />
+                  </IconButton>
+                  <span className="counter-value">{quantity}</span>
+                  <IconButton
+                    size="small"
+                    onClick={handleIncrease}
+                    className="counter-btn"
+                  >
+                    <Plus size={16} />
+                  </IconButton>
+                </div>
+                <Button
+                  variant="contained"
+                  size="medium"
+                  startIcon={<ShoppingCart size={18} />}
+                  onClick={handleGoToCart}
+                  className="cart-go-btn"
+                >
+                  Перейти
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

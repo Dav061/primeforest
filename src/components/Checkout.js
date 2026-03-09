@@ -11,20 +11,18 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
 import "../styles.scss";
+import { notifySuccess, notifyError } from "../utils/notifications";
 
 const Checkout = () => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
   const [addressSuggestions, setAddressSuggestions] = useState([]);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
 
   const timeIntervals = [
@@ -49,7 +47,7 @@ const Checkout = () => {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
-              Authorization: "Token YOUR_DADATA_API_KEY", // Замените на ваш API ключ
+              Authorization: "Token YOUR_DADATA_API_KEY",
             },
           }
         )
@@ -67,15 +65,14 @@ const Checkout = () => {
 
   const handleCheckout = async () => {
     if (!address || !phoneNumber || !deliveryDate || !deliveryTime) {
-      setError("Пожалуйста, заполните все обязательные поля.");
+      notifyError("Пожалуйста, заполните все обязательные поля");
       return;
     }
 
-    // Простая валидация телефона
     const phoneRegex =
       /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
     if (!phoneRegex.test(phoneNumber)) {
-      setError("Пожалуйста, введите корректный номер телефона");
+      notifyError("Пожалуйста, введите корректный номер телефона");
       return;
     }
 
@@ -85,9 +82,8 @@ const Checkout = () => {
     try {
       const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
 
-      // 1. Создаем заказ
       const orderResponse = await axios.post(
-        "https://prime-forest.ru/api/orders/",
+        "http://127.0.0.1:8000/api/orders/",
         {
           address: address,
           phone_number: phoneNumber,
@@ -103,37 +99,14 @@ const Checkout = () => {
         }
       );
 
-      // 2. Отправляем уведомление в Telegram
-      // try {
-      //   await axios.post(
-      //     "http://127.0.0.1:8000/api/telegram-notification/",
-      //     {
-      //       order_id: orderResponse.data.id,
-      //     },
-      //     {
-      //       headers: {
-      //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //       },
-      //     }
-      //   );
-      //   console.log("✅ Уведомление в Telegram отправлено");
-      // } catch (telegramError) {
-      //   // Не блокируем оформление заказа, если Telegram не отправился
-      //   console.error("❌ Ошибка отправки в Telegram:", telegramError);
-      // }
-
-      // 3. Очищаем корзину
-      await axios.delete("https://prime-forest.ru/api/carts/clear/", {
+      await axios.delete("http://127.0.0.1:8000/api/carts/clear/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      // 4. Показываем сообщение об успехе
-      setSuccessMessage(`Заказ #${orderResponse.data.id} успешно оформлен!`);
-      setSnackbarOpen(true);
+      notifySuccess(`✅ Заказ #${orderResponse.data.id} успешно оформлен!`);
 
-      // 5. Перенаправляем в профиль через 2 секунды
       setTimeout(() => {
         navigate("/profile", {
           state: { orderSuccess: true, orderId: orderResponse.data.id },
@@ -158,14 +131,11 @@ const Checkout = () => {
         errorMessage = error.message;
       }
 
+      notifyError(`❌ ${errorMessage}`);
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
   };
 
   const isFormValid = address && phoneNumber && deliveryDate && deliveryTime;
@@ -173,22 +143,6 @@ const Checkout = () => {
   return (
     <div className="checkout">
       <h1>Оформление заказа</h1>
-
-      {/* Snackbar для уведомлений */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
 
       <div className="form-container">
         <Autocomplete

@@ -1,10 +1,6 @@
-// ProductList.js
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react"; // добавили useRef
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
+import { useLocation } from "react-router-dom";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -12,33 +8,36 @@ import InputLabel from "@mui/material/InputLabel";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import "../styles.scss";
+import ProductCard from "./ProductCard";
+import { notifySuccess } from "../utils/notifications";
 
 const ProductList = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const categoryId = queryParams.get("category");
 
-  const [products, setProducts] = useState([]);
+  // Добавляем ref для отслеживания первого клика
+  const isFirstLoad = useRef(true);
+  const topRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [woodTypes, setWoodTypes] = useState([]);
   const [grades, setGrades] = useState([]);
+
   const [filters, setFilters] = useState({
     category: categoryId || "",
     wood_type: "",
     grade: "",
-    ordering: "name",
+    ordering: "",
   });
-  const [appliedFilters, setAppliedFilters] = useState({});
+
+  const [appliedFilters, setAppliedFilters] = useState({
+    category: categoryId || "",
+  });
 
   const [allProducts, setAllProducts] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -47,9 +46,6 @@ const ProductList = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
@@ -65,6 +61,7 @@ const ProductList = () => {
   };
 
   const fetchProducts = useCallback(() => {
+    setLoading(true);
     const params = {
       ...appliedFilters,
       is_active: true,
@@ -81,11 +78,10 @@ const ProductList = () => {
     });
 
     axios
-      .get("https://prime-forest.ru/api/products/", { params })
+      .get("http://127.0.0.1:8000/api/products/", { params })
       .then((response) => {
         if (response.data) {
           const productsData = response.data.results || [];
-          // Нормализуем изображения
           const normalizedProducts = productsData.map((product) => ({
             ...product,
             main_image: getImageUrl(product.main_image),
@@ -119,6 +115,14 @@ const ProductList = () => {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Функция для прокрутки вверх
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // плавная прокрутка
+    });
+  };
+
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
     setFilters({
@@ -130,6 +134,7 @@ const ProductList = () => {
   const handleApplyFilters = () => {
     setAppliedFilters(filters);
     setPage(1);
+    scrollToTop(); // Добавляем прокрутку вверх
   };
 
   const handleResetFilters = () => {
@@ -137,14 +142,18 @@ const ProductList = () => {
       category: categoryId || "",
       wood_type: "",
       grade: "",
-      ordering: "name",
+      ordering: "",
     });
+
     setAppliedFilters({
       category: categoryId || "",
-      ordering: "name",
     });
+
     setSearchQuery("");
     setPage(1);
+
+    scrollToTop(); // Добавляем прокрутку вверх
+    notifySuccess("Фильтры сброшены");
   };
 
   const handleSearchChange = (event) => {
@@ -157,68 +166,33 @@ const ProductList = () => {
       search: searchQuery,
     });
     setPage(1);
+    scrollToTop(); // Добавляем прокрутку вверх
   };
 
   const handlePageChange = (event, value) => {
     setPage(value);
+    // Прокручиваем вверх при смене страницы
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 100); // Небольшая задержка для плавности
   };
 
-  const openProductModal = (product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
-
-  const closeProductModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const addToCart = (productId) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else {
-      axios
-        .post(
-          "https://prime-forest.ru/api/carts/add_to_cart/",
-          { product_id: productId, quantity: 1 },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-        .then(() => {
-          setIsSuccessDialogOpen(true);
-        })
-        .catch(console.error);
-    }
-  };
-
-  const handleCloseSuccessDialog = () => {
-    setIsSuccessDialogOpen(false);
-  };
-
-  const handleGoToCart = () => {
-    setIsSuccessDialogOpen(false);
-    navigate("/cart");
-  };
-
-  if (loading)
+  if (loading && allProducts.length === 0)
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
+      <Box className="loading-container">
         <CircularProgress size={80} />
       </Box>
     );
+
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="product-list">
-      <h1>Товары</h1>
+    <div className="product-list" ref={topRef}>
+      <h1 className="page-title">Товары</h1>
 
-      {/* Блок поиска */}
       <div className="search-section">
         <div className="search-container">
           <TextField
@@ -240,17 +214,17 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* Блок сортировки и фильтров */}
       <div className="filters-section">
         <div className="filters-container">
-          {/* Сортировка */}
           <FormControl className="sort-control" fullWidth>
             <InputLabel>Сортировать по</InputLabel>
             <Select
               name="ordering"
               value={filters.ordering}
               onChange={handleFilterChange}
+              displayEmpty
             >
+              <MenuItem value=""></MenuItem>
               <MenuItem value="name">По названию (А-Я)</MenuItem>
               <MenuItem value="-name">По названию (Я-А)</MenuItem>
               <MenuItem value="price">По цене (возрастанию)</MenuItem>
@@ -258,7 +232,6 @@ const ProductList = () => {
             </Select>
           </FormControl>
 
-          {/* Фильтры */}
           {categoryId && (
             <>
               <FormControl fullWidth>
@@ -296,7 +269,6 @@ const ProductList = () => {
           )}
         </div>
 
-        {/* Кнопки */}
         <div className="filter-buttons">
           <Button
             variant="contained"
@@ -317,151 +289,20 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* Список товаров */}
       <div className="products-grid">
         {displayedProducts.map((product) => (
-          <Card key={product.id} className="product-card">
-            <CardContent>
-              <Typography variant="h5" component="div">
-                {product.name}
-              </Typography>
-              <Typography variant="h6">{product.price} руб.</Typography>
-              <Typography variant="body2">
-                Категория: {product.category}
-              </Typography>
-              {product.wood_type && (
-                <Typography variant="body2">
-                  Порода дерева: {product.wood_type}
-                </Typography>
-              )}
-              {product.grade && (
-                <Typography variant="body2">Сорт: {product.grade}</Typography>
-              )}
-              <div className="product-images">
-                {product.main_image ? (
-                  <img
-                    src={product.main_image}
-                    alt={product.name}
-                    onError={(e) => {
-                      e.target.src = "/default-product.jpg";
-                    }}
-                  />
-                ) : (
-                  <Typography variant="body2">
-                    Изображения отсутствуют
-                  </Typography>
-                )}
-              </div>
-              <Button
-                variant="contained"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart(product.id);
-                }}
-              >
-                Добавить в корзину
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => openProductModal(product)}
-              >
-                Подробнее
-              </Button>
-            </CardContent>
-          </Card>
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
-      {/* Пагинация */}
-      <Pagination
-        count={totalPages}
-        page={page}
-        onChange={handlePageChange}
-        className="pagination"
-      />
-
-      {/* Модальное окно товара */}
-      {isModalOpen && selectedProduct && (
-        <div className="modal-overlay" onClick={closeProductModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeProductModal}>
-              &times;
-            </button>
-            <div className="modal-product-content">
-              <div className="modal-product-images">
-                {selectedProduct.main_image ? (
-                  <img
-                    src={selectedProduct.main_image}
-                    alt={selectedProduct.name}
-                    className="main-image"
-                    onError={(e) => {
-                      e.target.src = "/default-product.jpg";
-                    }}
-                  />
-                ) : (
-                  <Typography>Изображения отсутствуют</Typography>
-                )}
-              </div>
-
-              <div className="modal-product-info">
-                <h2>{selectedProduct.name}</h2>
-                <div className="product-details">
-                  <p>
-                    <strong>Описание:</strong>{" "}
-                    {selectedProduct.description || "Описание отсутствует"}
-                  </p>
-                  <p>
-                    <strong>Категория:</strong> {selectedProduct.category}
-                  </p>
-                  {selectedProduct.wood_type && (
-                    <p>
-                      <strong>Порода дерева:</strong>{" "}
-                      {selectedProduct.wood_type}
-                    </p>
-                  )}
-                  {selectedProduct.grade && (
-                    <p>
-                      <strong>Сорт:</strong> {selectedProduct.grade}
-                    </p>
-                  )}
-                  <p className="price">{selectedProduct.price} руб.</p>
-                </div>
-
-                <button
-                  className="modal-add-to-cart-btn"
-                  onClick={() => addToCart(selectedProduct.id)}
-                >
-                  Добавить в корзину
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {totalPages > 1 && (
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          className="pagination"
+        />
       )}
-
-      {/* Диалоговое окно успешного добавления в корзину */}
-      <Dialog
-        open={isSuccessDialogOpen}
-        onClose={handleCloseSuccessDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          Товар добавлен в корзину
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Товар успешно добавлен в вашу корзину. Хотите перейти к просмотру
-            корзины?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseSuccessDialog}>Закрыть</Button>
-          <Button onClick={handleGoToCart} autoFocus>
-            Перейти в корзину
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

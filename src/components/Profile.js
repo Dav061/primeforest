@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthContext";
 import axios from "axios";
-import "../styles.scss";
 import {
   Modal,
   Box,
   Typography,
+  Button,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -13,9 +14,9 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
-  CircularProgress,
 } from "@mui/material";
+import { MapPin, Calendar, CreditCard, Package } from "lucide-react";
+import "../styles.scss";
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
@@ -26,16 +27,13 @@ const Profile = () => {
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState(null);
 
-  // Загружаем историю заказов пользователя
   useEffect(() => {
     const fetchOrders = async () => {
       if (user) {
         try {
           setLoading(true);
-          setError(null);
-
           const response = await axios.get(
-            "https://prime-forest.ru/api/orders/",
+            "http://127.0.0.1:8000/api/orders/",
             {
               headers: {
                 Authorization: `Bearer ${user.token}`,
@@ -43,22 +41,11 @@ const Profile = () => {
             }
           );
 
-          // Обрабатываем разные форматы ответа (с пагинацией и без)
           const ordersData = response.data.results || response.data;
-
-          // Убеждаемся, что это массив
-          if (Array.isArray(ordersData)) {
-            setOrders(ordersData);
-          } else {
-            console.error("Получены некорректные данные заказов:", ordersData);
-            setError("Ошибка формата данных заказов");
-          }
+          setOrders(Array.isArray(ordersData) ? ordersData : []);
         } catch (error) {
           console.error("Ошибка при загрузке заказов:", error);
-          setError(
-            error.response?.data?.detail ||
-              "Не удалось загрузить историю заказов"
-          );
+          setError("Не удалось загрузить историю заказов");
         } finally {
           setLoading(false);
         }
@@ -68,16 +55,12 @@ const Profile = () => {
     fetchOrders();
   }, [user]);
 
-  // Загружаем детали заказа при открытии модального окна
   const handleOpenModal = async (order) => {
     try {
       setOrderLoading(true);
-      setError(null);
-
-      // Проверяем, есть ли уже данные о товарах
       if (!order.items || order.items.length === 0) {
         const response = await axios.get(
-          `https://prime-forest.ru/api/orders/${order.id}/`,
+          `http://127.0.0.1:8000/api/orders/${order.id}/`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -88,13 +71,10 @@ const Profile = () => {
       } else {
         setSelectedOrder(order);
       }
-
       setOpenModal(true);
     } catch (error) {
       console.error("Ошибка при загрузке деталей заказа:", error);
-      setError(
-        error.response?.data?.detail || "Не удалось загрузить детали заказа"
-      );
+      setError("Не удалось загрузить детали заказа");
     } finally {
       setOrderLoading(false);
     }
@@ -103,23 +83,25 @@ const Profile = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedOrder(null);
-    setError(null);
   };
 
-  // Стили для модального окна
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80%",
-    maxWidth: "800px",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "8px",
-    maxHeight: "80vh",
-    overflowY: "auto",
+  const getStatusText = (status) => {
+    switch (status) {
+      case "in_process":
+        return { text: "В обработке", class: "status-in_process" };
+      case "completed":
+        return { text: "Выполнен", class: "status-completed" };
+      default:
+        return { text: "Отменён", class: "status-canceled" };
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   };
 
   if (!user) {
@@ -130,15 +112,21 @@ const Profile = () => {
 
   return (
     <div className="profile">
-      <h1>Личный кабинет</h1>
+      <h1 className="page-title">Личный кабинет</h1>
 
       <div className="user-info">
-        <h2>Информация о пользователе</h2>
-        <p>Логин: {user.username}</p>
-        <p>Email: {user.email}</p>
-        <button onClick={logout} className="logout-button">
+        <div className="user-details">
+          <h2>Информация о пользователе</h2>
+          <p>
+            <strong>Логин:</strong> {user.username}
+          </p>
+          <p>
+            <strong>Email:</strong> {user.email || "не указан"}
+          </p>
+        </div>
+        <Button variant="contained" onClick={logout} className="logout-button">
           Выйти
-        </button>
+        </Button>
       </div>
 
       <div className="order-history">
@@ -152,158 +140,145 @@ const Profile = () => {
             <p>Загрузка заказов...</p>
           </div>
         ) : orders.length > 0 ? (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center">№ Заказа</TableCell>
-                  <TableCell align="center">Статус</TableCell>
-                  <TableCell align="center">Адрес</TableCell>
-                  <TableCell align="center">Дата создания</TableCell>
-                  <TableCell align="center">Сумма</TableCell>
-                  <TableCell align="center">Действия</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell align="center">{order.id}</TableCell>
-                    <TableCell align="center">
-                      {order.status === "in_process"
-                        ? "В процессе"
-                        : order.status === "completed"
-                        ? "Завершен"
-                        : "Отменен"}
-                    </TableCell>
-                    <TableCell align="center">{order.address}</TableCell>
-                    <TableCell align="center">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell align="center">
+          <div className="orders-grid">
+            {orders.map((order) => {
+              const status = getStatusText(order.status);
+              return (
+                <div
+                  key={order.id}
+                  className="order-card"
+                  onClick={() => handleOpenModal(order)}
+                >
+                  <div className="order-header">
+                    <span className="order-number">Заказ №{order.id}</span>
+                    <span className={`order-status ${status.class}`}>
+                      {status.text}
+                    </span>
+                  </div>
+
+                  <div className="order-info">
+                    <p>
+                      <Calendar size={16} />
+                      {formatDate(order.created_at)}
+                    </p>
+                    <p>
+                      <MapPin size={16} />
+                      {order.address}
+                    </p>
+                    <p>
+                      <CreditCard size={16} />
+                      {order.payment_method === "cash"
+                        ? "Наличными"
+                        : "Переводом"}
+                    </p>
+                    <p>
+                      <Package size={16} />
+                      {order.items?.length || 0} товаров
+                    </p>
+                  </div>
+
+                  <div className="order-footer">
+                    <span className="order-total">
                       {order.total_price} руб.
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleOpenModal(order)}
-                        disabled={orderLoading}
-                      >
-                        {orderLoading ? "Загрузка..." : "Подробнее"}
-                      </Button>
-                    </TableCell>
-                    {/* <TableCell>{order.status}</TableCell> */}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </span>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      className="details-button"
+                    >
+                      Подробнее
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
-          <p>У вас пока нет заказов.</p>
+          <p className="no-orders">У вас пока нет заказов</p>
         )}
       </div>
 
       {/* Модальное окно с деталями заказа */}
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="order-details-modal"
-      >
-        <Box sx={modalStyle}>
-          {selectedOrder ? (
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box className="order-modal">
+          {selectedOrder && !orderLoading ? (
             <>
-              <Typography variant="h6" component="h2" gutterBottom>
-                Детали заказа №{selectedOrder.id}
+              <Typography variant="h5" component="h2" gutterBottom>
+                Заказ №{selectedOrder.id}
               </Typography>
 
-              <Typography variant="body1" gutterBottom>
-                <strong>Адрес доставки:</strong> {selectedOrder.address}
-              </Typography>
-
-              <Typography variant="body1" gutterBottom>
-                <strong>Дата доставки:</strong>{" "}
-                {selectedOrder.delivery_date &&
-                  new Date(
-                    selectedOrder.delivery_date
-                  ).toLocaleDateString()}{" "}
-                ({selectedOrder.delivery_time_interval})
-              </Typography>
-
-              <Typography variant="body1" gutterBottom>
-                <strong>Способ оплаты:</strong>{" "}
-                {selectedOrder.payment_method === "cash"
-                  ? "Наличными"
-                  : "Переводом"}
-              </Typography>
-
-              <Typography variant="body1" gutterBottom>
-                <strong>Статус:</strong>{" "}
-                {selectedOrder.status === "in_process"
-                  ? "В процессе"
-                  : selectedOrder.status === "completed"
-                  ? "Завершен"
-                  : "Отменен"}
-              </Typography>
-
-              <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
-                Товары в заказе:
-              </Typography>
-
-              {orderLoading ? (
-                <div className="loading-container">
-                  <CircularProgress />
-                  <p>Загрузка товаров...</p>
+              <div className="order-details-section">
+                <h3>Информация о доставке</h3>
+                <div className="detail-row">
+                  <span className="detail-label">Адрес:</span>
+                  <span className="detail-value">{selectedOrder.address}</span>
                 </div>
-              ) : selectedOrder.items && selectedOrder.items.length > 0 ? (
-                <TableContainer component={Paper} sx={{ mt: 2 }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Товар</TableCell>
-                        <TableCell align="right">Цена</TableCell>
-                        <TableCell align="right">Количество</TableCell>
-                        <TableCell align="right">Сумма</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {selectedOrder.items.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell component="th" scope="row">
-                            {item.product?.name || "Товар не найден"}
-                          </TableCell>
-                          <TableCell align="right">{item.price} руб.</TableCell>
-                          <TableCell align="right">{item.quantity}</TableCell>
-                          <TableCell align="right">
-                            {(item.price * item.quantity).toFixed(2)} руб.
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell colSpan={3} align="right">
-                          <strong>Итого:</strong>
-                        </TableCell>
-                        <TableCell align="right">
-                          <strong>{selectedOrder.total_price} руб.</strong>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  В заказе нет товаров
-                </Typography>
-              )}
+                <div className="detail-row">
+                  <span className="detail-label">Дата доставки:</span>
+                  <span className="detail-value">
+                    {formatDate(selectedOrder.delivery_date)} (
+                    {selectedOrder.delivery_time_interval})
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Способ оплаты:</span>
+                  <span className="detail-value">
+                    {selectedOrder.payment_method === "cash"
+                      ? "Наличными"
+                      : "Переводом"}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Статус:</span>
+                  <span className="detail-value">
+                    {getStatusText(selectedOrder.status).text}
+                  </span>
+                </div>
+              </div>
 
-              <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+              <h3>Товары в заказе</h3>
+              <TableContainer component={Paper} className="order-items">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Товар</TableCell>
+                      <TableCell align="right">Цена</TableCell>
+                      <TableCell align="right">Кол-во</TableCell>
+                      <TableCell align="right">Сумма</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedOrder.items?.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.product?.name || "Товар"}</TableCell>
+                        <TableCell align="right">{item.price} руб.</TableCell>
+                        <TableCell align="right">{item.quantity}</TableCell>
+                        <TableCell align="right">
+                          {(item.price * item.quantity).toFixed(2)} руб.
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={3} align="right">
+                        <strong>Итого:</strong>
+                      </TableCell>
+                      <TableCell align="right">
+                        <strong>{selectedOrder.total_price} руб.</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <div className="modal-actions">
                 <Button
-                  onClick={handleCloseModal}
                   variant="contained"
-                  color="error"
+                  onClick={handleCloseModal}
+                  className="close-modal-btn"
                 >
                   Закрыть
                 </Button>
-              </Box>
+              </div>
             </>
           ) : (
             <div className="loading-container">

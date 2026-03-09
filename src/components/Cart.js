@@ -1,88 +1,101 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { Link } from "react-router-dom";
+import { Trash2, Minus, Plus } from "lucide-react";
+import { CartContext } from "../CartContext"; // ← добавить импорт
+import "../styles.scss";
+import { notifySuccess, notifyError } from "../utils/notifications";
 
 const Cart = () => {
+  const { refreshCart } = useContext(CartContext); // ← используем для обновления
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Для просмотра корзины необходимо авторизоваться");
-        setLoading(false);
-        return;
-      }
+  const fetchCart = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Для просмотра корзины необходимо авторизоваться");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const response = await axios.get(
-          "https://prime-forest.ru/api/carts/my_cart/",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setCart(response.data);
-
-        if (response.data.items && response.data.items.length > 0) {
-          const total = response.data.items.reduce(
-            (sum, item) => sum + (item.product?.price || 0) * item.quantity,
-            0
-          );
-          setTotalPrice(total);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/carts/my_cart/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Cart error:", error.response?.data || error.message);
-        setError(
-          error.response?.data?.detail ||
-            error.response?.data?.message ||
-            "Ошибка при загрузке корзины"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
+      setCart(response.data);
+      calculateTotal(response.data);
+    } catch (error) {
+      console.error("Cart error:", error);
+      setError("Ошибка при загрузке корзины");
+      notifyError("❌ Не удалось загрузить корзину");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCart();
   }, []);
 
+  const calculateTotal = (cartData) => {
+    if (cartData?.items?.length > 0) {
+      const total = cartData.items.reduce(
+        (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+        0
+      );
+      setTotalPrice(total);
+    } else {
+      setTotalPrice(0);
+    }
+  };
+
   const removeFromCart = async (itemId) => {
     try {
-      await axios.delete(`https://prime-forest.ru/api/cartitems/${itemId}/`, {
+      const itemToRemove = cart.items.find((item) => item.id === itemId);
+      const productName = itemToRemove?.product?.name || "Товар";
+
+      await axios.delete(`http://127.0.0.1:8000/api/cartitems/${itemId}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      setCart((prevCart) => ({
-        ...prevCart,
-        items: prevCart.items.filter((item) => item.id !== itemId),
-      }));
+      const updatedCart = {
+        ...cart,
+        items: cart.items.filter((item) => item.id !== itemId),
+      };
+      setCart(updatedCart);
+      calculateTotal(updatedCart);
 
-      setTotalPrice((prevTotal) => {
-        const itemToRemove = cart.items.find((item) => item.id === itemId);
-        return (
-          prevTotal -
-          (itemToRemove?.product?.price || 0) * itemToRemove?.quantity
-        );
-      });
+      // Обновляем контекст
+      if (refreshCart) {
+        await refreshCart();
+      }
+
+      notifySuccess(`🗑️ "${productName}" удален из корзины`);
     } catch (error) {
       console.error("Remove error:", error);
-      setError("Ошибка при удалении товара: " + error.message);
+      notifyError("❌ Ошибка при удалении товара");
     }
   };
 
   const updateQuantity = async (itemId, newQuantity) => {
+    if (newQuantity < 1) return;
+
     try {
       await axios.patch(
-        `https://prime-forest.ru/api/cartitems/${itemId}/`,
+        `http://127.0.0.1:8000/api/cartitems/${itemId}/`,
         { quantity: newQuantity },
         {
           headers: {
@@ -91,47 +104,58 @@ const Cart = () => {
         }
       );
 
-      setCart((prevCart) => ({
-        ...prevCart,
-        items: prevCart.items.map((item) =>
+      const updatedCart = {
+        ...cart,
+        items: cart.items.map((item) =>
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         ),
-      }));
+      };
+      setCart(updatedCart);
+      calculateTotal(updatedCart);
 
-      setTotalPrice((prevTotal) => {
-        const itemToUpdate = cart.items.find((item) => item.id === itemId);
-        const oldQuantity = itemToUpdate?.quantity || 0;
-        const price = itemToUpdate?.product?.price || 0;
-        return prevTotal - oldQuantity * price + newQuantity * price;
-      });
+      // Обновляем контекст
+      if (refreshCart) {
+        await refreshCart();
+      }
     } catch (error) {
       console.error("Update quantity error:", error);
-      setError("Ошибка при обновлении количества товара: " + error.message);
+      notifyError("❌ Ошибка при обновлении количества");
     }
   };
 
-  if (loading)
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "/default-product.jpg";
+    if (imagePath.startsWith("http")) return imagePath;
+    return `http://127.0.0.1:8000${
+      imagePath.startsWith("/") ? "" : "/"
+    }${imagePath}`;
+  };
+
+  if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress size={80} />
+      <Box className="loading-container">
+        <CircularProgress size={60} />
+        <p>Загрузка корзины...</p>
       </Box>
     );
-  if (error) return <div className="error-message">{error}</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <div className="error-message">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container cart">
-      <h1 className="page-title">Ваша корзина</h1>
+      <h1 className="page-title">Корзина</h1>
 
-      {!cart || !cart.items || cart.items.length === 0 ? (
+      {!cart?.items?.length ? (
         <div className="empty-cart">
           <h2>Ваша корзина пуста</h2>
+          <p>Добавьте товары из каталога, чтобы оформить заказ</p>
           <Link to="/products" className="btn primary">
             Перейти к товарам
           </Link>
@@ -141,52 +165,97 @@ const Cart = () => {
           <div className="cart-items">
             {cart.items.map((item) => (
               <div key={item.id} className="cart-item">
-                <h3>{item.product.name}</h3>
-                <p>Цена: {item.product.price} руб.</p>
-                <div className="quantity-controls">
-                  <button
-                    className="quantity-btn"
-                    onClick={() =>
-                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                    }
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.id, parseInt(e.target.value) || 1)
-                    }
-                    min="1"
-                    className="quantity-input"
+                <div className="cart-item-image">
+                  <img
+                    src={getImageUrl(item.product?.main_image)}
+                    alt={item.product?.name}
+                    onError={(e) => {
+                      e.target.src = "/default-product.jpg";
+                    }}
                   />
-                  <button
-                    className="quantity-btn"
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  >
-                    +
-                  </button>
                 </div>
-                <p className="item-total">
-                  Сумма: {item.product.price * item.quantity} руб.
-                </p>
-                <button
-                  className="btn remove-btn"
-                  onClick={() => removeFromCart(item.id)}
-                >
-                  Удалить
-                </button>
+
+                <div className="cart-item-info">
+                  <h3 className="cart-item-title">{item.product?.name}</h3>
+                  <div className="cart-item-price">
+                    {item.product?.price} руб.
+                  </div>
+
+                  <div className="cart-item-details">
+                    <div className="quantity-controls">
+                      <button
+                        className="quantity-btn"
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="quantity-value">{item.quantity}</span>
+                      <button
+                        className="quantity-btn"
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+
+                    <span className="item-total">
+                      {(item.product?.price * item.quantity).toFixed(2)} руб.
+                    </span>
+
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFromCart(item.id)}
+                      title="Удалить"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="cart-summary">
-            <h2>Итого</h2>
-            <p className="total-price">{totalPrice} руб.</p>
-            <Link to="/checkout" className="btn checkout-btn">
+            <h2>Ваш заказ</h2>
+            <div className="summary-row">
+              <span>Товары ({cart.items.length})</span>
+              <span>{totalPrice.toFixed(2)} руб.</span>
+            </div>
+            <div className="summary-row">
+              <span>Доставка</span>
+              <span>Рассчитывается менеджером</span>
+            </div>
+            <div className="summary-row total">
+              <span>Итого</span>
+              <span>{totalPrice.toFixed(2)} руб.</span>
+            </div>
+            <Link to="/checkout" className="checkout-btn">
               Оформить заказ
             </Link>
+          </div>
+          <div className="delivery-info">
+            <h3>🚚 Информация о доставке</h3>
+            <p>
+              Стоимость доставки рассчитывается индивидуально для каждого адреса
+            </p>
+            <div className="delivery-calculator">
+              <p>
+                <strong>Ориентировочная стоимость:</strong>
+              </p>
+              <p>• В пределах МКАД: от 1500 ₽</p>
+              <p>• За МКАД (до 30 км): от 1000 ₽ + 80 ₽/км</p>
+              <p>• Дальше 30 км: рассчитывается менеджером</p>
+            </div>
+            <p>
+              <small>
+                Точная стоимость просьба уточнять перед оформлением заказа
+              </small>
+            </p>
           </div>
         </div>
       )}

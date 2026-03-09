@@ -1,12 +1,11 @@
-// AboutPage.js
 import React from "react";
-import { Typography, Container, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material"; // убрали Container
 import aboutImage from "../images/about-image.jpg";
 import "../styles.scss";
 
 const AboutPage = () => {
   return (
-    <Container maxWidth="lg" className="about-page">
+    <Box className="about-page"> {/* вместо Container */}
       <Typography
         variant="h2"
         align="center"
@@ -67,7 +66,7 @@ const AboutPage = () => {
           кропотливой работы и любви к своему делу.
         </Typography>
       </Box>
-    </Container>
+    </Box>
   );
 };
 
