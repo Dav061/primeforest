@@ -50,7 +50,7 @@ const ProductList = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -78,7 +78,7 @@ const ProductList = () => {
     });
 
     axios
-      .get("http://127.0.0.1:8000/api/products/", { params })
+      .get("https://prime-forest.ru/api/products/", { params })
       .then((response) => {
         if (response.data) {
           const productsData = response.data.results || [];

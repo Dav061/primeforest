@@ -24,7 +24,7 @@ export const CartProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/carts/my_cart/",
+        "https://prime-forest.ru/api/carts/my_cart/",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -66,7 +66,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/carts/add_to_cart/",
+        "https://prime-forest.ru/api/carts/add_to_cart/",
         { product_id: productId, quantity },
         {
           headers: {
@@ -111,7 +111,7 @@ export const CartProvider = ({ children }) => {
 
       if (cartItem) {
         await axios.patch(
-          `http://127.0.0.1:8000/api/cartitems/${cartItem.id}/`,
+          `https://prime-forest.ru/api/cartitems/${cartItem.id}/`,
           { quantity: newQuantity },
           {
             headers: {
@@ -151,7 +151,7 @@ export const CartProvider = ({ children }) => {
 
       if (cartItem) {
         await axios.delete(
-          `http://127.0.0.1:8000/api/cartitems/${cartItem.id}/`,
+          `https://prime-forest.ru/api/cartitems/${cartItem.id}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

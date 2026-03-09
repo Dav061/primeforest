@@ -25,7 +25,7 @@ const Cart = () => {
 
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/carts/my_cart/",
+        "https://prime-forest.ru/api/carts/my_cart/",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const Cart = () => {
       const itemToRemove = cart.items.find((item) => item.id === itemId);
       const productName = itemToRemove?.product?.name || "Товар";
 
-      await axios.delete(`http://127.0.0.1:8000/api/cartitems/${itemId}/`, {
+      await axios.delete(`https://prime-forest.ru/api/cartitems/${itemId}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -95,7 +95,7 @@ const Cart = () => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/cartitems/${itemId}/`,
+        `https://prime-forest.ru/api/cartitems/${itemId}/`,
         { quantity: newQuantity },
         {
           headers: {
@@ -126,7 +126,7 @@ const Cart = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
