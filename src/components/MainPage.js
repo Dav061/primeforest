@@ -121,8 +121,13 @@ const MainPage = () => {
   return (
     <>
       <Helmet>
-        <title>Prime-Forest - пиломатериалы от производителя в Москве и МО</title>
-        <meta name="description" content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области." />
+        <title>
+          Prime-Forest - пиломатериалы от производителя в Москве и МО
+        </title>
+        <meta
+          name="description"
+          content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области."
+        />
       </Helmet>
       <div className="main-page">
         {/* ГЕРОЙ СЕКЦИЯ */}
@@ -261,7 +266,9 @@ const MainPage = () => {
                           "Пиломатериалы"}
                       </p>
                       <div className="product-price">
-                        {product.price ? `${product.price} ₽` : "Цена по запросу"}
+                        {product.price
+                          ? `${product.price} ₽`
+                          : "Цена по запросу"}
                       </div>
                     </div>
                   </div>
@@ -351,7 +358,8 @@ const MainPage = () => {
                 ))}
               </div>
               <p className="review-text">
-                "Отличное качество досок. Быстрая доставка. Буду заказывать ещё."
+                "Отличное качество досок. Быстрая доставка. Буду заказывать
+                ещё."
               </p>
               <div className="review-author">
                 <div className="review-avatar-placeholder">АП</div>

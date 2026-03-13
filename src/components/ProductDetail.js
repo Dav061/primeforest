@@ -108,16 +108,25 @@ const ProductDetail = () => {
   // Проверяем, есть ли хотя бы один размер
   const hasSizes = product.width || product.thickness || product.length;
 
-  const productDescription = product.description 
-    ? product.description.substring(0, 160) 
-    : `${product.name}. ${product.wood_type || 'Древесина'}, сорт ${product.grade || '1'}. Размеры: ${product.thickness || '?'}x${product.width || '?'}x${product.length || '?'} мм. Доставка по Москве и МО.`;
+  const productDescription = product.description
+    ? product.description.substring(0, 160)
+    : `${product.name}. ${product.wood_type || "Древесина"}, сорт ${
+        product.grade || "1"
+      }. Размеры: ${product.thickness || "?"}x${product.width || "?"}x${
+        product.length || "?"
+      } мм. Доставка по Москве и МО.`;
 
   return (
     <>
       <Helmet>
         <title>{product.name} - купить в Москве | Prime-Forest</title>
         <meta name="description" content={productDescription} />
-        {product.wood_type && <meta name="keywords" content={`${product.wood_type}, пиломатериалы, ${product.name}, доска, брус, Москва`} />}
+        {product.wood_type && (
+          <meta
+            name="keywords"
+            content={`${product.wood_type}, пиломатериалы, ${product.name}, доска, брус, Москва`}
+          />
+        )}
       </Helmet>
       <div className="product-detail">
         <Button
@@ -217,7 +226,9 @@ const ProductDetail = () => {
                       {product.length && (
                         <span className="size-badge">
                           <span className="size-label">Длина:</span>
-                          <span className="size-value">{product.length} мм</span>
+                          <span className="size-value">
+                            {product.length} мм
+                          </span>
                         </span>
                       )}
                     </div>

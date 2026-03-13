@@ -68,7 +68,10 @@ const Register = () => {
     <>
       <Helmet>
         <title>Регистрация - Prime-Forest | Создание личного кабинета</title>
-        <meta name="description" content="Регистрация в интернет-магазине пиломатериалов Prime-Forest. Сохраняйте историю заказов, отслеживайте доставку по Москве и МО." />
+        <meta
+          name="description"
+          content="Регистрация в интернет-магазине пиломатериалов Prime-Forest. Сохраняйте историю заказов, отслеживайте доставку по Москве и МО."
+        />
       </Helmet>
       <div className="register-page">
         <div className="register-header">

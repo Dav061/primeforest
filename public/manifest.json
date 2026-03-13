@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Prime-Forest",
+  "name": "Prime-Forest - пиломатериалы от производителя",
   "icons": [
     {
       "src": "favicon.ico",
@@ -15,11 +15,11 @@
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512"  
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#2e7d32",
   "background_color": "#ffffff"
 }

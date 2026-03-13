@@ -128,7 +128,10 @@ const Profile = () => {
     <>
       <Helmet>
         <title>Личный кабинет - Prime-Forest | История заказов</title>
-        <meta name="description" content="Личный кабинет Prime-Forest. Просмотр истории заказов пиломатериалов, отслеживание статуса доставки по Москве и МО." />
+        <meta
+          name="description"
+          content="Личный кабинет Prime-Forest. Просмотр истории заказов пиломатериалов, отслеживание статуса доставки по Москве и МО."
+        />
       </Helmet>
       <div className="profile">
         <h1 className="page-title">Личный кабинет</h1>
@@ -143,7 +146,11 @@ const Profile = () => {
               <strong>Email:</strong> {user.email || "не указан"}
             </p>
           </div>
-          <Button variant="contained" onClick={logout} className="logout-button">
+          <Button
+            variant="contained"
+            onClick={logout}
+            className="logout-button"
+          >
             Выйти
           </Button>
         </div>
@@ -229,7 +236,9 @@ const Profile = () => {
                   <h3>Информация о доставке</h3>
                   <div className="detail-row">
                     <span className="detail-label">Адрес:</span>
-                    <span className="detail-value">{selectedOrder.address}</span>
+                    <span className="detail-value">
+                      {selectedOrder.address}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Телефон:</span>

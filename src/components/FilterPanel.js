@@ -214,8 +214,13 @@ const FilterPanel = ({ onClose }) => {
   return (
     <>
       <Helmet>
-        <title>Фильтр пиломатериалов - Prime-Forest | Подбор по параметрам</title>
-        <meta name="description" content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена. Доска, брус, OSB, фанера, вагонка." />
+        <title>
+          Фильтр пиломатериалов - Prime-Forest | Подбор по параметрам
+        </title>
+        <meta
+          name="description"
+          content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена. Доска, брус, OSB, фанера, вагонка."
+        />
       </Helmet>
       <Box className="filter-panel">
         <Accordion defaultExpanded>

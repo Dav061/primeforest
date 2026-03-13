@@ -315,7 +315,8 @@ const ProductList = () => {
 
   // Определяем заголовок в зависимости от параметров
   const getTitle = () => {
-    if (searchParam) return `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`;
+    if (searchParam)
+      return `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`;
     if (categoryName) return `${categoryName} - купить в Москве | Prime-Forest`;
     return "Пиломатериалы - каталог | Prime-Forest";
   };

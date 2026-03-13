@@ -328,7 +328,10 @@ const Cart = () => {
     <>
       <Helmet>
         <title>Корзина - Prime-Forest | Пиломатериалы в Москве</title>
-        <meta name="description" content="Ваша корзина с пиломатериалами. Доска, брус, OSB, фанера и другие материалы. Оформляйте заказ с доставкой по Москве и Московской области." />
+        <meta
+          name="description"
+          content="Ваша корзина с пиломатериалами. Доска, брус, OSB, фанера и другие материалы. Оформляйте заказ с доставкой по Москве и Московской области."
+        />
       </Helmet>
       <div className="container cart">
         <h1 className="page-title">Корзина</h1>
@@ -340,8 +343,8 @@ const Cart = () => {
               <Link to="/login" state={{ from: "/cart" }}>
                 войдите
               </Link>{" "}
-              или <Link to="/register">зарегистрируйтесь</Link>. Собранная корзина
-              автоматически синхронизируется.
+              или <Link to="/register">зарегистрируйтесь</Link>. Собранная
+              корзина автоматически синхронизируется.
             </p>
           </div>
         )}
@@ -412,7 +415,9 @@ const Cart = () => {
                         </button>
 
                         <input
-                          ref={(el) => (inputRefs.current[item.product.id] = el)}
+                          ref={(el) =>
+                            (inputRefs.current[item.product.id] = el)
+                          }
                           type="number"
                           min="1"
                           value={
@@ -497,7 +502,8 @@ const Cart = () => {
             <div className="delivery-info">
               <h3>🚚 Информация о доставке</h3>
               <p>
-                Стоимость доставки рассчитывается индивидуально для каждого адреса
+                Стоимость доставки рассчитывается индивидуально для каждого
+                адреса
               </p>
               <div className="delivery-calculator">
                 <p>

@@ -1,6 +1,7 @@
 // src/App.js
 import React, { useLayoutEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async"; // или 'react-helmet' - оба работают
 import { AuthProvider } from "./AuthContext";
 import { CartProvider } from "./CartContext";
 import Navbar from "./components/Navbar";
@@ -10,7 +11,7 @@ import CategoryList from "./components/CategoryList";
 import ProductDetail from "./components/ProductDetail";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
-import OrderSuccess from "./components/OrderSuccess"; // ИМПОРТИРУЕМ НОВЫЙ КОМПОНЕНТ
+import OrderSuccess from "./components/OrderSuccess";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AboutPage from "./components/AboutPage";
@@ -21,6 +22,7 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import Promotions from "./components/Promotions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -45,8 +47,8 @@ function AppContent() {
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/catalog/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} /> {/* Убрали ProtectedRoute */}
-        <Route path="/order-success" element={<OrderSuccess />} /> {/* НОВЫЙ МАРШРУТ */}
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<AboutPage />} />
@@ -75,24 +77,26 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-          <AppContent />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+    <HelmetProvider> {/* ← ВАЖНО: добавьте этот компонент */}
+      <AuthProvider>
+        <CartProvider>
+          <Router>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+            <AppContent />
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

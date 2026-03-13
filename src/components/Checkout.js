@@ -125,8 +125,13 @@ const Checkout = () => {
   return (
     <>
       <Helmet>
-        <title>Оформление заказа - Prime-Forest | Пиломатериалы с доставкой</title>
-        <meta name="description" content="Оформление заказа на пиломатериалы. Доставка по Москве и Московской области. Доска, брус, OSB, фанера, вагонка, имитация бруса." />
+        <title>
+          Оформление заказа - Prime-Forest | Пиломатериалы с доставкой
+        </title>
+        <meta
+          name="description"
+          content="Оформление заказа на пиломатериалы. Доставка по Москве и Московской области. Доска, брус, OSB, фанера, вагонка, имитация бруса."
+        />
       </Helmet>
       <div className="checkout-page">
         <div className="checkout-header">
@@ -243,7 +248,11 @@ const Checkout = () => {
           </div>
 
           {error && (
-            <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
+            <Alert
+              severity="error"
+              sx={{ mt: 2 }}
+              onClose={() => setError(null)}
+            >
               {error}
             </Alert>
           )}
