@@ -26,6 +26,7 @@ const Register = () => {
     setLoading(true);
 
     try {
+<<<<<<< HEAD
       const response = await axios.post(
         "https://prime-forest.ru/api/register/",
         {
@@ -37,6 +38,15 @@ const Register = () => {
           withCredentials: true,
         }
       );
+=======
+      const response = await axios.post("https://prime-forest.ru/api/register/", {
+        username,
+        password,
+        email,
+      }, {
+        withCredentials: true
+      });
+>>>>>>> d43d602d181320f13df1bd722f28f1b221134805
 
       localStorage.setItem("token", response.data.tokens.access);
 

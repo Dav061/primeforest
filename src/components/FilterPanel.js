@@ -73,12 +73,18 @@ const FilterPanel = ({ onClose }) => {
 
       console.log("📊 Fetching filter values with params:", params);
 
+<<<<<<< HEAD
       const response = await axios.get(
         "https://prime-forest.ru/api/products/",
         {
           params,
         }
       );
+=======
+      const response = await axios.get("https://prime-forest.ru/api/products/", {
+        params,
+      });
+>>>>>>> d43d602d181320f13df1bd722f28f1b221134805
       const products = response.data.results || [];
 
       // Извлекаем уникальные значения из отфильтрованных товаров

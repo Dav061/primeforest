@@ -143,12 +143,18 @@ const ProductList = () => {
     console.log("📤 Fetching with params:", params);
 
     try {
+<<<<<<< HEAD
       const response = await axios.get(
         "https://prime-forest.ru/api/products/",
         {
           params,
         }
       );
+=======
+      const response = await axios.get("https://prime-forest.ru/api/products/", {
+        params,
+      });
+>>>>>>> d43d602d181320f13df1bd722f28f1b221134805
 
       if (response.data) {
         const productsData = response.data.results || [];
