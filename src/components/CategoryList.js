@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { ChevronRight } from "lucide-react";
+import { Helmet } from "react-helmet";
 import "../styles.scss";
 
 const CategoryList = () => {
@@ -54,44 +55,50 @@ const CategoryList = () => {
   }
 
   return (
-    <div className="category-list">
-      <div className="categories-grid">
-        {categories.map((category) => (
-          <Link
-            to={`/catalog?category=${category.id}`}
-            key={category.id}
-            className="category-link"
-          >
-            <Card className="category-card">
-              <div className="category-image-wrapper">
-                {category.image_url ? (
-                  <img
-                    src={category.image_url}
-                    alt={category.name}
-                    className="category-image"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="category-image-placeholder">
-                    <span>{category.name.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-              <CardContent className="category-card-content">
-                <Typography
-                  variant="h5"
-                  component="div"
-                  className="category-title"
-                >
-                  {category.name}
-                </Typography>
-                <ChevronRight size={20} className="category-arrow" />
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+    <>
+      <Helmet>
+        <title>Категории пиломатериалов - Prime-Forest | Доска, брус, OSB, фанера</title>
+        <meta name="description" content="Все категории пиломатериалов: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и МО." />
+      </Helmet>
+      <div className="category-list">
+        <div className="categories-grid">
+          {categories.map((category) => (
+            <Link
+              to={`/catalog?category=${category.id}`}
+              key={category.id}
+              className="category-link"
+            >
+              <Card className="category-card">
+                <div className="category-image-wrapper">
+                  {category.image_url ? (
+                    <img
+                      src={category.image_url}
+                      alt={category.name}
+                      className="category-image"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="category-image-placeholder">
+                      <span>{category.name.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
+                <CardContent className="category-card-content">
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    className="category-title"
+                  >
+                    {category.name}
+                  </Typography>
+                  <ChevronRight size={20} className="category-arrow" />
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

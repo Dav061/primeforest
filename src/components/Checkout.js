@@ -8,6 +8,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Helmet } from "react-helmet";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
@@ -122,127 +123,133 @@ const Checkout = () => {
   const isFormValid = address && phoneNumber;
 
   return (
-    <div className="checkout-page">
-      <div className="checkout-header">
-        <Button
-          variant="contained"
-          onClick={() => navigate("/cart")}
-          className="back-to-cart-btn"
-          startIcon={<ArrowBackIcon />}
-        >
-          Назад
-        </Button>
-        <h1 className="checkout-title">Оформление заказа</h1>
-      </div>
+    <>
+      <Helmet>
+        <title>Оформление заказа - Prime-Forest | Пиломатериалы с доставкой</title>
+        <meta name="description" content="Оформление заказа на пиломатериалы. Доставка по Москве и Московской области. Доска, брус, OSB, фанера, вагонка, имитация бруса." />
+      </Helmet>
+      <div className="checkout-page">
+        <div className="checkout-header">
+          <Button
+            variant="contained"
+            onClick={() => navigate("/cart")}
+            className="back-to-cart-btn"
+            startIcon={<ArrowBackIcon />}
+          >
+            Назад
+          </Button>
+          <h1 className="checkout-title">Оформление заказа</h1>
+        </div>
 
-      <div className="checkout-form">
-        <div className="form-section">
-          <h2>Контактные данные</h2>
+        <div className="checkout-form">
+          <div className="form-section">
+            <h2>Контактные данные</h2>
 
-          {/* Номер телефона - обязателен */}
-          <TextField
-            label="Номер телефона"
-            fullWidth
-            margin="normal"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="+7 (999) 123-45-67"
-            required
-            error={error && !phoneNumber}
-          />
-
-          {user && (
+            {/* Номер телефона - обязателен */}
             <TextField
-              label="Email"
+              label="Номер телефона"
               fullWidth
               margin="normal"
-              value={user.email || ""}
-              disabled
-              helperText="Ваш email из профиля"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+7 (999) 123-45-67"
+              required
+              error={error && !phoneNumber}
             />
-          )}
 
-          {!user && (
-            <>
-              <TextField
-                label="Ваше имя"
-                fullWidth
-                margin="normal"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Как к вам обращаться?"
-                helperText="Необязательно"
-              />
-
+            {user && (
               <TextField
                 label="Email"
-                type="email"
                 fullWidth
                 margin="normal"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                placeholder="Почта"
-                helperText="Необязательно"
+                value={user.email || ""}
+                disabled
+                helperText="Ваш email из профиля"
               />
-            </>
+            )}
+
+            {!user && (
+              <>
+                <TextField
+                  label="Ваше имя"
+                  fullWidth
+                  margin="normal"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="Как к вам обращаться?"
+                  helperText="Необязательно"
+                />
+
+                <TextField
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  margin="normal"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="Почта"
+                  helperText="Необязательно"
+                />
+              </>
+            )}
+          </div>
+
+          {/* Адрес доставки - обязателен */}
+          <div className="form-section">
+            <h2>Адрес доставки</h2>
+
+            <TextField
+              label="Адрес доставки"
+              fullWidth
+              margin="normal"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Город, улица, дом, квартира"
+              required
+              multiline
+              rows={2}
+              error={error && !address}
+            />
+          </div>
+
+          {/* Комментарий - необязательный */}
+          <div className="form-section">
+            <h2>Комментарий к заказу</h2>
+
+            <TextField
+              label="Комментарий"
+              fullWidth
+              margin="normal"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Укажите дополнительную информацию: подъезд, домофон, пожелания по доставке и т.д."
+              multiline
+              rows={3}
+            />
+          </div>
+
+          <div className="checkout-actions">
+            <Button
+              onClick={handleCheckout}
+              disabled={loading || !isFormValid}
+              variant="contained"
+              color="primary"
+              className="submit-order-btn"
+              fullWidth
+              size="large"
+            >
+              {loading ? "Оформление..." : "Подтвердить заказ"}
+            </Button>
+          </div>
+
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
+              {error}
+            </Alert>
           )}
         </div>
-
-        {/* Адрес доставки - обязателен */}
-        <div className="form-section">
-          <h2>Адрес доставки</h2>
-
-          <TextField
-            label="Адрес доставки"
-            fullWidth
-            margin="normal"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Город, улица, дом, квартира"
-            required
-            multiline
-            rows={2}
-            error={error && !address}
-          />
-        </div>
-
-        {/* Комментарий - необязательный */}
-        <div className="form-section">
-          <h2>Комментарий к заказу</h2>
-
-          <TextField
-            label="Комментарий"
-            fullWidth
-            margin="normal"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Укажите дополнительную информацию: подъезд, домофон, пожелания по доставке и т.д."
-            multiline
-            rows={3}
-          />
-        </div>
-
-        <div className="checkout-actions">
-          <Button
-            onClick={handleCheckout}
-            disabled={loading || !isFormValid}
-            variant="contained"
-            color="primary"
-            className="submit-order-btn"
-            fullWidth
-            size="large"
-          >
-            {loading ? "Оформление..." : "Подтвердить заказ"}
-          </Button>
-        </div>
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
       </div>
-    </div>
+    </>
   );
 };
 

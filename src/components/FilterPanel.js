@@ -16,6 +16,7 @@ import {
 import { ChevronDown, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 import "../styles.scss";
 
 const FilterPanel = ({ onClose }) => {
@@ -211,202 +212,208 @@ const FilterPanel = ({ onClose }) => {
   const hasSearch = queryParams.get("search");
 
   return (
-    <Box className="filter-panel">
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-          <Typography>Сортировка</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <FormControl fullWidth size="small">
-            <InputLabel>Сортировать по</InputLabel>
-            <Select
-              name="ordering"
-              value={filters.ordering}
-              onChange={handleFilterChange}
-              label="Сортировать по"
-            >
-              {sortingOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion>
-        <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-          <Typography>Цена</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Box className="price-range">
-            <TextField
-              name="min_price"
-              label="От"
-              type="number"
-              size="small"
-              value={filters.min_price}
-              onChange={handleFilterChange}
-              fullWidth
-            />
-            <TextField
-              name="max_price"
-              label="До"
-              type="number"
-              size="small"
-              value={filters.max_price}
-              onChange={handleFilterChange}
-              fullWidth
-            />
-          </Box>
-        </AccordionDetails>
-      </Accordion>
-
-      {availableValues.wood_types.length > 0 && (
-        <Accordion>
+    <>
+      <Helmet>
+        <title>Фильтр пиломатериалов - Prime-Forest | Подбор по параметрам</title>
+        <meta name="description" content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена. Доска, брус, OSB, фанера, вагонка." />
+      </Helmet>
+      <Box className="filter-panel">
+        <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-            <Typography>Порода дерева</Typography>
+            <Typography>Сортировка</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormControl fullWidth size="small">
+              <InputLabel>Сортировать по</InputLabel>
               <Select
-                name="wood_type"
-                value={filters.wood_type}
+                name="ordering"
+                value={filters.ordering}
                 onChange={handleFilterChange}
-                displayEmpty
+                label="Сортировать по"
               >
-                <MenuItem value="">Все породы</MenuItem>
-                {availableValues.wood_types.map((type, index) => (
-                  <MenuItem key={index} value={type}>
-                    {type}
+                {sortingOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </AccordionDetails>
         </Accordion>
-      )}
 
-      {availableValues.grades.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-            <Typography>Сорт</Typography>
+            <Typography>Цена</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <FormControl fullWidth size="small">
-              <Select
-                name="grade"
-                value={filters.grade}
+            <Box className="price-range">
+              <TextField
+                name="min_price"
+                label="От"
+                type="number"
+                size="small"
+                value={filters.min_price}
                 onChange={handleFilterChange}
-                displayEmpty
-              >
-                <MenuItem value="">Все сорта</MenuItem>
-                {availableValues.grades.map((grade, index) => (
-                  <MenuItem key={index} value={grade}>
-                    {grade}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                fullWidth
+              />
+              <TextField
+                name="max_price"
+                label="До"
+                type="number"
+                size="small"
+                value={filters.max_price}
+                onChange={handleFilterChange}
+                fullWidth
+              />
+            </Box>
           </AccordionDetails>
         </Accordion>
-      )}
 
-      {availableValues.widths.length > 0 && (
-        <Accordion>
-          <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-            <Typography>Ширина (мм)</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <FormControl fullWidth size="small">
-              <Select
-                name="width"
-                value={filters.width}
-                onChange={handleFilterChange}
-                displayEmpty
-              >
-                <MenuItem value="">Любая ширина</MenuItem>
-                {availableValues.widths.map((width, index) => (
-                  <MenuItem key={index} value={width}>
-                    {width} мм
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </AccordionDetails>
-        </Accordion>
-      )}
+        {availableValues.wood_types.length > 0 && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ChevronDown size={20} />}>
+              <Typography>Порода дерева</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="wood_type"
+                  value={filters.wood_type}
+                  onChange={handleFilterChange}
+                  displayEmpty
+                >
+                  <MenuItem value="">Все породы</MenuItem>
+                  {availableValues.wood_types.map((type, index) => (
+                    <MenuItem key={index} value={type}>
+                      {type}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        )}
 
-      {availableValues.thicknesses.length > 0 && (
-        <Accordion>
-          <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-            <Typography>Толщина (мм)</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <FormControl fullWidth size="small">
-              <Select
-                name="thickness"
-                value={filters.thickness}
-                onChange={handleFilterChange}
-                displayEmpty
-              >
-                <MenuItem value="">Любая толщина</MenuItem>
-                {availableValues.thicknesses.map((thickness, index) => (
-                  <MenuItem key={index} value={thickness}>
-                    {thickness} мм
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </AccordionDetails>
-        </Accordion>
-      )}
+        {availableValues.grades.length > 0 && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ChevronDown size={20} />}>
+              <Typography>Сорт</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="grade"
+                  value={filters.grade}
+                  onChange={handleFilterChange}
+                  displayEmpty
+                >
+                  <MenuItem value="">Все сорта</MenuItem>
+                  {availableValues.grades.map((grade, index) => (
+                    <MenuItem key={index} value={grade}>
+                      {grade}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        )}
 
-      {availableValues.lengths.length > 0 && (
-        <Accordion>
-          <AccordionSummary expandIcon={<ChevronDown size={20} />}>
-            <Typography>Длина (мм)</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <FormControl fullWidth size="small">
-              <Select
-                name="length"
-                value={filters.length}
-                onChange={handleFilterChange}
-                displayEmpty
-              >
-                <MenuItem value="">Любая длина</MenuItem>
-                {availableValues.lengths.map((length, index) => (
-                  <MenuItem key={index} value={length}>
-                    {length} мм
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </AccordionDetails>
-        </Accordion>
-      )}
+        {availableValues.widths.length > 0 && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ChevronDown size={20} />}>
+              <Typography>Ширина (мм)</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="width"
+                  value={filters.width}
+                  onChange={handleFilterChange}
+                  displayEmpty
+                >
+                  <MenuItem value="">Любая ширина</MenuItem>
+                  {availableValues.widths.map((width, index) => (
+                    <MenuItem key={index} value={width}>
+                      {width} мм
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        )}
 
-      <Box className="filter-actions">
-        <Button
-          variant="contained"
-          onClick={handleApplyFilters}
-          fullWidth
-          disabled={!hasActiveFilters() && !hasSearch}
-        >
-          Применить
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={handleResetFilters}
-          fullWidth
-          disabled={!hasActiveFilters() && !hasSearch}
-        >
-          Сбросить фильтры
-        </Button>
+        {availableValues.thicknesses.length > 0 && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ChevronDown size={20} />}>
+              <Typography>Толщина (мм)</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="thickness"
+                  value={filters.thickness}
+                  onChange={handleFilterChange}
+                  displayEmpty
+                >
+                  <MenuItem value="">Любая толщина</MenuItem>
+                  {availableValues.thicknesses.map((thickness, index) => (
+                    <MenuItem key={index} value={thickness}>
+                      {thickness} мм
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        {availableValues.lengths.length > 0 && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ChevronDown size={20} />}>
+              <Typography>Длина (мм)</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl fullWidth size="small">
+                <Select
+                  name="length"
+                  value={filters.length}
+                  onChange={handleFilterChange}
+                  displayEmpty
+                >
+                  <MenuItem value="">Любая длина</MenuItem>
+                  {availableValues.lengths.map((length, index) => (
+                    <MenuItem key={index} value={length}>
+                      {length} мм
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        <Box className="filter-actions">
+          <Button
+            variant="contained"
+            onClick={handleApplyFilters}
+            fullWidth
+            disabled={!hasActiveFilters() && !hasSearch}
+          >
+            Применить
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={handleResetFilters}
+            fullWidth
+            disabled={!hasActiveFilters() && !hasSearch}
+          >
+            Сбросить фильтры
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
+import { Helmet } from "react-helmet";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -40,62 +41,68 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-header">
-        <IconButton 
-          className="back-button" 
-          onClick={handleGoBack}
-          aria-label="назад"
-        >
-          <ArrowBackIcon />
-          <span className="back-button-text">Назад</span>
-        </IconButton>
-      </div>
-      
-      <div className="login-form">
-        <h2>Вход</h2>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Логин"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Пароль"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            fullWidth
-            className="submit-btn"
+    <>
+      <Helmet>
+        <title>Вход в личный кабинет - Prime-Forest | Пиломатериалы</title>
+        <meta name="description" content="Вход в личный кабинет Prime-Forest. Отслеживайте статус заказов, сохраняйте историю покупок пиломатериалов." />
+      </Helmet>
+      <div className="login-page">
+        <div className="login-header">
+          <IconButton 
+            className="back-button" 
+            onClick={handleGoBack}
+            aria-label="назад"
           >
-            {loading ? "Вход..." : "Войти"}
-          </Button>
-          <Link to="/register" style={{ textDecoration: "none" }}>
-            <Button
-              variant="outlined"
-              color="primary"
+            <ArrowBackIcon />
+            <span className="back-button-text">Назад</span>
+          </IconButton>
+        </div>
+        
+        <div className="login-form">
+          <h2>Вход</h2>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Логин"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               fullWidth
-              className="register-btn"
-              style={{ marginTop: "10px" }}
+              margin="normal"
+              required
+            />
+            <TextField
+              label="Пароль"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              fullWidth
+              className="submit-btn"
             >
-              Зарегистрироваться
+              {loading ? "Вход..." : "Войти"}
             </Button>
-          </Link>
-        </form>
+            <Link to="/register" style={{ textDecoration: "none" }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                fullWidth
+                className="register-btn"
+                style={{ marginTop: "10px" }}
+              >
+                Зарегистрироваться
+              </Button>
+            </Link>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

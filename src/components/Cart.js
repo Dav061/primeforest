@@ -15,6 +15,7 @@ import { CartContext } from "../CartContext";
 import { AuthContext } from "../AuthContext";
 import "../styles.scss";
 import { notifyError, notifySuccess } from "../utils/notifications";
+import { Helmet } from "react-helmet";
 
 const Cart = () => {
   const { user } = useContext(AuthContext);
@@ -324,192 +325,198 @@ const Cart = () => {
   const isGuestCart = !user && Object.keys(cartItems).length > 0;
 
   return (
-    <div className="container cart">
-      <h1 className="page-title">Корзина</h1>
+    <>
+      <Helmet>
+        <title>Корзина - Prime-Forest | Пиломатериалы в Москве</title>
+        <meta name="description" content="Ваша корзина с пиломатериалами. Доска, брус, OSB, фанера и другие материалы. Оформляйте заказ с доставкой по Москве и Московской области." />
+      </Helmet>
+      <div className="container cart">
+        <h1 className="page-title">Корзина</h1>
 
-      {!user && (
-        <div className="guest-cart-notice">
-          <p>
-            ⚡ Для сохранения истории заказа, пожалуйста,{" "}
-            <Link to="/login" state={{ from: "/cart" }}>
-              войдите
-            </Link>{" "}
-            или <Link to="/register">зарегистрируйтесь</Link>. Собранная корзина
-            автоматически синхронизируется.
-          </p>
-        </div>
-      )}
+        {!user && (
+          <div className="guest-cart-notice">
+            <p>
+              ⚡ Для сохранения истории заказа, пожалуйста,{" "}
+              <Link to="/login" state={{ from: "/cart" }}>
+                войдите
+              </Link>{" "}
+              или <Link to="/register">зарегистрируйтесь</Link>. Собранная корзина
+              автоматически синхронизируется.
+            </p>
+          </div>
+        )}
 
-      {itemsToShow.length === 0 ? (
-        <div className="empty-cart">
-          <h2>Ваша корзина пуста</h2>
-          <p>Добавьте товары из каталога, чтобы оформить заказ</p>
-          <Link to="/products" className="btn primary">
-            Перейти к товарам
-          </Link>
-        </div>
-      ) : (
-        <div className="cart-content">
-          <div className="cart-items">
-            {itemsToShow.map((item) => (
-              <div
-                key={item.id}
-                className={`cart-item ${
-                  updatingItems[item.product.id] ? "updating" : ""
-                }`}
-                onClick={(e) => handleProductClick(item.product.id, e)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="cart-item-image">
-                  <img
-                    src={getImageUrl(item.product?.main_image)}
-                    alt={item.product?.name}
-                    onError={(e) => {
-                      e.target.src = "/default-product.jpg";
-                    }}
-                  />
-                  {updatingItems[item.product.id] && (
-                    <div className="item-update-loader">
-                      <CircularProgress size={24} />
+        {itemsToShow.length === 0 ? (
+          <div className="empty-cart">
+            <h2>Ваша корзина пуста</h2>
+            <p>Добавьте товары из каталога, чтобы оформить заказ</p>
+            <Link to="/products" className="btn primary">
+              Перейти к товарам
+            </Link>
+          </div>
+        ) : (
+          <div className="cart-content">
+            <div className="cart-items">
+              {itemsToShow.map((item) => (
+                <div
+                  key={item.id}
+                  className={`cart-item ${
+                    updatingItems[item.product.id] ? "updating" : ""
+                  }`}
+                  onClick={(e) => handleProductClick(item.product.id, e)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="cart-item-image">
+                    <img
+                      src={getImageUrl(item.product?.main_image)}
+                      alt={item.product?.name}
+                      onError={(e) => {
+                        e.target.src = "/default-product.jpg";
+                      }}
+                    />
+                    {updatingItems[item.product.id] && (
+                      <div className="item-update-loader">
+                        <CircularProgress size={24} />
+                      </div>
+                    )}
+                    {/* Добавляем иконку для указания возможности перехода */}
+                    <div className="cart-item-view-overlay">
+                      <Eye size={20} />
                     </div>
-                  )}
-                  {/* Добавляем иконку для указания возможности перехода */}
-                  <div className="cart-item-view-overlay">
-                    <Eye size={20} />
-                  </div>
-                </div>
-
-                <div className="cart-item-info">
-                  <h3 className="cart-item-title">{item.product?.name}</h3>
-                  <div className="cart-item-price">
-                    {item.product?.price} руб.
                   </div>
 
-                  <div className="cart-item-details">
-                    <div className="cart-counter">
-                      <button
-                        className="counter-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleButtonClick(
-                            item.product.id,
-                            item.quantity - 1,
-                            !user
-                          );
-                        }}
-                        onMouseUp={(e) => e.target.blur()}
-                        disabled={
-                          item.quantity <= 1 || updatingItems[item.product.id]
-                        }
-                      >
-                        <Minus size={16} />
-                      </button>
-
-                      <input
-                        ref={(el) => (inputRefs.current[item.product.id] = el)}
-                        type="number"
-                        min="1"
-                        value={
-                          inputValues[item.product.id] ||
-                          item.quantity.toString()
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) =>
-                          handleInputChange(item.product.id, e.target.value)
-                        }
-                        onBlur={(e) =>
-                          handleInputBlur(
-                            item.product.id,
-                            e.target.value,
-                            !user
-                          )
-                        }
-                        onKeyDown={(e) =>
-                          handleInputKeyDown(e, item.product.id, !user)
-                        }
-                        className="counter-input"
-                        disabled={updatingItems[item.product.id]}
-                      />
-
-                      <button
-                        className="counter-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleButtonClick(
-                            item.product.id,
-                            item.quantity + 1,
-                            !user
-                          );
-                        }}
-                        onMouseUp={(e) => e.target.blur()}
-                        disabled={updatingItems[item.product.id]}
-                      >
-                        <Plus size={16} />
-                      </button>
+                  <div className="cart-item-info">
+                    <h3 className="cart-item-title">{item.product?.name}</h3>
+                    <div className="cart-item-price">
+                      {item.product?.price} руб.
                     </div>
 
-                    <span className="item-total">
-                      {(item.product?.price * item.quantity).toFixed(2)} руб.
-                    </span>
+                    <div className="cart-item-details">
+                      <div className="cart-counter">
+                        <button
+                          className="counter-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleButtonClick(
+                              item.product.id,
+                              item.quantity - 1,
+                              !user
+                            );
+                          }}
+                          onMouseUp={(e) => e.target.blur()}
+                          disabled={
+                            item.quantity <= 1 || updatingItems[item.product.id]
+                          }
+                        >
+                          <Minus size={16} />
+                        </button>
 
-                    <button
-                      className="remove-btn"
-                      onClick={(e) => handleRemove(item.product.id, !user, e)}
-                      onMouseUp={(e) => e.target.blur()}
-                      disabled={updatingItems[item.product.id]}
-                      title="Удалить"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                        <input
+                          ref={(el) => (inputRefs.current[item.product.id] = el)}
+                          type="number"
+                          min="1"
+                          value={
+                            inputValues[item.product.id] ||
+                            item.quantity.toString()
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) =>
+                            handleInputChange(item.product.id, e.target.value)
+                          }
+                          onBlur={(e) =>
+                            handleInputBlur(
+                              item.product.id,
+                              e.target.value,
+                              !user
+                            )
+                          }
+                          onKeyDown={(e) =>
+                            handleInputKeyDown(e, item.product.id, !user)
+                          }
+                          className="counter-input"
+                          disabled={updatingItems[item.product.id]}
+                        />
+
+                        <button
+                          className="counter-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleButtonClick(
+                              item.product.id,
+                              item.quantity + 1,
+                              !user
+                            );
+                          }}
+                          onMouseUp={(e) => e.target.blur()}
+                          disabled={updatingItems[item.product.id]}
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+
+                      <span className="item-total">
+                        {(item.product?.price * item.quantity).toFixed(2)} руб.
+                      </span>
+
+                      <button
+                        className="remove-btn"
+                        onClick={(e) => handleRemove(item.product.id, !user, e)}
+                        onMouseUp={(e) => e.target.blur()}
+                        disabled={updatingItems[item.product.id]}
+                        title="Удалить"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="cart-summary">
+              <h2>Ваш заказ</h2>
+              <div className="summary-row">
+                <span>Позиций ({itemsToShow.length})</span>
+                <span>{totalPrice.toFixed(2)} руб.</span>
               </div>
-            ))}
-          </div>
+              <div className="summary-row">
+                <span>Доставка</span>
+                <span>Рассчитывается менеджером</span>
+              </div>
+              <div className="summary-row total">
+                <span>Итого</span>
+                <span>{totalPrice.toFixed(2)} руб.</span>
+              </div>
 
-          <div className="cart-summary">
-            <h2>Ваш заказ</h2>
-            <div className="summary-row">
-              <span>Позиций ({itemsToShow.length})</span>
-              <span>{totalPrice.toFixed(2)} руб.</span>
-            </div>
-            <div className="summary-row">
-              <span>Доставка</span>
-              <span>Рассчитывается менеджером</span>
-            </div>
-            <div className="summary-row total">
-              <span>Итого</span>
-              <span>{totalPrice.toFixed(2)} руб.</span>
+              {/* ИСПРАВЛЕННАЯ КНОПКА - теперь всегда "Оформить заказ" */}
+              <button onClick={handleCheckout} className="checkout-btn">
+                Оформить заказ
+              </button>
             </div>
 
-            {/* ИСПРАВЛЕННАЯ КНОПКА - теперь всегда "Оформить заказ" */}
-            <button onClick={handleCheckout} className="checkout-btn">
-              Оформить заказ
-            </button>
-          </div>
-
-          <div className="delivery-info">
-            <h3>🚚 Информация о доставке</h3>
-            <p>
-              Стоимость доставки рассчитывается индивидуально для каждого адреса
-            </p>
-            <div className="delivery-calculator">
+            <div className="delivery-info">
+              <h3>🚚 Информация о доставке</h3>
               <p>
-                <strong>Ориентировочная стоимость:</strong>
+                Стоимость доставки рассчитывается индивидуально для каждого адреса
               </p>
-              <p>• В пределах МКАД: от 1500 ₽</p>
-              <p>• За МКАД (до 30 км): от 1000 ₽ + 80 ₽/км</p>
-              <p>• Дальше 30 км: рассчитывается менеджером</p>
+              <div className="delivery-calculator">
+                <p>
+                  <strong>Ориентировочная стоимость:</strong>
+                </p>
+                <p>• В пределах МКАД: от 1500 ₽</p>
+                <p>• За МКАД (до 30 км): от 1000 ₽ + 80 ₽/км</p>
+                <p>• Дальше 30 км: рассчитывается менеджером</p>
+              </div>
+              <p>
+                <small>
+                  Точную стоимость просьба уточнять перед оформлением заказа
+                </small>
+              </p>
             </div>
-            <p>
-              <small>
-                Точную стоимость просьба уточнять перед оформлением заказа
-              </small>
-            </p>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

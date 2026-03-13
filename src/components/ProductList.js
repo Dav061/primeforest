@@ -17,6 +17,7 @@ import {
 } from "lucide-react"; // Добавлен ArrowLeft
 import "../styles.scss";
 import ProductCard from "./ProductCard";
+import { Helmet } from "react-helmet";
 
 const ProductList = () => {
   const location = useLocation();
@@ -312,241 +313,264 @@ const ProductList = () => {
 
   if (error) return <div className="error-message">{error}</div>;
 
+  // Определяем заголовок в зависимости от параметров
+  const getTitle = () => {
+    if (searchParam) return `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`;
+    if (categoryName) return `${categoryName} - купить в Москве | Prime-Forest`;
+    return "Пиломатериалы - каталог | Prime-Forest";
+  };
+
+  const getDescription = () => {
+    if (searchParam) {
+      return `Результаты поиска "${searchParam}" в каталоге пиломатериалов. Доставка по Москве и Московской области.`;
+    }
+    if (categoryName) {
+      return `${categoryName} от производителя. Доставка по Москве и МО. Высокое качество, экологически чистые материалы.`;
+    }
+    return "Каталог пиломатериалов: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области.";
+  };
+
   return (
-    <div className="product-list">
-      {/* Заголовок категории с кнопкой назад */}
-      {categoryName && (
-        <div className="category-header-with-back">
-          <button
-            onClick={handleBackToCategories}
-            className="back-to-categories-btn"
-            aria-label="Назад к категориям"
-          >
-            <ArrowLeft size={20} />
-            <span>Все категории</span>
-          </button>
-          <h1 className="category-title-large">{categoryName}</h1>
-          <div className="header-placeholder"></div>{" "}
-          {/* Пустой div для баланса */}
-        </div>
-      )}
-
-      {/* Информация о результатах поиска */}
-      {searchParam && (
-        <div className="search-info">
-          <div className="search-info-header">
-            <div className="search-info-text">
-              <h2>Результаты поиска: "{searchParam}"</h2>
-              <p>Найдено товаров: {allProducts.length}</p>
-            </div>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<X size={16} />}
-              onClick={handleClearSearch}
-              className="clear-search-button"
+    <>
+      <Helmet>
+        <title>{getTitle()}</title>
+        <meta name="description" content={getDescription()} />
+      </Helmet>
+      <div className="product-list">
+        {/* Заголовок категории с кнопкой назад */}
+        {categoryName && (
+          <div className="category-header-with-back">
+            <button
+              onClick={handleBackToCategories}
+              className="back-to-categories-btn"
+              aria-label="Назад к категориям"
             >
-              Сбросить поиск
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Активные фильтры */}
-      {hasActiveFilters() && (
-        <div className="active-filters">
-          <div className="active-filters-header">
-            <div className="active-filters-title">
-              <Filter size={16} />
-              <span>Активные фильтры:</span>
-            </div>
-            <Button
-              variant="text"
-              size="small"
-              onClick={handleClearAllFilters}
-              className="clear-all-filters"
-            >
-              Очистить все
-            </Button>
-          </div>
-          <div className="active-filters-list">
-            {/* Порода дерева */}
-            {woodTypeParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("wood_type")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("wood_type", woodTypeParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("wood_type")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Сорт */}
-            {gradeParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("grade")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("grade", gradeParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("grade")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Ширина */}
-            {widthParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("width")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("width", widthParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("width")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Толщина */}
-            {thicknessParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("thickness")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("thickness", thicknessParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("thickness")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Длина */}
-            {lengthParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("length")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("length", lengthParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("length")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Цена от */}
-            {minPriceParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("min_price")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("min_price", minPriceParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("min_price")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Цена до */}
-            {maxPriceParam && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("max_price")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("max_price", maxPriceParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("max_price")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Сортировка */}
-            {orderingParam && orderingParam !== "" && (
-              <div className="filter-chip">
-                <span className="filter-chip-icon">
-                  {getFilterIcon("ordering")}
-                </span>
-                <span className="filter-chip-label">
-                  {getFilterLabel("ordering", orderingParam)}
-                </span>
-                <button
-                  className="filter-chip-remove"
-                  onClick={() => handleRemoveFilter("ordering")}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="products-grid">
-        {displayedProducts.length > 0 ? (
-          displayedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))
-        ) : (
-          <div className="no-products">
-            <p>Товары не найдены</p>
-            {hasActiveFilters() && (
-              <Button
-                variant="contained"
-                onClick={handleClearAllFilters}
-                className="reset-filters-button"
-              >
-                Сбросить все фильтры
-              </Button>
-            )}
+              <ArrowLeft size={20} />
+              <span>Все категории</span>
+            </button>
+            <h1 className="category-title-large">{categoryName}</h1>
+            <div className="header-placeholder"></div>{" "}
+            {/* Пустой div для баланса */}
           </div>
         )}
-      </div>
 
-      {totalPages > 1 && (
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          className="pagination"
-        />
-      )}
-    </div>
+        {/* Информация о результатах поиска */}
+        {searchParam && (
+          <div className="search-info">
+            <div className="search-info-header">
+              <div className="search-info-text">
+                <h2>Результаты поиска: "{searchParam}"</h2>
+                <p>Найдено товаров: {allProducts.length}</p>
+              </div>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<X size={16} />}
+                onClick={handleClearSearch}
+                className="clear-search-button"
+              >
+                Сбросить поиск
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Активные фильтры */}
+        {hasActiveFilters() && (
+          <div className="active-filters">
+            <div className="active-filters-header">
+              <div className="active-filters-title">
+                <Filter size={16} />
+                <span>Активные фильтры:</span>
+              </div>
+              <Button
+                variant="text"
+                size="small"
+                onClick={handleClearAllFilters}
+                className="clear-all-filters"
+              >
+                Очистить все
+              </Button>
+            </div>
+            <div className="active-filters-list">
+              {/* Порода дерева */}
+              {woodTypeParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("wood_type")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("wood_type", woodTypeParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("wood_type")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Сорт */}
+              {gradeParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("grade")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("grade", gradeParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("grade")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Ширина */}
+              {widthParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("width")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("width", widthParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("width")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Толщина */}
+              {thicknessParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("thickness")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("thickness", thicknessParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("thickness")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Длина */}
+              {lengthParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("length")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("length", lengthParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("length")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Цена от */}
+              {minPriceParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("min_price")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("min_price", minPriceParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("min_price")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Цена до */}
+              {maxPriceParam && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("max_price")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("max_price", maxPriceParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("max_price")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Сортировка */}
+              {orderingParam && orderingParam !== "" && (
+                <div className="filter-chip">
+                  <span className="filter-chip-icon">
+                    {getFilterIcon("ordering")}
+                  </span>
+                  <span className="filter-chip-label">
+                    {getFilterLabel("ordering", orderingParam)}
+                  </span>
+                  <button
+                    className="filter-chip-remove"
+                    onClick={() => handleRemoveFilter("ordering")}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="products-grid">
+          {displayedProducts.length > 0 ? (
+            displayedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <div className="no-products">
+              <p>Товары не найдены</p>
+              {hasActiveFilters() && (
+                <Button
+                  variant="contained"
+                  onClick={handleClearAllFilters}
+                  className="reset-filters-button"
+                >
+                  Сбросить все фильтры
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {totalPages > 1 && (
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            className="pagination"
+          />
+        )}
+      </div>
+    </>
   );
 };
 
