@@ -266,7 +266,7 @@ const AdminOrders = () => {
                             maxWidth: 200,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {order.comment}

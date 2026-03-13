@@ -33,9 +33,9 @@ const Profile = () => {
         try {
           setLoading(true);
           console.log("Загружаем заказы для пользователя:", user.id);
-          
+
           const response = await axios.get(
-            "http://127.0.0.1:8000/api/orders/",
+            "https://prime-forest.ru/api/orders/",
             {
               headers: {
                 Authorization: `Bearer ${user.token}`,
@@ -47,9 +47,9 @@ const Profile = () => {
 
           const ordersData = response.data.results || response.data;
           const ordersArray = Array.isArray(ordersData) ? ordersData : [];
-          
+
           setOrders(ordersArray);
-          
+
           if (ordersArray.length === 0) {
             console.log("Заказы не найдены");
           }
@@ -71,7 +71,7 @@ const Profile = () => {
       setOrderLoading(true);
       if (!order.items || order.items.length === 0) {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/orders/${order.id}/`,
+          `https://prime-forest.ru/api/orders/${order.id}/`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -227,7 +227,9 @@ const Profile = () => {
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Телефон:</span>
-                  <span className="detail-value">{selectedOrder.phone_number}</span>
+                  <span className="detail-value">
+                    {selectedOrder.phone_number}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Статус:</span>
@@ -241,9 +243,7 @@ const Profile = () => {
               {selectedOrder.comment && (
                 <div className="order-comment">
                   <h3>Комментарий к заказу</h3>
-                  <div className="comment-text">
-                    {selectedOrder.comment}
-                  </div>
+                  <div className="comment-text">{selectedOrder.comment}</div>
                 </div>
               )}
 

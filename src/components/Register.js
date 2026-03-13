@@ -26,18 +26,24 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/register/", {
-        username,
-        password,
-        email,
-      }, {
-        withCredentials: true
-      });
+      const response = await axios.post(
+        "https://prime-forest.ru/api/register/",
+        {
+          username,
+          password,
+          email,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       localStorage.setItem("token", response.data.tokens.access);
 
       if (response.data.linked_orders_count > 0) {
-        notifySuccess(`К вашему аккаунту привязано ${response.data.linked_orders_count} заказов`);
+        notifySuccess(
+          `К вашему аккаунту привязано ${response.data.linked_orders_count} заказов`
+        );
       }
 
       await login(username, password);
@@ -60,8 +66,8 @@ const Register = () => {
   return (
     <div className="register-page">
       <div className="register-header">
-        <IconButton 
-          className="back-button" 
+        <IconButton
+          className="back-button"
           onClick={handleGoBack}
           aria-label="назад"
         >
@@ -69,7 +75,7 @@ const Register = () => {
           <span className="back-button-text">Назад</span>
         </IconButton>
       </div>
-      
+
       <div className="register-form">
         <h2>Регистрация</h2>
         <form onSubmit={handleSubmit}>

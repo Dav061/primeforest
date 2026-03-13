@@ -62,7 +62,9 @@ const AdminCategories = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("https://prime-forest.ru/api/categories/");
+      const response = await axios.get(
+        "https://prime-forest.ru/api/categories/"
+      );
       setCategories(response.data.results || response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);

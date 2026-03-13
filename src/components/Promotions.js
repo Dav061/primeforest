@@ -6,7 +6,7 @@ import "../styles.scss";
 const Promotions = () => {
   return (
     <div className="promotions-page">
-      <h1 className="page-title">Акции и специальные предложения</h1>
+      {/* <h1 className="page-title">Акции и специальные предложения</h1> */}
 
       {/* Главный баннер с акцией на доставку */}
       <div className="delivery-promo-banner">

@@ -4,11 +4,11 @@ import "./index.css";
 import App from "./App";
 import "./styles.scss";
 import reportWebVitals from "./reportWebVitals";
-import axios from 'axios'
+import axios from "axios";
 
 // Настройка axios по умолчанию
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'https://prime-forest.ru';
+axios.defaults.baseURL = "https://prime-forest.ru";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

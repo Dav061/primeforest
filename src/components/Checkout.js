@@ -19,14 +19,14 @@ const Checkout = () => {
   // Обязательные поля (только адрес и телефон)
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  
+
   // Необязательные поля
   const [comment, setComment] = useState("");
-  
+
   // Для гостей (необязательные)
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -38,7 +38,8 @@ const Checkout = () => {
     }
 
     // Валидация телефона
-    const phoneRegex = /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    const phoneRegex =
+      /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
     if (!phoneRegex.test(phoneNumber)) {
       notifyError("Пожалуйста, введите корректный номер телефона");
       return;
@@ -67,20 +68,22 @@ const Checkout = () => {
         if (guestEmail.trim()) {
           orderData.guest_email = guestEmail.trim();
         }
-        
+
         // Добавляем товары из корзины
-        orderData.cart_items = Object.entries(cartItems).map(([productId, quantity]) => ({
-          product_id: parseInt(productId),
-          quantity: quantity
-        }));
+        orderData.cart_items = Object.entries(cartItems).map(
+          ([productId, quantity]) => ({
+            product_id: parseInt(productId),
+            quantity: quantity,
+          })
+        );
       }
 
-      const headers = user 
-        ? { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const headers = user
+        ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
         : {};
 
       const orderResponse = await axios.post(
-        "http://127.0.0.1:8000/api/orders/",
+        "https://prime-forest.ru/api/orders/",
         orderData,
         { headers }
       );
@@ -90,25 +93,24 @@ const Checkout = () => {
 
       notifySuccess(`✅ Заказ #${orderResponse.data.id} успешно оформлен!`);
 
-      navigate("/order-success", { 
-        state: { 
+      navigate("/order-success", {
+        state: {
           orderId: orderResponse.data.id,
           isGuest: !user,
           phoneNumber: phoneNumber,
-          email: guestEmail || user?.email
-        } 
+          email: guestEmail || user?.email,
+        },
       });
-
     } catch (error) {
       console.error("Ошибка при оформлении заказа:", error);
-      
+
       let errorMessage = "Произошла ошибка при оформлении заказа";
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
       } else if (error.response?.data?.detail) {
         errorMessage = error.response.data.detail;
       }
-      
+
       notifyError(`❌ ${errorMessage}`);
       setError(errorMessage);
     } finally {
@@ -136,7 +138,7 @@ const Checkout = () => {
       <div className="checkout-form">
         <div className="form-section">
           <h2>Контактные данные</h2>
-          
+
           {/* Номер телефона - обязателен */}
           <TextField
             label="Номер телефона"
@@ -171,7 +173,7 @@ const Checkout = () => {
                 placeholder="Как к вам обращаться?"
                 helperText="Необязательно"
               />
-              
+
               <TextField
                 label="Email"
                 type="email"
@@ -189,7 +191,7 @@ const Checkout = () => {
         {/* Адрес доставки - обязателен */}
         <div className="form-section">
           <h2>Адрес доставки</h2>
-          
+
           <TextField
             label="Адрес доставки"
             fullWidth
@@ -207,7 +209,7 @@ const Checkout = () => {
         {/* Комментарий - необязательный */}
         <div className="form-section">
           <h2>Комментарий к заказу</h2>
-          
+
           <TextField
             label="Комментарий"
             fullWidth

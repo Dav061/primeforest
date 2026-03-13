@@ -1,5 +1,11 @@
 // src/components/Cart.js - исправленная версия
-import React, { useEffect, useState, useContext, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -22,7 +28,7 @@ const Cart = () => {
   const [updatingItems, setUpdatingItems] = useState({});
   const [inputValues, setInputValues] = useState({});
   const [initialLoadDone, setInitialLoadDone] = useState(false);
-  
+
   // Ref для хранения таймаутов
   const timeouts = useRef({});
   // Ref для хранения ссылок на инпуты
@@ -72,7 +78,7 @@ const Cart = () => {
 
           for (const productId of productIds) {
             const response = await axios.get(
-              `http://127.0.0.1:8000/api/products/${productId}/`
+              `https://prime-forest.ru/api/products/${productId}/`
             );
             const product = response.data;
             const quantity = cartItems[productId];
@@ -179,11 +185,11 @@ const Cart = () => {
   const handleProductClick = (productId, e) => {
     // Предотвращаем переход, если клик был по интерактивным элементам
     if (
-      e.target.tagName === 'INPUT' || 
-      e.target.tagName === 'BUTTON' ||
-      e.target.closest('.counter-btn') ||
-      e.target.closest('.remove-btn') ||
-      e.target.closest('.counter-input')
+      e.target.tagName === "INPUT" ||
+      e.target.tagName === "BUTTON" ||
+      e.target.closest(".counter-btn") ||
+      e.target.closest(".remove-btn") ||
+      e.target.closest(".counter-input")
     ) {
       return;
     }
@@ -199,7 +205,7 @@ const Cart = () => {
 
   const handleInputBlur = (productId, value, isGuest) => {
     const newQuantity = parseInt(value);
-    
+
     if (!isNaN(newQuantity) && newQuantity >= 1) {
       const currentProduct = cartProducts.find(
         (item) => item.product.id === productId
@@ -209,7 +215,7 @@ const Cart = () => {
         if (timeouts.current[productId]) {
           clearTimeout(timeouts.current[productId]);
         }
-        
+
         performUpdate(productId, newQuantity, isGuest);
       }
     } else {
@@ -226,7 +232,7 @@ const Cart = () => {
   };
 
   const handleInputKeyDown = (e, productId, isGuest) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.target.blur();
     }
   };
@@ -246,7 +252,7 @@ const Cart = () => {
 
   const handleRemove = async (productId, isGuest = false, e) => {
     e.stopPropagation(); // Предотвращаем переход на детальную страницу
-    
+
     setUpdatingItems((prev) => ({ ...prev, [productId]: true }));
 
     const removedItem = cartProducts.find(
@@ -299,7 +305,7 @@ const Cart = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -328,7 +334,8 @@ const Cart = () => {
             <Link to="/login" state={{ from: "/cart" }}>
               войдите
             </Link>{" "}
-            или <Link to="/register">зарегистрируйтесь</Link>. Собранная корзина автоматически синхронизируется.
+            или <Link to="/register">зарегистрируйтесь</Link>. Собранная корзина
+            автоматически синхронизируется.
           </p>
         </div>
       )}
@@ -351,7 +358,7 @@ const Cart = () => {
                   updatingItems[item.product.id] ? "updating" : ""
                 }`}
                 onClick={(e) => handleProductClick(item.product.id, e)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 <div className="cart-item-image">
                   <img
@@ -399,25 +406,27 @@ const Cart = () => {
                       </button>
 
                       <input
-                        ref={el => inputRefs.current[item.product.id] = el}
+                        ref={(el) => (inputRefs.current[item.product.id] = el)}
                         type="number"
                         min="1"
-                        value={inputValues[item.product.id] || item.quantity.toString()}
+                        value={
+                          inputValues[item.product.id] ||
+                          item.quantity.toString()
+                        }
                         onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => handleInputChange(
-                          item.product.id,
-                          e.target.value
-                        )}
-                        onBlur={(e) => handleInputBlur(
-                          item.product.id,
-                          e.target.value,
-                          !user
-                        )}
-                        onKeyDown={(e) => handleInputKeyDown(
-                          e,
-                          item.product.id,
-                          !user
-                        )}
+                        onChange={(e) =>
+                          handleInputChange(item.product.id, e.target.value)
+                        }
+                        onBlur={(e) =>
+                          handleInputBlur(
+                            item.product.id,
+                            e.target.value,
+                            !user
+                          )
+                        }
+                        onKeyDown={(e) =>
+                          handleInputKeyDown(e, item.product.id, !user)
+                        }
                         className="counter-input"
                         disabled={updatingItems[item.product.id]}
                       />
@@ -472,7 +481,7 @@ const Cart = () => {
               <span>Итого</span>
               <span>{totalPrice.toFixed(2)} руб.</span>
             </div>
-            
+
             {/* ИСПРАВЛЕННАЯ КНОПКА - теперь всегда "Оформить заказ" */}
             <button onClick={handleCheckout} className="checkout-btn">
               Оформить заказ
