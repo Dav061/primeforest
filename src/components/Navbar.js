@@ -151,7 +151,7 @@ const Navbar = () => {
                 Prime-Forest
               </Link>
               <a
-                href="https://yandex.ru/maps/-/CHuLuW9G"
+                href="https://yandex.ru/maps/-/CPB24ZOi"
                 className="logo-address"
                 target="_blank"
                 rel="noopener noreferrer"
