@@ -25,14 +25,14 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/products/${id}/`
+          `https://prime-forest.ru/api/products/${id}/`
         );
         const productData = response.data;
 
         const getImageUrl = (imagePath) => {
           if (!imagePath) return "/default-product.jpg";
           if (imagePath.startsWith("http")) return imagePath;
-          return `http://127.0.0.1:8000${
+          return `https://prime-forest.ru${
             imagePath.startsWith("/") ? "" : "/"
           }${imagePath}`;
         };
