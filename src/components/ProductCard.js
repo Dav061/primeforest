@@ -49,7 +49,7 @@ const ProductCard = ({ product }) => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
+    return `http://127.0.0.1:8000${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };

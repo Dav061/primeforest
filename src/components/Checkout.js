@@ -83,7 +83,7 @@ const Checkout = () => {
         : {};
 
       const orderResponse = await axios.post(
-        "https://prime-forest.ru/api/orders/",
+        "http://127.0.0.1:8000/api/orders/",
         orderData,
         { headers }
       );

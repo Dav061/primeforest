@@ -35,7 +35,7 @@ const Profile = () => {
           console.log("Загружаем заказы для пользователя:", user.id);
 
           const response = await axios.get(
-            "https://prime-forest.ru/api/orders/",
+            "http://127.0.0.1:8000/api/orders/",
             {
               headers: {
                 Authorization: `Bearer ${user.token}`,
@@ -71,7 +71,7 @@ const Profile = () => {
       setOrderLoading(true);
       if (!order.items || order.items.length === 0) {
         const response = await axios.get(
-          `https://prime-forest.ru/api/orders/${order.id}/`,
+          `http://127.0.0.1:8000/api/orders/${order.id}/`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,

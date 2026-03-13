@@ -8,7 +8,7 @@ import axios from "axios";
 
 // Настройка axios по умолчанию
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "https://prime-forest.ru";
+axios.defaults.baseURL = "http://127.0.0.1:8000";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

@@ -17,7 +17,7 @@ const CategoryList = () => {
 
   useEffect(() => {
     axios
-      .get("https://prime-forest.ru/api/categories/")
+      .get("http://127.0.0.1:8000/api/categories/")
       .then((response) => {
         if (response.data && Array.isArray(response.data.results)) {
           setCategories(response.data.results);
