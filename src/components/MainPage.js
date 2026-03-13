@@ -41,7 +41,7 @@ const MainPage = () => {
       try {
         // Загружаем все товары
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/products/",
+          "https://prime-forest.ru/api/products/",
           {
             params: {
               limit: 100, // Загружаем достаточно товаров для фильтрации
@@ -84,7 +84,7 @@ const MainPage = () => {
 
     // Загружаем статистику (если есть эндпоинт)
     // axios
-    //   .get("http://127.0.0.1:8000/api/stats/")
+    //   .get("https://prime-forest.ru/api/stats/")
     //   .then((response) => {
     //     setStats(response.data);
     //   })
@@ -112,7 +112,7 @@ const MainPage = () => {
     if (!imagePath)
       return "https://images.unsplash.com/photo-1581517066154-d9ca0f8c456a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };

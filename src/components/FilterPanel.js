@@ -73,7 +73,7 @@ const FilterPanel = ({ onClose }) => {
 
       console.log("📊 Fetching filter values with params:", params);
 
-      const response = await axios.get("http://127.0.0.1:8000/api/products/", {
+      const response = await axios.get("https://prime-forest.ru/api/products/", {
         params,
       });
       const products = response.data.results || [];

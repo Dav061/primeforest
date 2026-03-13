@@ -73,7 +73,7 @@ const ProductList = () => {
 
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/categories/${categoryId}/`
+          `https://prime-forest.ru/api/categories/${categoryId}/`
         );
         setCategoryName(response.data.name);
       } catch (error) {
@@ -88,7 +88,7 @@ const ProductList = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -143,7 +143,7 @@ const ProductList = () => {
     console.log("📤 Fetching with params:", params);
 
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/products/", {
+      const response = await axios.get("https://prime-forest.ru/api/products/", {
         params,
       });
 

@@ -72,7 +72,7 @@ const Cart = () => {
 
           for (const productId of productIds) {
             const response = await axios.get(
-              `http://127.0.0.1:8000/api/products/${productId}/`
+              `https://prime-forest.ru/api/products/${productId}/`
             );
             const product = response.data;
             const quantity = cartItems[productId];
@@ -299,7 +299,7 @@ const Cart = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
