@@ -46,6 +46,9 @@ const AdminProducts = () => {
     category: "",
     wood_type: "",
     grade: "",
+    thickness: "",
+    width: "",
+    length: "",
     image_url: "",
   });
   const [activeFilter, setActiveFilter] = useState("all");
@@ -58,16 +61,14 @@ const AdminProducts = () => {
     productName: "",
   });
 
-  const [itemsPerPage] = useState(10); // Количество элементов на странице
+  const [itemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Вычисляем продукты для текущей страницы
   const currentProducts = filteredProducts.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
 
-  // Общее количество страниц
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ const AdminProducts = () => {
         ]);
 
       const productsData = productsRes.data.results || productsRes.data;
+      console.log("Полученные товары:", productsData);
       setProducts(productsData);
       setFilteredProducts(productsData);
 
@@ -156,6 +158,8 @@ const AdminProducts = () => {
 
   const handleOpenDialog = (product = null) => {
     if (product) {
+      console.log("Редактируемый товар (полные данные):", product);
+
       setCurrentProduct({
         id: product.id,
         name: product.name || "",
@@ -164,6 +168,9 @@ const AdminProducts = () => {
         category: product.category || "",
         wood_type: product.wood_type || "",
         grade: product.grade || "",
+        thickness: product.thickness || "",
+        width: product.width || "",
+        length: product.length || "",
         image_url: product.main_image || "",
       });
     } else {
@@ -175,6 +182,9 @@ const AdminProducts = () => {
         category: "",
         wood_type: "",
         grade: "",
+        thickness: "",
+        width: "",
+        length: "",
         image_url: "",
       });
     }
@@ -193,9 +203,10 @@ const AdminProducts = () => {
 
   const handleSaveProduct = async () => {
     try {
+      // Подготавливаем данные
       const productData = {
         name: currentProduct.name,
-        description: currentProduct.description,
+        description: currentProduct.description || "",
         price: parseFloat(currentProduct.price),
         category_name: currentProduct.category || null,
         wood_type_name: currentProduct.wood_type || null,
@@ -203,23 +214,73 @@ const AdminProducts = () => {
         image_url: currentProduct.image_url || null,
       };
 
+      // Добавляем размерные поля только если они не пустые
+      if (currentProduct.thickness && currentProduct.thickness !== "") {
+        productData.thickness = parseInt(currentProduct.thickness, 10);
+      }
+
+      if (currentProduct.width && currentProduct.width !== "") {
+        productData.width = parseInt(currentProduct.width, 10);
+      }
+
+      if (currentProduct.length && currentProduct.length !== "") {
+        productData.length = parseInt(currentProduct.length, 10);
+      }
+
+      console.log("Отправляемые данные:", productData);
+
+      let response;
       if (currentProduct.id) {
-        await axios.patch(
+        response = await axios.patch(
           `http://localhost:8000/api/products/${currentProduct.id}/`,
           productData
         );
         setSuccessMessage(`Товар "${currentProduct.name}" успешно обновлен!`);
       } else {
-        await axios.post("http://localhost:8000/api/products/", productData);
+        response = await axios.post(
+          "http://localhost:8000/api/products/",
+          productData
+        );
         setSuccessMessage(`Товар "${currentProduct.name}" успешно добавлен!`);
       }
 
-      fetchData();
+      // Обновляем список товаров
+      await fetchData();
       setOpenDialog(false);
+
+      // Очищаем форму
+      setCurrentProduct({
+        id: null,
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        wood_type: "",
+        grade: "",
+        thickness: "",
+        width: "",
+        length: "",
+        image_url: "",
+      });
     } catch (error) {
       console.error("Error saving product:", error);
-      if (error.response?.data) {
-        setError(JSON.stringify(error.response.data));
+
+      if (error.response) {
+        console.error("Данные ошибки:", error.response.data);
+
+        if (error.response.data) {
+          const errorMessages = Object.entries(error.response.data)
+            .map(
+              ([key, value]) =>
+                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+            )
+            .join("\n");
+          setError(`Ошибка сохранения:\n${errorMessages}`);
+        } else {
+          setError(`Ошибка сохранения: ${error.response.statusText}`);
+        }
+      } else if (error.request) {
+        setError("Ошибка сохранения: сервер не отвечает");
       } else {
         setError(`Ошибка сохранения: ${error.message}`);
       }
@@ -235,23 +296,14 @@ const AdminProducts = () => {
       productName: product.name,
       onConfirm: async () => {
         try {
-          const response = await axios.delete(
-            `http://localhost:8000/api/products/${id}/`
-          );
-
-          if (response.status === 204) {
-            setSuccessMessage(`Товар "${product.name}" успешно удалён!`);
-            fetchData();
-          }
-          setConfirmDialog((prev) => ({ ...prev, open: false })); // Закрываем диалог после успешного удаления
+          await axios.delete(`http://localhost:8000/api/products/${id}/`);
+          setSuccessMessage(`Товар "${product.name}" успешно удалён!`);
+          fetchData();
+          setConfirmDialog((prev) => ({ ...prev, open: false }));
         } catch (error) {
           console.error("Error deleting product:", error);
-          if (error.response?.data?.error) {
-            setError(error.response.data.error);
-          } else {
-            setError(`Ошибка удаления: ${error.message}`);
-          }
-          setConfirmDialog((prev) => ({ ...prev, open: false })); // Закрываем диалог при ошибке
+          setError(`Ошибка удаления: ${error.message}`);
+          setConfirmDialog((prev) => ({ ...prev, open: false }));
         }
       },
     });
@@ -278,7 +330,7 @@ const AdminProducts = () => {
           );
         } finally {
           setLoading(false);
-          setConfirmDialog((prev) => ({ ...prev, open: false })); // Закрываем диалог после выполнения
+          setConfirmDialog((prev) => ({ ...prev, open: false }));
         }
       },
     });
@@ -348,11 +400,15 @@ const AdminProducts = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>Название</TableCell>
                 <TableCell>Цена</TableCell>
                 <TableCell>Категория</TableCell>
-                <TableCell>Порода дерева</TableCell>
+                <TableCell>Порода</TableCell>
                 <TableCell>Сорт</TableCell>
+                <TableCell>Толщина</TableCell>
+                <TableCell>Ширина</TableCell>
+                <TableCell>Длина</TableCell>
                 <TableCell>Изображение</TableCell>
                 <TableCell>Доступность</TableCell>
                 <TableCell>Действия</TableCell>
@@ -362,11 +418,15 @@ const AdminProducts = () => {
               {currentProducts.length > 0 ? (
                 currentProducts.map((product) => (
                   <TableRow key={product.id}>
+                    <TableCell>{product.id}</TableCell>
                     <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.price} руб.</TableCell>
+                    <TableCell>{product.price}</TableCell>
                     <TableCell>{product.category || "-"}</TableCell>
                     <TableCell>{product.wood_type || "-"}</TableCell>
                     <TableCell>{product.grade || "-"}</TableCell>
+                    <TableCell>{product.thickness || "-"}</TableCell>
+                    <TableCell>{product.width || "-"}</TableCell>
+                    <TableCell>{product.length || "-"}</TableCell>
                     <TableCell>
                       {product.main_image ? (
                         <a
@@ -377,7 +437,7 @@ const AdminProducts = () => {
                           Просмотр
                         </a>
                       ) : (
-                        "Нет изображения"
+                        "Нет"
                       )}
                     </TableCell>
                     <TableCell>
@@ -414,7 +474,7 @@ const AdminProducts = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={12} align="center">
                     {searchTerm ? "Ничего не найдено" : "Нет товаров"}
                   </TableCell>
                 </TableRow>
@@ -430,11 +490,9 @@ const AdminProducts = () => {
           >
             Назад
           </Button>
-
           <Typography sx={{ mx: 2, alignSelf: "center" }}>
             Страница {currentPage + 1} из {totalPages}
           </Typography>
-
           <Button
             variant="outlined"
             disabled={currentPage >= totalPages - 1}
@@ -449,8 +507,6 @@ const AdminProducts = () => {
       <Dialog
         open={confirmDialog.open}
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-        maxWidth="sm"
-        fullWidth
       >
         <DialogTitle>{confirmDialog.title}</DialogTitle>
         <DialogContent>
@@ -464,30 +520,23 @@ const AdminProducts = () => {
           >
             Отмена
           </Button>
-          <Button
-            onClick={() => {
-              confirmDialog.onConfirm();
-              setConfirmDialog((prev) => ({ ...prev, open: false }));
-            }}
-            color="primary"
-            variant="contained"
-          >
+          <Button onClick={confirmDialog.onConfirm} color="primary">
             Подтвердить
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Диалог редактирования/добавления товара */}
+      {/* Диалог редактирования/добавления */}
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
+        maxWidth="md"
         fullWidth
-        maxWidth="sm"
       >
         <DialogTitle>
           {currentProduct.id ? "Редактировать товар" : "Добавить товар"}
         </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
+        <DialogContent>
           <TextField
             margin="dense"
             name="name"
@@ -495,7 +544,6 @@ const AdminProducts = () => {
             fullWidth
             value={currentProduct.name}
             onChange={handleInputChange}
-            sx={{ mb: 2 }}
             required
           />
           <TextField
@@ -504,10 +552,9 @@ const AdminProducts = () => {
             label="Описание"
             fullWidth
             multiline
-            rows={4}
+            rows={3}
             value={currentProduct.description}
             onChange={handleInputChange}
-            sx={{ mb: 2 }}
           />
           <TextField
             margin="dense"
@@ -517,11 +564,10 @@ const AdminProducts = () => {
             fullWidth
             value={currentProduct.price}
             onChange={handleInputChange}
-            sx={{ mb: 2 }}
             required
           />
 
-          <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormControl fullWidth margin="dense">
             <InputLabel>Категория</InputLabel>
             <Select
               name="category"
@@ -529,18 +575,16 @@ const AdminProducts = () => {
               onChange={handleSelectChange}
               label="Категория"
             >
-              <MenuItem value="">
-                <em>Не выбрано</em>
-              </MenuItem>
-              {allCategories.map((category, index) => (
-                <MenuItem key={`category-${index}`} value={category.name}>
-                  {category.name}
+              <MenuItem value="">Не выбрано</MenuItem>
+              {allCategories.map((cat) => (
+                <MenuItem key={cat.name} value={cat.name}>
+                  {cat.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormControl fullWidth margin="dense">
             <InputLabel>Порода дерева</InputLabel>
             <Select
               name="wood_type"
@@ -548,18 +592,16 @@ const AdminProducts = () => {
               onChange={handleSelectChange}
               label="Порода дерева"
             >
-              <MenuItem value="">
-                <em>Не выбрано</em>
-              </MenuItem>
-              {allWoodTypes.map((woodType, index) => (
-                <MenuItem key={`wood-${index}`} value={woodType.name}>
-                  {woodType.name}
+              <MenuItem value="">Не выбрано</MenuItem>
+              {allWoodTypes.map((wood) => (
+                <MenuItem key={wood.name} value={wood.name}>
+                  {wood.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormControl fullWidth margin="dense">
             <InputLabel>Сорт</InputLabel>
             <Select
               name="grade"
@@ -567,16 +609,44 @@ const AdminProducts = () => {
               onChange={handleSelectChange}
               label="Сорт"
             >
-              <MenuItem value="">
-                <em>Не выбрано</em>
-              </MenuItem>
-              {allGrades.map((grade, index) => (
-                <MenuItem key={`grade-${index}`} value={grade.name}>
+              <MenuItem value="">Не выбрано</MenuItem>
+              {allGrades.map((grade) => (
+                <MenuItem key={grade.name} value={grade.name}>
                   {grade.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              margin="dense"
+              name="thickness"
+              label="Толщина"
+              type="number"
+              fullWidth
+              value={currentProduct.thickness}
+              onChange={handleInputChange}
+            />
+            <TextField
+              margin="dense"
+              name="width"
+              label="Ширина"
+              type="number"
+              fullWidth
+              value={currentProduct.width}
+              onChange={handleInputChange}
+            />
+            <TextField
+              margin="dense"
+              name="length"
+              label="Длина"
+              type="number"
+              fullWidth
+              value={currentProduct.length}
+              onChange={handleInputChange}
+            />
+          </Box>
 
           <TextField
             margin="dense"
@@ -585,8 +655,6 @@ const AdminProducts = () => {
             fullWidth
             value={currentProduct.image_url}
             onChange={handleInputChange}
-            sx={{ mb: 2 }}
-            placeholder="https://example.com/image.jpg"
           />
         </DialogContent>
         <DialogActions>
@@ -595,7 +663,6 @@ const AdminProducts = () => {
             onClick={handleSaveProduct}
             variant="contained"
             color="primary"
-            disabled={!currentProduct.name || !currentProduct.price}
           >
             Сохранить
           </Button>

@@ -6,14 +6,14 @@ import "../styles.scss";
 const AboutPage = () => {
   return (
     <Box className="about-page"> {/* вместо Container */}
-      <Typography
+      {/* <Typography
         variant="h2"
         align="center"
         gutterBottom
         className="page-title"
       >
         О нас
-      </Typography>
+      </Typography> */}
 
       <Box className="about-content">
         <Box className="about-text-block">

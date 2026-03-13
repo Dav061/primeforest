@@ -1,56 +1,94 @@
-import React, { useEffect, useState, useCallback, useRef } from "react"; // добавили useRef
+// src/components/ProductList.js
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import TextField from "@mui/material/TextField";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import {
+  X,
+  Filter,
+  Ruler,
+  Tag,
+  Layers,
+  DollarSign,
+  ArrowLeft,
+} from "lucide-react"; // Добавлен ArrowLeft
 import "../styles.scss";
 import ProductCard from "./ProductCard";
-import { notifySuccess } from "../utils/notifications";
 
 const ProductList = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const categoryId = queryParams.get("category");
 
-  // Добавляем ref для отслеживания первого клика
-  const isFirstLoad = useRef(true);
-  const topRef = useRef(null);
+  // Состояние для названия категории
+  const [categoryName, setCategoryName] = useState("");
+
+  // Получаем все параметры из URL при каждом изменении
+  const searchParam = queryParams.get("search") || "";
+  const woodTypeParam = queryParams.get("wood_type") || "";
+  const gradeParam = queryParams.get("grade") || "";
+  const orderingParam = queryParams.get("ordering") || "";
+  const widthParam = queryParams.get("width") || "";
+  const thicknessParam = queryParams.get("thickness") || "";
+  const lengthParam = queryParams.get("length") || "";
+  const minPriceParam = queryParams.get("min_price") || "";
+  const maxPriceParam = queryParams.get("max_price") || "";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [woodTypes, setWoodTypes] = useState([]);
   const [grades, setGrades] = useState([]);
 
+  // Состояние для фильтров (синхронизируется с URL)
   const [filters, setFilters] = useState({
     category: categoryId || "",
-    wood_type: "",
-    grade: "",
-    ordering: "",
-  });
-
-  const [appliedFilters, setAppliedFilters] = useState({
-    category: categoryId || "",
+    wood_type: woodTypeParam,
+    grade: gradeParam,
+    ordering: orderingParam,
+    width: widthParam,
+    thickness: thicknessParam,
+    length: lengthParam,
+    min_price: minPriceParam,
+    max_price: maxPriceParam,
+    search: searchParam,
   });
 
   const [allProducts, setAllProducts] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  // Загружаем название категории, если выбран categoryId
+  useEffect(() => {
+    const fetchCategoryName = async () => {
+      if (!categoryId) {
+        setCategoryName("");
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/api/categories/${categoryId}/`
+        );
+        setCategoryName(response.data.name);
+      } catch (error) {
+        console.error("Ошибка загрузки названия категории:", error);
+        setCategoryName("");
+      }
+    };
+
+    fetchCategoryName();
+  }, [categoryId]);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
+    return `http://127.0.0.1:8000${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -60,50 +98,82 @@ const ProductList = () => {
     return [...new Set(values)].filter(Boolean);
   };
 
-  const fetchProducts = useCallback(() => {
+  // Загружаем товары при изменении URL
+  useEffect(() => {
+    console.log("📍 URL changed:", location.search);
+
+    // Обновляем filters из URL
+    setFilters({
+      category: categoryId || "",
+      wood_type: woodTypeParam,
+      grade: gradeParam,
+      ordering: orderingParam,
+      width: widthParam,
+      thickness: thicknessParam,
+      length: lengthParam,
+      min_price: minPriceParam,
+      max_price: maxPriceParam,
+      search: searchParam,
+    });
+
+    // Загружаем товары
+    fetchProducts();
+  }, [location.search]);
+
+  const fetchProducts = async () => {
     setLoading(true);
+
+    // Собираем параметры из URL
     const params = {
-      ...appliedFilters,
       is_active: true,
     };
 
-    if (categoryId) {
-      params.category = categoryId;
-    }
+    // Добавляем все непустые параметры из URL
+    if (categoryId) params.category = categoryId;
+    if (searchParam) params.search = searchParam;
+    if (woodTypeParam) params.wood_type = woodTypeParam;
+    if (gradeParam) params.grade = gradeParam;
+    if (orderingParam) params.ordering = orderingParam;
+    if (widthParam) params.width = widthParam;
+    if (thicknessParam) params.thickness = thicknessParam;
+    if (lengthParam) params.length = lengthParam;
+    if (minPriceParam) params.min_price = minPriceParam;
+    if (maxPriceParam) params.max_price = maxPriceParam;
 
-    Object.keys(params).forEach((key) => {
-      if (params[key] === "" || params[key] == null) {
-        delete params[key];
-      }
-    });
+    console.log("📤 Fetching with params:", params);
 
-    axios
-      .get("https://prime-forest.ru/api/products/", { params })
-      .then((response) => {
-        if (response.data) {
-          const productsData = response.data.results || [];
-          const normalizedProducts = productsData.map((product) => ({
-            ...product,
-            main_image: getImageUrl(product.main_image),
-            images: product.images?.map((img) => ({
-              ...img,
-              image: getImageUrl(img.image),
-            })),
-          }));
-          setAllProducts(normalizedProducts);
-          setWoodTypes(getUniqueValues(normalizedProducts, "wood_type"));
-          setGrades(getUniqueValues(normalizedProducts, "grade"));
-        }
-      })
-      .catch((error) => {
-        console.error("Ошибка при загрузке данных:", error);
-        setError("Ошибка при загрузке данных: " + error.message);
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/products/", {
+        params,
       });
-  }, [appliedFilters, categoryId]);
 
+      if (response.data) {
+        const productsData = response.data.results || [];
+        console.log(`📥 Received ${productsData.length} products`);
+
+        const normalizedProducts = productsData.map((product) => ({
+          ...product,
+          main_image: getImageUrl(product.main_image),
+          images: product.images?.map((img) => ({
+            ...img,
+            image: getImageUrl(img.image),
+          })),
+        }));
+
+        setAllProducts(normalizedProducts);
+        setWoodTypes(getUniqueValues(normalizedProducts, "wood_type"));
+        setGrades(getUniqueValues(normalizedProducts, "grade"));
+        setPage(1);
+      }
+    } catch (error) {
+      console.error("Ошибка при загрузке данных:", error);
+      setError("Ошибка при загрузке данных: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Обновляем отображаемые товары при изменении allProducts или страницы
   useEffect(() => {
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -111,73 +181,123 @@ const ProductList = () => {
     setTotalPages(Math.ceil(allProducts.length / itemsPerPage));
   }, [allProducts, page, itemsPerPage]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  // Функция для прокрутки вверх
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // плавная прокрутка
-    });
-  };
-
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-    setFilters({
-      ...filters,
-      [name]: value,
-    });
-  };
-
-  const handleApplyFilters = () => {
-    setAppliedFilters(filters);
-    setPage(1);
-    scrollToTop(); // Добавляем прокрутку вверх
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      category: categoryId || "",
-      wood_type: "",
-      grade: "",
-      ordering: "",
-    });
-
-    setAppliedFilters({
-      category: categoryId || "",
-    });
-
-    setSearchQuery("");
-    setPage(1);
-
-    scrollToTop(); // Добавляем прокрутку вверх
-    notifySuccess("Фильтры сброшены");
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSearch = () => {
-    setAppliedFilters({
-      ...appliedFilters,
-      search: searchQuery,
-    });
-    setPage(1);
-    scrollToTop(); // Добавляем прокрутку вверх
-  };
-
   const handlePageChange = (event, value) => {
     setPage(value);
-    // Прокручиваем вверх при смене страницы
     setTimeout(() => {
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       });
-    }, 100); // Небольшая задержка для плавности
+    }, 100);
+  };
+
+  // Функция для возврата к списку категорий
+  const handleBackToCategories = () => {
+    navigate("/catalog");
+  };
+
+  // Функция для сброса поиска
+  // src/components/ProductList.js - замените функцию handleClearSearch
+
+  const handleClearSearch = () => {
+    console.log("🔍 Сброс поиска из ProductList");
+
+    // Получаем ВСЕ текущие параметры из URL
+    const params = new URLSearchParams(location.search);
+    console.log("📦 Текущие параметры:", Object.fromEntries(params));
+
+    // Удаляем ТОЛЬКО search
+    params.delete("search");
+    console.log("📦 После удаления search:", Object.fromEntries(params));
+
+    // Навигируем с сохраненными параметрами
+    navigate(`/catalog?${params.toString()}`);
+  };
+
+  // Функция для сброса конкретного фильтра
+  const handleRemoveFilter = (filterName) => {
+    const params = new URLSearchParams(location.search);
+    params.delete(filterName);
+    navigate(`/products?${params.toString()}`);
+  };
+
+  // Функция для сброса всех фильтров (кроме поиска и категории)
+  const handleClearAllFilters = () => {
+    const params = new URLSearchParams();
+    if (categoryId) {
+      params.append("category", categoryId);
+    }
+    if (searchParam) {
+      params.append("search", searchParam);
+    }
+    navigate(`/products?${params.toString()}`);
+  };
+
+  // Проверяем, есть ли активные фильтры (кроме search и category)
+  const hasActiveFilters = () => {
+    return !!(
+      woodTypeParam ||
+      gradeParam ||
+      widthParam ||
+      thicknessParam ||
+      lengthParam ||
+      minPriceParam ||
+      maxPriceParam ||
+      orderingParam
+    );
+  };
+
+  // Форматирование названия фильтра для отображения
+  const getFilterLabel = (key, value) => {
+    const labels = {
+      wood_type: "Порода",
+      grade: "Сорт",
+      width: "Ширина",
+      thickness: "Толщина",
+      length: "Длина",
+      min_price: "Цена от",
+      max_price: "Цена до",
+      ordering: "Сортировка",
+    };
+
+    const orderingLabels = {
+      name: "По названию (А-Я)",
+      "-name": "По названию (Я-А)",
+      price: "По цене (возр.)",
+      "-price": "По цене (убыв.)",
+    };
+
+    if (key === "ordering" && orderingLabels[value]) {
+      return orderingLabels[value];
+    }
+
+    if (key === "min_price") return `${labels[key]}: ${value} ₽`;
+    if (key === "max_price") return `${labels[key]}: ${value} ₽`;
+    if (key === "width" || key === "thickness" || key === "length")
+      return `${labels[key]}: ${value} мм`;
+
+    return `${labels[key]}: ${value}`;
+  };
+
+  // Получаем иконку для фильтра
+  const getFilterIcon = (key) => {
+    switch (key) {
+      case "wood_type":
+        return <Tag size={14} />;
+      case "grade":
+        return <Layers size={14} />;
+      case "width":
+      case "thickness":
+      case "length":
+        return <Ruler size={14} />;
+      case "min_price":
+      case "max_price":
+        return <DollarSign size={14} />;
+      case "ordering":
+        return <Filter size={14} />;
+      default:
+        return null;
+    }
   };
 
   if (loading && allProducts.length === 0)
@@ -190,109 +310,229 @@ const ProductList = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="product-list" ref={topRef}>
-      <h1 className="page-title">Товары</h1>
-
-      <div className="search-section">
-        <div className="search-container">
-          <TextField
-            name="search"
-            label="Поиск"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="search-input"
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            onClick={handleSearch}
-            className="search-button"
-            size="large"
+    <div className="product-list">
+      {/* Заголовок категории с кнопкой назад */}
+      {categoryName && (
+        <div className="category-header-with-back">
+          <button
+            onClick={handleBackToCategories}
+            className="back-to-categories-btn"
+            aria-label="Назад к категориям"
           >
-            Поиск
-          </Button>
+            <ArrowLeft size={20} />
+            <span>Все категории</span>
+          </button>
+          <h1 className="category-title-large">{categoryName}</h1>
+          <div className="header-placeholder"></div>{" "}
+          {/* Пустой div для баланса */}
         </div>
-      </div>
+      )}
 
-      <div className="filters-section">
-        <div className="filters-container">
-          <FormControl className="sort-control" fullWidth>
-            <InputLabel>Сортировать по</InputLabel>
-            <Select
-              name="ordering"
-              value={filters.ordering}
-              onChange={handleFilterChange}
-              displayEmpty
+      {/* Информация о результатах поиска */}
+      {searchParam && (
+        <div className="search-info">
+          <div className="search-info-header">
+            <div className="search-info-text">
+              <h2>Результаты поиска: "{searchParam}"</h2>
+              <p>Найдено товаров: {allProducts.length}</p>
+            </div>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<X size={16} />}
+              onClick={handleClearSearch}
+              className="clear-search-button"
             >
-              <MenuItem value=""></MenuItem>
-              <MenuItem value="name">По названию (А-Я)</MenuItem>
-              <MenuItem value="-name">По названию (Я-А)</MenuItem>
-              <MenuItem value="price">По цене (возрастанию)</MenuItem>
-              <MenuItem value="-price">По цене (убыванию)</MenuItem>
-            </Select>
-          </FormControl>
-
-          {categoryId && (
-            <>
-              <FormControl fullWidth>
-                <InputLabel>Порода дерева</InputLabel>
-                <Select
-                  name="wood_type"
-                  value={filters.wood_type}
-                  onChange={handleFilterChange}
-                >
-                  <MenuItem value="">Все породы</MenuItem>
-                  {woodTypes.map((woodType, index) => (
-                    <MenuItem key={index} value={woodType}>
-                      {woodType}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel>Сорт</InputLabel>
-                <Select
-                  name="grade"
-                  value={filters.grade}
-                  onChange={handleFilterChange}
-                >
-                  <MenuItem value="">Все сорта</MenuItem>
-                  {grades.map((grade, index) => (
-                    <MenuItem key={index} value={grade}>
-                      {grade}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </>
-          )}
+              Сбросить поиск
+            </Button>
+          </div>
         </div>
+      )}
 
-        <div className="filter-buttons">
-          <Button
-            variant="contained"
-            onClick={handleApplyFilters}
-            className="apply-filters-button"
-            size="large"
-          >
-            Применить фильтры
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleResetFilters}
-            className="reset-filters-button"
-            size="large"
-          >
-            Сбросить фильтры
-          </Button>
+      {/* Активные фильтры */}
+      {hasActiveFilters() && (
+        <div className="active-filters">
+          <div className="active-filters-header">
+            <div className="active-filters-title">
+              <Filter size={16} />
+              <span>Активные фильтры:</span>
+            </div>
+            <Button
+              variant="text"
+              size="small"
+              onClick={handleClearAllFilters}
+              className="clear-all-filters"
+            >
+              Очистить все
+            </Button>
+          </div>
+          <div className="active-filters-list">
+            {/* Порода дерева */}
+            {woodTypeParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("wood_type")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("wood_type", woodTypeParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("wood_type")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Сорт */}
+            {gradeParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("grade")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("grade", gradeParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("grade")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Ширина */}
+            {widthParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("width")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("width", widthParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("width")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Толщина */}
+            {thicknessParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("thickness")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("thickness", thicknessParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("thickness")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Длина */}
+            {lengthParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("length")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("length", lengthParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("length")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Цена от */}
+            {minPriceParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("min_price")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("min_price", minPriceParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("min_price")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Цена до */}
+            {maxPriceParam && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("max_price")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("max_price", maxPriceParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("max_price")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Сортировка */}
+            {orderingParam && orderingParam !== "" && (
+              <div className="filter-chip">
+                <span className="filter-chip-icon">
+                  {getFilterIcon("ordering")}
+                </span>
+                <span className="filter-chip-label">
+                  {getFilterLabel("ordering", orderingParam)}
+                </span>
+                <button
+                  className="filter-chip-remove"
+                  onClick={() => handleRemoveFilter("ordering")}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="products-grid">
-        {displayedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {displayedProducts.length > 0 ? (
+          displayedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        ) : (
+          <div className="no-products">
+            <p>Товары не найдены</p>
+            {hasActiveFilters() && (
+              <Button
+                variant="contained"
+                onClick={handleClearAllFilters}
+                className="reset-filters-button"
+              >
+                Сбросить все фильтры
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {totalPages > 1 && (

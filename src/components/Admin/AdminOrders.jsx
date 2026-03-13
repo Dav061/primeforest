@@ -18,8 +18,10 @@ import {
   TableRow,
   TextField,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import CommentIcon from "@mui/icons-material/Comment";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -132,6 +134,7 @@ const AdminOrders = () => {
 
   const statusColors = {
     in_process: "orange",
+    in_working: "blue",
     completed: "green",
     canceled: "red",
   };
@@ -172,6 +175,7 @@ const AdminOrders = () => {
         >
           <MenuItem value="">Все статусы</MenuItem>
           <MenuItem value="in_process">В процессе</MenuItem>
+          <MenuItem value="in_working">В работе</MenuItem>
           <MenuItem value="completed">Завершен</MenuItem>
           <MenuItem value="canceled">Отменен</MenuItem>
         </Select>
@@ -187,6 +191,7 @@ const AdminOrders = () => {
               <TableCell>Статус</TableCell>
               <TableCell>Дата</TableCell>
               <TableCell>Товары</TableCell>
+              <TableCell>Комментарий</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -218,6 +223,7 @@ const AdminOrders = () => {
                       }}
                     >
                       <MenuItem value="in_process">В процессе</MenuItem>
+                      <MenuItem value="in_working">В работе</MenuItem>
                       <MenuItem value="completed">Завершен</MenuItem>
                       <MenuItem value="canceled">Отменен</MenuItem>
                     </Select>
@@ -248,6 +254,30 @@ const AdminOrders = () => {
                       </Typography>
                     ))}
                   </Box>
+                </TableCell>
+                <TableCell>
+                  {order.comment ? (
+                    <Tooltip title={order.comment} arrow>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <CommentIcon color="primary" sx={{ mr: 1 }} />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            maxWidth: 200,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap"
+                          }}
+                        >
+                          {order.comment}
+                        </Typography>
+                      </Box>
+                    </Tooltip>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Нет комментария
+                    </Typography>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

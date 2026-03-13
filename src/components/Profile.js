@@ -15,7 +15,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { MapPin, Calendar, CreditCard, Package } from "lucide-react";
+import { MapPin, Calendar, Package } from "lucide-react";
 import "../styles.scss";
 
 const Profile = () => {
@@ -32,8 +32,10 @@ const Profile = () => {
       if (user) {
         try {
           setLoading(true);
+          console.log("Загружаем заказы для пользователя:", user.id);
+          
           const response = await axios.get(
-            "https://prime-forest.ru/api/orders/",
+            "http://127.0.0.1:8000/api/orders/",
             {
               headers: {
                 Authorization: `Bearer ${user.token}`,
@@ -41,10 +43,19 @@ const Profile = () => {
             }
           );
 
+          console.log("Получены заказы:", response.data);
+
           const ordersData = response.data.results || response.data;
-          setOrders(Array.isArray(ordersData) ? ordersData : []);
+          const ordersArray = Array.isArray(ordersData) ? ordersData : [];
+          
+          setOrders(ordersArray);
+          
+          if (ordersArray.length === 0) {
+            console.log("Заказы не найдены");
+          }
         } catch (error) {
           console.error("Ошибка при загрузке заказов:", error);
+          console.error("Детали ошибки:", error.response?.data);
           setError("Не удалось загрузить историю заказов");
         } finally {
           setLoading(false);
@@ -60,7 +71,7 @@ const Profile = () => {
       setOrderLoading(true);
       if (!order.items || order.items.length === 0) {
         const response = await axios.get(
-          `https://prime-forest.ru/api/orders/${order.id}/`,
+          `http://127.0.0.1:8000/api/orders/${order.id}/`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -89,6 +100,8 @@ const Profile = () => {
     switch (status) {
       case "in_process":
         return { text: "В обработке", class: "status-in_process" };
+      case "in_working":
+        return { text: "В работе", class: "status-in_working" };
       case "completed":
         return { text: "Выполнен", class: "status-completed" };
       default:
@@ -165,12 +178,11 @@ const Profile = () => {
                       <MapPin size={16} />
                       {order.address}
                     </p>
-                    <p>
-                      <CreditCard size={16} />
-                      {order.payment_method === "cash"
-                        ? "Наличными"
-                        : "Переводом"}
-                    </p>
+                    {!order.user && order.guest_name && (
+                      <p>
+                        <strong>Гость:</strong> {order.guest_name}
+                      </p>
+                    )}
                     <p>
                       <Package size={16} />
                       {order.items?.length || 0} товаров
@@ -214,19 +226,8 @@ const Profile = () => {
                   <span className="detail-value">{selectedOrder.address}</span>
                 </div>
                 <div className="detail-row">
-                  <span className="detail-label">Дата доставки:</span>
-                  <span className="detail-value">
-                    {formatDate(selectedOrder.delivery_date)} (
-                    {selectedOrder.delivery_time_interval})
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Способ оплаты:</span>
-                  <span className="detail-value">
-                    {selectedOrder.payment_method === "cash"
-                      ? "Наличными"
-                      : "Переводом"}
-                  </span>
+                  <span className="detail-label">Телефон:</span>
+                  <span className="detail-value">{selectedOrder.phone_number}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Статус:</span>
@@ -235,6 +236,16 @@ const Profile = () => {
                   </span>
                 </div>
               </div>
+
+              {/* БЛОК КОММЕНТАРИЯ */}
+              {selectedOrder.comment && (
+                <div className="order-comment">
+                  <h3>Комментарий к заказу</h3>
+                  <div className="comment-text">
+                    {selectedOrder.comment}
+                  </div>
+                </div>
+              )}
 
               <h3>Товары в заказе</h3>
               <TableContainer component={Paper} className="order-items">

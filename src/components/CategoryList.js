@@ -7,6 +7,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import { ChevronRight } from "lucide-react";
 import "../styles.scss";
 
 const CategoryList = () => {
@@ -16,7 +17,7 @@ const CategoryList = () => {
 
   useEffect(() => {
     axios
-      .get("https://prime-forest.ru/api/categories/")
+      .get("http://127.0.0.1:8000/api/categories/")
       .then((response) => {
         if (response.data && Array.isArray(response.data.results)) {
           setCategories(response.data.results);
@@ -49,23 +50,42 @@ const CategoryList = () => {
     );
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="error-message">{error}</div>;
   }
 
   return (
     <div className="category-list">
-      <h1>Категории</h1>
       <div className="categories-grid">
         {categories.map((category) => (
-          <Link to={`/products?category=${category.id}`} key={category.id}>
+          <Link
+            to={`/catalog?category=${category.id}`}
+            key={category.id}
+            className="category-link"
+          >
             <Card className="category-card">
-              {category.image_url && (
-                <img src={category.image_url} alt={category.name} />
-              )}
-              <CardContent>
-                <Typography variant="h5" component="div">
+              <div className="category-image-wrapper">
+                {category.image_url ? (
+                  <img
+                    src={category.image_url}
+                    alt={category.name}
+                    className="category-image"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="category-image-placeholder">
+                    <span>{category.name.charAt(0)}</span>
+                  </div>
+                )}
+              </div>
+              <CardContent className="category-card-content">
+                <Typography
+                  variant="h5"
+                  component="div"
+                  className="category-title"
+                >
                   {category.name}
                 </Typography>
+                <ChevronRight size={20} className="category-arrow" />
               </CardContent>
             </Card>
           </Link>

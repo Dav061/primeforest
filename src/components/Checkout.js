@@ -1,76 +1,44 @@
-import React, { useState } from "react";
+// src/components/Checkout.js - исправленная версия
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Autocomplete from "@mui/material/Autocomplete";
+import { AuthContext } from "../AuthContext";
+import { CartContext } from "../CartContext";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Radio from "@mui/material/Radio";
 import Alert from "@mui/material/Alert";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
 const Checkout = () => {
-  const [address, setAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [addressSuggestions, setAddressSuggestions] = useState([]);
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [deliveryTime, setDeliveryTime] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const { user } = useContext(AuthContext);
+  const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  const timeIntervals = [
-    { value: "9-12", label: "9:00 - 12:00" },
-    { value: "12-15", label: "12:00 - 15:00" },
-    { value: "15-18", label: "15:00 - 18:00" },
-    { value: "18-21", label: "18:00 - 21:00" },
-  ];
-
-  const paymentMethods = [
-    { value: "cash", label: "Наличными при получении" },
-    { value: "transfer", label: "Переводом при получении" },
-  ];
-
-  const fetchAddressSuggestions = (query) => {
-    if (query.length > 2) {
-      axios
-        .post(
-          "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address",
-          { query: query },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: "Token YOUR_DADATA_API_KEY",
-            },
-          }
-        )
-        .then((response) => {
-          const suggestions = response.data.suggestions.map(
-            (suggestion) => suggestion.value
-          );
-          setAddressSuggestions(suggestions);
-        })
-        .catch((error) => {
-          console.error("Ошибка при загрузке подсказок:", error);
-        });
-    }
-  };
+  // Обязательные поля (только адрес и телефон)
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  
+  // Необязательные поля
+  const [comment, setComment] = useState("");
+  
+  // Для гостей (необязательные)
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleCheckout = async () => {
-    if (!address || !phoneNumber || !deliveryDate || !deliveryTime) {
-      notifyError("Пожалуйста, заполните все обязательные поля");
+    // Проверяем только обязательные поля (адрес и телефон)
+    if (!address || !phoneNumber) {
+      notifyError("Пожалуйста, заполните обязательные поля: адрес и телефон");
       return;
     }
 
-    const phoneRegex =
-      /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    // Валидация телефона
+    const phoneRegex = /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
     if (!phoneRegex.test(phoneNumber)) {
       notifyError("Пожалуйста, введите корректный номер телефона");
       return;
@@ -80,57 +48,67 @@ const Checkout = () => {
     setError(null);
 
     try {
-      const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
+      // Проверяем корзину
+      if (!user && Object.keys(cartItems).length === 0) {
+        notifyError("Корзина пуста");
+        return;
+      }
+
+      // Базовая структура заказа - только нужные поля
+      const orderData = {
+        address: address.trim(),
+        phone_number: phoneNumber.trim(),
+        comment: comment.trim() || null,
+      };
+
+      // Для гостей
+      if (!user) {
+        orderData.guest_name = guestName.trim() || "Гость";
+        if (guestEmail.trim()) {
+          orderData.guest_email = guestEmail.trim();
+        }
+        
+        // Добавляем товары из корзины
+        orderData.cart_items = Object.entries(cartItems).map(([productId, quantity]) => ({
+          product_id: parseInt(productId),
+          quantity: quantity
+        }));
+      }
+
+      const headers = user 
+        ? { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        : {};
 
       const orderResponse = await axios.post(
-        "https://prime-forest.ru/api/orders/",
-        {
-          address: address,
-          phone_number: phoneNumber,
-          delivery_date: formattedDate,
-          delivery_time_interval: deliveryTime,
-          payment_method: paymentMethod,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
+        "http://127.0.0.1:8000/api/orders/",
+        orderData,
+        { headers }
       );
 
-      await axios.delete("https://prime-forest.ru/api/carts/clear/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      // Очищаем корзину
+      clearCart();
 
       notifySuccess(`✅ Заказ #${orderResponse.data.id} успешно оформлен!`);
 
-      setTimeout(() => {
-        navigate("/profile", {
-          state: { orderSuccess: true, orderId: orderResponse.data.id },
-        });
-      }, 2000);
+      navigate("/order-success", { 
+        state: { 
+          orderId: orderResponse.data.id,
+          isGuest: !user,
+          phoneNumber: phoneNumber,
+          email: guestEmail || user?.email
+        } 
+      });
+
     } catch (error) {
       console.error("Ошибка при оформлении заказа:", error);
-
+      
       let errorMessage = "Произошла ошибка при оформлении заказа";
-
-      if (error.response?.data) {
-        if (typeof error.response.data === "string") {
-          errorMessage = error.response.data;
-        } else if (error.response.data.error) {
-          errorMessage = error.response.data.error;
-        } else if (error.response.data.detail) {
-          errorMessage = error.response.data.detail;
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
       }
-
+      
       notifyError(`❌ ${errorMessage}`);
       setError(errorMessage);
     } finally {
@@ -138,110 +116,123 @@ const Checkout = () => {
     }
   };
 
-  const isFormValid = address && phoneNumber && deliveryDate && deliveryTime;
+  // Проверяем только обязательные поля
+  const isFormValid = address && phoneNumber;
 
   return (
-    <div className="checkout">
-      <h1>Оформление заказа</h1>
+    <div className="checkout-page">
+      <div className="checkout-header">
+        <Button
+          variant="contained"
+          onClick={() => navigate("/cart")}
+          className="back-to-cart-btn"
+          startIcon={<ArrowBackIcon />}
+        >
+          Назад
+        </Button>
+        <h1 className="checkout-title">Оформление заказа</h1>
+      </div>
 
-      <div className="form-container">
-        <Autocomplete
-          freeSolo
-          options={addressSuggestions}
-          onInputChange={(event, newValue) => {
-            setAddress(newValue);
-            fetchAddressSuggestions(newValue);
-          }}
-          renderInput={(params) => (
+      <div className="checkout-form">
+        <div className="form-section">
+          <h2>Контактные данные</h2>
+          
+          {/* Номер телефона - обязателен */}
+          <TextField
+            label="Номер телефона"
+            fullWidth
+            margin="normal"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="+7 (999) 123-45-67"
+            required
+            error={error && !phoneNumber}
+          />
+
+          {user && (
             <TextField
-              {...params}
-              label="Адрес доставки"
+              label="Email"
               fullWidth
               margin="normal"
-              required
-              error={error && !address}
-              helperText={error && !address ? "Адрес обязателен" : ""}
+              value={user.email || ""}
+              disabled
+              helperText="Ваш email из профиля"
             />
           )}
-        />
 
-        <TextField
-          label="Номер телефона"
-          fullWidth
-          margin="normal"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          required
-          placeholder="+7 (999) 123-45-67"
-          error={error && !phoneNumber}
-          helperText={error && !phoneNumber ? "Телефон обязателен" : ""}
-        />
-
-        <TextField
-          label="Дата доставки"
-          type="date"
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ shrink: true }}
-          value={deliveryDate}
-          onChange={(e) => setDeliveryDate(e.target.value)}
-          required
-          inputProps={{
-            min: new Date().toISOString().split("T")[0],
-          }}
-          error={error && !deliveryDate}
-          helperText={error && !deliveryDate ? "Дата доставки обязательна" : ""}
-        />
-
-        <TextField
-          select
-          label="Временной интервал"
-          fullWidth
-          margin="normal"
-          value={deliveryTime}
-          onChange={(e) => setDeliveryTime(e.target.value)}
-          required
-          error={error && !deliveryTime}
-          helperText={
-            error && !deliveryTime ? "Временной интервал обязателен" : ""
-          }
-        >
-          {timeIntervals.map((interval) => (
-            <MenuItem key={interval.value} value={interval.value}>
-              {interval.label}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Способ оплаты</FormLabel>
-          <RadioGroup
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            {paymentMethods.map((method) => (
-              <FormControlLabel
-                key={method.value}
-                value={method.value}
-                control={<Radio />}
-                label={method.label}
+          {!user && (
+            <>
+              <TextField
+                label="Ваше имя"
+                fullWidth
+                margin="normal"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                placeholder="Как к вам обращаться?"
+                helperText="Необязательно"
               />
-            ))}
-          </RadioGroup>
-        </FormControl>
+              
+              <TextField
+                label="Email"
+                type="email"
+                fullWidth
+                margin="normal"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                placeholder="Почта"
+                helperText="Необязательно"
+              />
+            </>
+          )}
+        </div>
 
-        <Button
-          onClick={handleCheckout}
-          disabled={loading || !isFormValid}
-          variant="contained"
-          color="primary"
-          className="submit-button"
-          fullWidth
-          size="large"
-          sx={{ mt: 2 }}
-        >
-          {loading ? "Оформление..." : "Оформить заказ"}
-        </Button>
+        {/* Адрес доставки - обязателен */}
+        <div className="form-section">
+          <h2>Адрес доставки</h2>
+          
+          <TextField
+            label="Адрес доставки"
+            fullWidth
+            margin="normal"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Город, улица, дом, квартира"
+            required
+            multiline
+            rows={2}
+            error={error && !address}
+          />
+        </div>
+
+        {/* Комментарий - необязательный */}
+        <div className="form-section">
+          <h2>Комментарий к заказу</h2>
+          
+          <TextField
+            label="Комментарий"
+            fullWidth
+            margin="normal"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Укажите дополнительную информацию: подъезд, домофон, пожелания по доставке и т.д."
+            multiline
+            rows={3}
+          />
+        </div>
+
+        <div className="checkout-actions">
+          <Button
+            onClick={handleCheckout}
+            disabled={loading || !isFormValid}
+            variant="contained"
+            color="primary"
+            className="submit-order-btn"
+            fullWidth
+            size="large"
+          >
+            {loading ? "Оформление..." : "Подтвердить заказ"}
+          </Button>
+        </div>
 
         {error && (
           <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>

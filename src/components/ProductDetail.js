@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import { ShoppingCart, Minus, Plus } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Ruler } from "lucide-react";
 import { CartContext } from "../CartContext";
 import "../styles.scss";
 import { IconButton } from "@mui/material";
@@ -17,7 +17,7 @@ const ProductDetail = () => {
   const [mainImage, setMainImage] = useState("");
   const navigate = useNavigate();
 
-  const { addToCart, updateCartItem, getItemQuantity } =
+  const { addToCart, updateCartItem, getItemQuantity, removeFromCart } =
     useContext(CartContext);
   const quantity = getItemQuantity(parseInt(id));
 
@@ -25,14 +25,14 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `https://prime-forest.ru/api/products/${id}/`
+          `http://127.0.0.1:8000/api/products/${id}/`
         );
         const productData = response.data;
 
         const getImageUrl = (imagePath) => {
           if (!imagePath) return "/default-product.jpg";
           if (imagePath.startsWith("http")) return imagePath;
-          return `https://prime-forest.ru${
+          return `http://127.0.0.1:8000${
             imagePath.startsWith("/") ? "" : "/"
           }${imagePath}`;
         };
@@ -42,6 +42,9 @@ const ProductDetail = () => {
           category: productData.category || "Не указана",
           wood_type: productData.wood_type || "Не указана",
           grade: productData.grade || "Не указан",
+          width: productData.width, // Добавляем ширину
+          thickness: productData.thickness, // Добавляем толщину
+          length: productData.length, // Добавляем длину
           main_image: getImageUrl(
             productData.main_image || productData.images?.[0]?.image
           ),
@@ -74,11 +77,21 @@ const ProductDetail = () => {
   };
 
   const handleDecrease = async () => {
-    await updateCartItem(product.id, quantity - 1);
+    if (quantity <= 1) {
+      await removeFromCart(product.id);
+    } else {
+      await updateCartItem(product.id, quantity - 1);
+    }
   };
 
   const handleGoToCart = () => {
     navigate("/cart");
+  };
+
+  // Функция для форматирования размера
+  const formatSize = (value) => {
+    if (value === null || value === undefined || value === "") return null;
+    return value;
   };
 
   if (loading)
@@ -90,6 +103,9 @@ const ProductDetail = () => {
 
   if (error) return <div className="error-message">{error}</div>;
   if (!product) return <div className="error-message">Товар не найден.</div>;
+
+  // Проверяем, есть ли хотя бы один размер
+  const hasSizes = product.width || product.thickness || product.length;
 
   return (
     <div className="product-detail">
@@ -164,6 +180,38 @@ const ProductDetail = () => {
                   <span className="meta-value">{product.grade}</span>
                 </div>
               )}
+
+              {/* ДОБАВЛЕНЫ РАЗМЕРЫ */}
+              {hasSizes && (
+                <div className="meta-item sizes-section">
+                  <span className="meta-label">
+                    <Ruler size={16} style={{ marginRight: "4px" }} />
+                    Размеры:
+                  </span>
+                  <div className="sizes-values">
+                    {product.thickness && (
+                      <span className="size-badge">
+                        <span className="size-label">Толщина:</span>
+                        <span className="size-value">
+                          {product.thickness} мм
+                        </span>
+                      </span>
+                    )}
+                    {product.width && (
+                      <span className="size-badge">
+                        <span className="size-label">Ширина:</span>
+                        <span className="size-value">{product.width} мм</span>
+                      </span>
+                    )}
+                    {product.length && (
+                      <span className="size-badge">
+                        <span className="size-label">Длина:</span>
+                        <span className="size-value">{product.length} мм</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {quantity === 0 ? (
@@ -172,7 +220,7 @@ const ProductDetail = () => {
                 Добавить в корзину
               </button>
             ) : (
-              <div className="cart-controls">
+              <div className="detail-cart-controls">
                 <div className="cart-counter">
                   <IconButton
                     size="small"
@@ -181,7 +229,24 @@ const ProductDetail = () => {
                   >
                     <Minus size={16} />
                   </IconButton>
-                  <span className="counter-value">{quantity}</span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={async (e) => {
+                      const newValue = parseInt(e.target.value);
+                      if (!isNaN(newValue)) {
+                        if (newValue <= 0) {
+                          await removeFromCart(product.id);
+                        } else {
+                          await updateCartItem(product.id, newValue);
+                        }
+                      }
+                    }}
+                    className="counter-input"
+                  />
+
                   <IconButton
                     size="small"
                     onClick={handleIncrease}
@@ -197,7 +262,7 @@ const ProductDetail = () => {
                   onClick={handleGoToCart}
                   className="cart-go-btn"
                 >
-                  Перейти
+                  Перейти в корзину
                 </Button>
               </div>
             )}

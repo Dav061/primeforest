@@ -1,13 +1,16 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// src/App.js
+import React, { useLayoutEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider } from "./AuthContext";
-import { CartProvider } from "./CartContext"; // ← добавить импорт
+import { CartProvider } from "./CartContext";
 import Navbar from "./components/Navbar";
+import MainPage from "./components/MainPage";
+import CatalogPage from "./components/CatalogPage";
 import CategoryList from "./components/CategoryList";
-import ProductList from "./components/ProductList";
 import ProductDetail from "./components/ProductDetail";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
+import OrderSuccess from "./components/OrderSuccess"; // ИМПОРТИРУЕМ НОВЫЙ КОМПОНЕНТ
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AboutPage from "./components/AboutPage";
@@ -19,12 +22,61 @@ import Promotions from "./components/Promotions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
+function AppContent() {
+  return (
+    <>
+      <ScrollToTop />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/catalog" element={<CatalogPage />} />
+        <Route path="/products" element={<CatalogPage />} />
+        <Route path="/categories" element={<CategoryList />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/catalog/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} /> {/* Убрали ProtectedRoute */}
+        <Route path="/order-success" element={<OrderSuccess />} /> {/* НОВЫЙ МАРШРУТ */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contacts" element={<Contacts />} />
+        <Route path="/promotions" element={<Promotions />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        {" "}
-        {/* ← добавить обертку */}
         <Router>
           <ToastContainer
             position="top-right"
@@ -37,42 +89,7 @@ function App() {
             draggable
             pauseOnHover
           />
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<CategoryList />} />
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <Cart />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/promotions" element={<Promotions />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute adminOnly={true}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          <AppContent />
         </Router>
       </CartProvider>
     </AuthProvider>

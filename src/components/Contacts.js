@@ -4,7 +4,7 @@ import "../styles.scss"; // Подключаем стили
 const Contacts = () => {
   return (
     <div className="contacts-container">
-      <h1 className="contacts-title">Контакты</h1>
+      {/* <h1 className="contacts-title">Контакты</h1> */}
 
       {/* Основная информация */}
       <div className="contacts-grid">
@@ -22,6 +22,9 @@ const Contacts = () => {
           <p className="contact-text">
             <a href="tel:+79990000629">+7 (999) 000-06-29</a>
           </p>
+          <p className="contact-text">
+            <a href="tel:+79055983500">+7 (905) 598-35-00</a>
+          </p>
         </div>
 
         {/* Email */}
@@ -29,7 +32,7 @@ const Contacts = () => {
           <div className="contact-icon">✉️</div>
           <h2 className="contact-heading">Email</h2>
           <p className="contact-text">
-            <a href="mailto:info@severlesgroup.ru">info@woodgood.ru</a>
+            <a href="mailto:info@prime-forest@yandex.ru">prime-forest@yandex.ru</a>
           </p>
         </div>
 
@@ -43,9 +46,15 @@ const Contacts = () => {
         {/* вотсап */}
         <div className="contact-card">
           <div className="contact-icon">📲</div>
-          <h2 className="contact-heading">Telegram</h2>
+          <h2 className="contact-heading">WhatsApp</h2>
           <p className="contact-text">
-            <a href="https://t.me/+79999849269">Написать сообщение</a>
+            <a
+              href="https://wa.me/79990000629?text=Здравствуйте!%20Меня%20интересуют%20пиломатериалы"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Написать с вопросом о товарах
+            </a>
           </p>
         </div>
       </div>
@@ -66,22 +75,7 @@ const Contacts = () => {
           <h2 className="section-title">Реквизиты компании</h2>
           <div className="requisites-content">
             <p>
-              <strong>ИНН:</strong> \
-            </p>
-            <p>
-              <strong>КПП:</strong> \
-            </p>
-            <p>
-              <strong>ОГРН:</strong> \
-            </p>
-            <p>
-              <strong>Банк:</strong> ПАО Сбербанк
-            </p>
-            <p>
-              <strong>Р/с:</strong> \
-            </p>
-            <p>
-              <strong>БИК:</strong> \
+              <h>Уточняйте, пожалуйста, по телефону</h> 
             </p>
           </div>
         </div>

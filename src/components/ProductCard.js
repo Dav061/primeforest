@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Card, CardContent, Button, IconButton } from "@mui/material";
 import { ShoppingCart, Eye, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,13 +7,16 @@ import "../styles.scss";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-  const { addToCart, updateCartItem, getItemQuantity } =
+  const { addToCart, updateCartItem, getItemQuantity, removeFromCart } =
     useContext(CartContext);
   const quantity = getItemQuantity(product.id);
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
-    await addToCart(product.id, 1);
+    const success = await addToCart(product.id, 1);
+    if (success) {
+      // Уведомление уже показывается в addToCart
+    }
   };
 
   const handleIncrease = async (e) => {
@@ -23,10 +26,18 @@ const ProductCard = ({ product }) => {
 
   const handleDecrease = async (e) => {
     e.stopPropagation();
-    await updateCartItem(product.id, quantity - 1);
+    if (quantity <= 1) {
+      // Если количество 1 - удаляем товар
+      await removeFromCart(product.id);
+      // Уведомление показывается в removeFromCart
+    } else {
+      // Иначе уменьшаем количество
+      await updateCartItem(product.id, quantity - 1);
+    }
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = (e) => {
+    if (e) e.stopPropagation();
     navigate(`/products/${product.id}`);
   };
 
@@ -38,13 +49,13 @@ const ProductCard = ({ product }) => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
+    return `http://127.0.0.1:8000${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
 
   return (
-    <Card className="product-card" onClick={handleViewDetails}>
+    <Card className="product-card" onClick={(e) => handleViewDetails(e)}>
       <div className="product-image-container">
         <img
           src={getImageUrl(product.main_image)}
@@ -61,7 +72,7 @@ const ProductCard = ({ product }) => {
 
       <CardContent className="product-content">
         <h3 className="product-name">{product.name}</h3>
-        <div className="product-category">{product.category}</div>
+        {/* <div className="product-category">{product.category}</div> */}
 
         {(product.wood_type || product.grade) && (
           <div className="product-wood-info">
@@ -80,7 +91,6 @@ const ProductCard = ({ product }) => {
 
         <div className="product-actions">
           {quantity === 0 ? (
-            // Кнопка для добавления (когда товара нет в корзине)
             <Button
               variant="contained"
               size="medium"
@@ -92,17 +102,37 @@ const ProductCard = ({ product }) => {
               В корзину
             </Button>
           ) : (
-            // Блок с счетчиком и отдельной кнопкой перехода (всегда видимой)
             <div className="cart-controls">
               <div className="cart-counter">
                 <IconButton
                   size="small"
                   onClick={handleDecrease}
                   className="counter-btn"
+                  // Убираем disabled - кнопка всегда активна
                 >
                   <Minus size={16} />
                 </IconButton>
-                <span className="counter-value">{quantity}</span>
+
+                <input
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  onClick={(e) => e.stopPropagation()}
+                  onFocus={(e) => e.stopPropagation()}
+                  onChange={async (e) => {
+                    const newValue = parseInt(e.target.value);
+                    if (!isNaN(newValue)) {
+                      if (newValue <= 0) {
+                        // Если ввели 0 или меньше - удаляем
+                        await removeFromCart(product.id);
+                      } else {
+                        await updateCartItem(product.id, newValue);
+                      }
+                    }
+                  }}
+                  className="counter-input"
+                />
+
                 <IconButton
                   size="small"
                   onClick={handleIncrease}
@@ -122,16 +152,6 @@ const ProductCard = ({ product }) => {
               </Button>
             </div>
           )}
-
-          <Button
-            variant="outlined"
-            size="medium"
-            startIcon={<Eye size={18} />}
-            onClick={handleViewDetails}
-            className="details-btn"
-          >
-            Детали
-          </Button>
         </div>
       </CardContent>
     </Card>
