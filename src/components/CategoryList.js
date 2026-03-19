@@ -11,32 +11,29 @@ import { ChevronRight } from "lucide-react";
 import { Helmet } from "react-helmet";
 import "../styles.scss";
 
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("https://prime-forest.ru/api/categories/")
-      .then((response) => {
-        if (response.data && Array.isArray(response.data.results)) {
-          setCategories(response.data.results);
-        } else {
-          setError(
-            "Ожидался массив категорий, но получен другой формат данных."
-          );
-        }
-      })
-      .catch((error) => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/categories/`);
+        setCategories(response.data.results || []);
+      } catch (error) {
         setError("Ошибка при загрузке категорий: " + error.message);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchCategories();
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
       <Box
         sx={{
@@ -49,6 +46,7 @@ const CategoryList = () => {
         <CircularProgress size={80} />
       </Box>
     );
+  }
 
   if (error) {
     return <div className="error-message">{error}</div>;
@@ -65,6 +63,7 @@ const CategoryList = () => {
           content="Все категории пиломатериалов: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и МО."
         />
       </Helmet>
+
       <div className="category-list">
         <div className="categories-grid">
           {categories.map((category) => (
@@ -88,6 +87,7 @@ const CategoryList = () => {
                     </div>
                   )}
                 </div>
+
                 <CardContent className="category-card-content">
                   <Typography
                     variant="h5"

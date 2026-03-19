@@ -1,5 +1,4 @@
-// src/CartContext.js - исправленная версия
-
+// src/CartContext.js
 import React, {
   createContext,
   useContext,
@@ -13,367 +12,349 @@ import { notifySuccess, notifyError } from "./utils/notifications";
 
 export const CartContext = createContext();
 
-// Ключ для localStorage (только для товаров в корзине)
-const GUEST_CART_KEY = "guestCart";
+export const GUEST_CART_KEY = "guestCart";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cart, setCart] = useState(null);
-  const [cartItems, setCartItems] = useState({}); // { productId: quantity }
+  const [cartItems, setCartItems] = useState({});
   const [cartCount, setCartCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  // УДАЛЯЕМ getSessionKey - она больше не нужна
+  const getAuthHeader = useCallback(
+    () => ({
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    }),
+    []
+  );
 
   // Загрузка корзины из localStorage для гостя
   const loadGuestCart = useCallback(() => {
     try {
       const savedCart = localStorage.getItem(GUEST_CART_KEY);
-      if (savedCart) {
-        const items = JSON.parse(savedCart);
-        setCartItems(items);
-
-        // Подсчитываем общее количество
-        const totalCount = Object.values(items).reduce(
-          (sum, qty) => sum + qty,
-          0
-        );
-        setCartCount(totalCount);
-
-        setCart({ id: "guest", items: [] }); // Просто для совместимости
-      } else {
-        setCartItems({});
-        setCartCount(0);
-        setCart({ id: "guest", items: [] });
-      }
+      setCartItems(savedCart ? JSON.parse(savedCart) : {});
     } catch (error) {
-      console.error("Error loading guest cart:", error);
+      setCartItems({});
     }
   }, []);
 
-  // Сохранение гостевой корзины в localStorage
-  const saveGuestCart = (items) => {
+  // Сохранение гостевой корзины
+  const saveGuestCart = useCallback((items) => {
     try {
       localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
-      setCartItems(items);
-
-      const totalCount = Object.values(items).reduce(
-        (sum, qty) => sum + qty,
-        0
-      );
-      setCartCount(totalCount);
     } catch (error) {
       console.error("Error saving guest cart:", error);
     }
-  };
+  }, []);
 
-  // Загрузка корзины с сервера для авторизованного пользователя
+  // Загрузка корзины с сервера
   const fetchUserCart = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://prime-forest.ru/api/carts/my_cart/",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          withCredentials: true, // Добавляем для отправки cookies
-        }
+        `${API_URL}/api/carts/my_cart/`,
+        getAuthHeader()
       );
 
       setCart(response.data);
 
-      // Преобразуем в объект для быстрого доступа
       const itemsMap = {};
-      let totalCount = 0;
 
       if (response.data?.items) {
         response.data.items.forEach((item) => {
-          itemsMap[item.product.id] = item.quantity;
-          totalCount += item.quantity;
+          const priceId =
+            item.selected_price?.id ||
+            item.selected_price_info?.id ||
+            (typeof item.selected_price === "number"
+              ? item.selected_price
+              : null);
+
+          if (item.product && priceId) {
+            itemsMap[`${item.product.id}_${priceId}`] = item.quantity;
+          }
         });
       }
 
       setCartItems(itemsMap);
-      setCartCount(totalCount);
     } catch (error) {
-      console.error("Ошибка загрузки корзины:", error);
+      console.error("Error loading cart:", error);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, getAuthHeader]);
 
-  // Синхронизация гостевой корзины с сервером после авторизации
-  const syncGuestCartWithServer = useCallback(async () => {
-    if (!user) return;
+  // Синхронизация гостевой корзины с сервером
+  const syncGuestCartWithServer = useCallback(
+    async (username) => {
+      const token = localStorage.getItem("token");
+      if (!token) return false;
 
-    const guestItems = cartItems;
-    if (Object.keys(guestItems).length === 0) return;
+      try {
+        const savedCart = localStorage.getItem(GUEST_CART_KEY);
+        if (!savedCart) return true;
 
-    try {
-      // Добавляем каждый товар из гостевой корзины на сервер
-      for (const [productId, quantity] of Object.entries(guestItems)) {
-        await axios.post(
-          "https://prime-forest.ru/api/carts/add_to_cart/",
-          { product_id: parseInt(productId), quantity },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            withCredentials: true,
-          }
+        const guestItems = JSON.parse(savedCart);
+        if (Object.keys(guestItems).length === 0) return true;
+
+        setLoading(true);
+        setIsSyncing(true);
+
+        const currentCartResponse = await axios.get(
+          `${API_URL}/api/carts/my_cart/`,
+          getAuthHeader()
         );
+
+        const currentItems = {};
+        if (currentCartResponse.data?.items) {
+          currentCartResponse.data.items.forEach((item) => {
+            if (item.selected_price?.id) {
+              currentItems[`${item.product.id}_${item.selected_price.id}`] =
+                item.quantity;
+            }
+          });
+        }
+
+        // Объединяем корзины
+        for (const [key, guestQuantity] of Object.entries(guestItems)) {
+          const [productId, priceId] = key.split("_").map(Number);
+          const currentQuantity = currentItems[key] || 0;
+
+          await axios.post(
+            `${API_URL}/api/carts/add_to_cart/`,
+            {
+              product_id: productId,
+              quantity: currentQuantity + guestQuantity,
+              selected_price_id: priceId,
+            },
+            getAuthHeader()
+          );
+        }
+
+        localStorage.setItem(`guestCartSynced_${username}`, "true");
+        localStorage.removeItem(GUEST_CART_KEY);
+
+        const response = await axios.get(
+          `${API_URL}/api/carts/my_cart/`,
+          getAuthHeader()
+        );
+
+        const itemsMap = {};
+        if (response.data?.items) {
+          response.data.items.forEach((item) => {
+            if (item.selected_price?.id) {
+              itemsMap[`${item.product.id}_${item.selected_price.id}`] =
+                item.quantity;
+            }
+          });
+        }
+
+        setCartItems(itemsMap);
+        setCart(response.data);
+        notifySuccess("Корзина синхронизирована");
+        return true;
+      } catch (error) {
+        console.error("Error syncing cart:", error);
+        notifyError("Ошибка при синхронизации корзины");
+        return false;
+      } finally {
+        setLoading(false);
+        setIsSyncing(false);
       }
+    },
+    [getAuthHeader]
+  );
 
-      // Очищаем гостевую корзину
-      localStorage.removeItem(GUEST_CART_KEY);
-
-      // Загружаем актуальную корзину с сервера
-      await fetchUserCart();
-
-      notifySuccess("Корзина синхронизирована");
-    } catch (error) {
-      console.error("Error syncing cart:", error);
-      notifyError("Ошибка при синхронизации корзины");
-    }
-  }, [user, cartItems, fetchUserCart]);
-
-  // Загрузка корзины в зависимости от статуса пользователя
+  // Эффект для загрузки корзины
   useEffect(() => {
+    if (isSyncing) return;
+
     if (user) {
       fetchUserCart();
     } else {
       loadGuestCart();
     }
-  }, [user, fetchUserCart, loadGuestCart]);
+  }, [user, isSyncing, fetchUserCart, loadGuestCart]);
 
-  // Синхронизация при авторизации
+  // Подсчет количества
   useEffect(() => {
-    if (user && Object.keys(cartItems).length > 0) {
-      const guestItems = localStorage.getItem(GUEST_CART_KEY);
-      if (guestItems) {
-        syncGuestCartWithServer();
-      }
-    }
-  }, [user, cartItems, syncGuestCartWithServer]);
+    const totalCount = Object.values(cartItems).reduce(
+      (sum, qty) => sum + (typeof qty === "number" ? qty : 0),
+      0
+    );
+    setCartCount(totalCount);
+  }, [cartItems]);
 
-  // Добавление товара в корзину
-  const addToCart = async (productId, quantity = 1) => {
-    // Для авторизованных пользователей
+  // Добавление товара
+  const addToCart = async (productId, quantity = 1, selectedPrice) => {
+    if (!selectedPrice) {
+      notifyError("Выберите вариант цены");
+      return false;
+    }
+
+    const key = `${productId}_${selectedPrice.id}`;
+
     if (user) {
       try {
         await axios.post(
-          "https://prime-forest.ru/api/carts/add_to_cart/",
-          { product_id: productId, quantity },
+          `${API_URL}/api/carts/add_to_cart/`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            withCredentials: true,
-          }
+            product_id: productId,
+            quantity,
+            selected_price_id: selectedPrice.id,
+          },
+          getAuthHeader()
         );
-
-        // Обновляем локальное состояние без полной перезагрузки
-        const newQuantity = (cartItems[productId] || 0) + quantity;
 
         setCartItems((prev) => ({
           ...prev,
-          [productId]: newQuantity,
+          [key]: (prev[key] || 0) + quantity,
         }));
 
-        setCartCount((prev) => prev + quantity);
-
-        // Обновляем cart.items если он есть
-        if (cart?.items) {
-          const existingItemIndex = cart.items.findIndex(
-            (item) => item.product.id === productId
-          );
-
-          if (existingItemIndex >= 0) {
-            // Обновляем существующий item
-            const updatedItems = [...cart.items];
-            updatedItems[existingItemIndex] = {
-              ...updatedItems[existingItemIndex],
-              quantity: updatedItems[existingItemIndex].quantity + quantity,
-            };
-            setCart({ ...cart, items: updatedItems });
-          } else {
-            // Добавляем новый item (нужны данные о продукте)
-            // В этом случае лучше сделать полную перезагрузку
-            await fetchUserCart();
-          }
-        }
-
+        notifySuccess("Товар добавлен в корзину");
         return true;
       } catch (error) {
-        console.error("Ошибка добавления в корзину:", error);
+        console.error("Error adding to cart:", error);
         notifyError("Не удалось добавить товар в корзину");
         return false;
       }
-    }
-    // Для гостей
-    else {
-      const newItems = { ...cartItems };
-      newItems[productId] = (newItems[productId] || 0) + quantity;
-      saveGuestCart(newItems);
+    } else {
+      setCartItems((prev) => {
+        const newItems = { ...prev, [key]: (prev[key] || 0) + quantity };
+        saveGuestCart(newItems);
+        return newItems;
+      });
       notifySuccess("Товар добавлен в корзину");
       return true;
     }
   };
 
-  // Обновление количества товара
-  const updateCartItem = async (productId, newQuantity) => {
+  // Обновление количества
+  const updateCartItem = async (productId, priceId, newQuantity) => {
+    const key = `${productId}_${priceId}`;
+
     if (newQuantity < 1) {
-      await removeFromCart(productId);
+      await removeFromCart(productId, priceId);
       return;
     }
 
-    // Для авторизованных пользователей
     if (user) {
       try {
-        // Ищем item в корзине
+        setCartItems((prev) => ({ ...prev, [key]: newQuantity }));
+
         const cartItem = cart?.items?.find(
-          (item) => item.product.id === productId
+          (item) =>
+            item.product?.id === productId &&
+            item.selected_price?.id === priceId
         );
 
         if (cartItem) {
           await axios.patch(
-            `https://prime-forest.ru/api/cartitems/${cartItem.id}/`,
+            `${API_URL}/api/cartitems/${cartItem.id}/`,
             { quantity: newQuantity },
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              withCredentials: true,
-            }
+            getAuthHeader()
           );
-
-          // Обновляем локальное состояние без полной перезагрузки
-          setCartItems((prev) => ({
-            ...prev,
-            [productId]: newQuantity,
-          }));
-
-          // Обновляем счетчик
-          const oldQuantity = cartItems[productId] || 0;
-          setCartCount((prev) => prev - oldQuantity + newQuantity);
-
-          // Обновляем cart.items
-          if (cart?.items) {
-            const updatedItems = cart.items.map((item) =>
-              item.product.id === productId
-                ? { ...item, quantity: newQuantity }
-                : item
-            );
-            setCart({ ...cart, items: updatedItems });
-          }
         } else {
-          await addToCart(productId, newQuantity);
+          await axios.post(
+            `${API_URL}/api/carts/add_to_cart/`,
+            {
+              product_id: productId,
+              quantity: newQuantity,
+              selected_price_id: priceId,
+            },
+            getAuthHeader()
+          );
         }
       } catch (error) {
-        console.error("Ошибка обновления корзины:", error);
+        console.error("Error updating cart:", error);
         notifyError("Не удалось обновить количество");
-        throw error; // Пробрасываем ошибку для отката в компоненте
+        await fetchUserCart();
+        throw error;
       }
-    }
-    // Для гостей
-    else {
-      const newItems = { ...cartItems };
-      newItems[productId] = newQuantity;
-      saveGuestCart(newItems);
+    } else {
+      setCartItems((prev) => {
+        const newItems = { ...prev, [key]: newQuantity };
+        saveGuestCart(newItems);
+        return newItems;
+      });
     }
   };
 
-  // Удаление товара из корзины
-  const removeFromCart = async (productId) => {
-    // Для авторизованных пользователей
+  // Удаление товара
+  const removeFromCart = async (productId, priceId) => {
+    const key = `${productId}_${priceId}`;
+
     if (user) {
       try {
+        setCartItems((prev) => {
+          const newItems = { ...prev };
+          delete newItems[key];
+          return newItems;
+        });
+
         const cartItem = cart?.items?.find(
-          (item) => item.product.id === productId
+          (item) =>
+            item.product?.id === productId &&
+            item.selected_price?.id === priceId
         );
 
         if (cartItem) {
           await axios.delete(
-            `https://prime-forest.ru/api/cartitems/${cartItem.id}/`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              withCredentials: true,
-            }
+            `${API_URL}/api/cartitems/${cartItem.id}/`,
+            getAuthHeader()
           );
         }
-
-        // Обновляем локальное состояние без полной перезагрузки
-        const oldQuantity = cartItems[productId] || 0;
-
-        const newCartItems = { ...cartItems };
-        delete newCartItems[productId];
-        setCartItems(newCartItems);
-
-        setCartCount((prev) => prev - oldQuantity);
-
-        // Обновляем cart.items
-        if (cart?.items) {
-          const updatedItems = cart.items.filter(
-            (item) => item.product.id !== productId
-          );
-          setCart({ ...cart, items: updatedItems });
-        }
-
-        notifySuccess("Товар удален из корзины");
       } catch (error) {
-        console.error("Ошибка удаления из корзины:", error);
+        console.error("Error removing from cart:", error);
         notifyError("Не удалось удалить товар");
-        throw error; // Пробрасываем ошибку для отката в компоненте
+        await fetchUserCart();
+        throw error;
       }
-    }
-    // Для гостей
-    else {
-      const newItems = { ...cartItems };
-      delete newItems[productId];
-      saveGuestCart(newItems);
-      notifySuccess("Товар удален из корзины");
+    } else {
+      setCartItems((prev) => {
+        const newItems = { ...prev };
+        delete newItems[key];
+        saveGuestCart(newItems);
+        return newItems;
+      });
     }
   };
 
-  // Получение количества конкретного товара
-  const getItemQuantity = (productId) => {
-    return cartItems[productId] || 0;
-  };
+  // Получение количества
+  const getItemQuantity = useCallback(
+    (productId, priceId) => {
+      if (!priceId) return 0;
+      return cartItems[`${productId}_${priceId}`] || 0;
+    },
+    [cartItems]
+  );
 
   // Очистка корзины
   const clearCart = async () => {
     if (user) {
       try {
-        await axios.delete("https://prime-forest.ru/api/carts/clear/", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          withCredentials: true,
-        });
+        await axios.delete(`${API_URL}/api/carts/clear/`, getAuthHeader());
         setCartItems({});
-        setCartCount(0);
-        setCart({ ...cart, items: [] });
+        setCart(null);
+        notifySuccess("Корзина очищена");
       } catch (error) {
-        console.error("Ошибка очистки корзины:", error);
+        console.error("Error clearing cart:", error);
+        notifyError("Ошибка при очистке корзины");
       }
     } else {
       localStorage.removeItem(GUEST_CART_KEY);
       setCartItems({});
-      setCartCount(0);
+      notifySuccess("Корзина очищена");
     }
   };
 
-  // Сброс гостевой корзины после авторизации
-  const resetGuestCart = () => {
-    localStorage.removeItem(GUEST_CART_KEY);
-    setCartItems({});
-    setCartCount(0);
-  };
+  const refreshCart = useCallback(() => {
+    if (user) return fetchUserCart();
+    return loadGuestCart();
+  }, [user, fetchUserCart, loadGuestCart]);
 
   return (
     <CartContext.Provider
@@ -387,10 +368,8 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         getItemQuantity,
         clearCart,
-        refreshCart: user ? fetchUserCart : loadGuestCart,
+        refreshCart,
         syncGuestCartWithServer,
-        resetGuestCart,
-        // УДАЛЯЕМ getSessionKey из value
       }}
     >
       {children}

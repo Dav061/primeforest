@@ -1,78 +1,251 @@
-import React, { useContext } from "react";
-import { Card, CardContent, Button, IconButton } from "@mui/material";
-import { ShoppingCart, Eye, Minus, Plus } from "lucide-react";
+// src/components/ProductCard.js
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
+import { CardContent, Button, IconButton } from "@mui/material"; // убрали Card
+import { ShoppingCart, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../CartContext";
 import "../styles.scss";
 
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-  const { addToCart, updateCartItem, getItemQuantity, removeFromCart } =
+  const { addToCart, updateCartItem, removeFromCart, cartItems } =
     useContext(CartContext);
-  const quantity = getItemQuantity(product.id);
 
-  const handleAddToCart = async (e) => {
-    e.stopPropagation();
-    const success = await addToCart(product.id, 1);
-    if (success) {
-      // Уведомление уже показывается в addToCart
+  const [selectedPrice, setSelectedPrice] = useState(null);
+
+  // Мемоизация цены по умолчанию
+  const defaultPrice = useMemo(() => {
+    if (!product.prices?.length) return null;
+    return product.prices.find((p) => p.is_default) || product.prices[0];
+  }, [product.prices]);
+
+  // Форматирование цены
+  const formatPrice = useCallback((price) => {
+    return new Intl.NumberFormat("ru-RU").format(price);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPrice && defaultPrice) {
+      setSelectedPrice(defaultPrice);
     }
-  };
+  }, [defaultPrice, selectedPrice]);
 
-  const handleIncrease = async (e) => {
-    e.stopPropagation();
-    await updateCartItem(product.id, quantity + 1);
-  };
+  const getCurrentQuantity = useCallback(() => {
+    if (!selectedPrice) return 0;
+    const key = `${product.id}_${selectedPrice.id}`;
+    return cartItems[key] || 0;
+  }, [cartItems, product.id, selectedPrice]);
 
-  const handleDecrease = async (e) => {
-    e.stopPropagation();
-    if (quantity <= 1) {
-      // Если количество 1 - удаляем товар
-      await removeFromCart(product.id);
-      // Уведомление показывается в removeFromCart
-    } else {
-      // Иначе уменьшаем количество
-      await updateCartItem(product.id, quantity - 1);
-    }
-  };
+  const quantity = getCurrentQuantity();
 
-  const handleViewDetails = (e) => {
-    if (e) e.stopPropagation();
-    navigate(`/products/${product.id}`);
-  };
+  const handleAddToCart = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      if (!selectedPrice) {
+        alert("Выберите вариант цены");
+        return;
+      }
+      await addToCart(product.id, 1, selectedPrice);
+    },
+    [addToCart, product.id, selectedPrice]
+  );
 
-  const handleGoToCart = (e) => {
-    e.stopPropagation();
-    navigate("/cart");
-  };
+  const handleIncrease = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      if (!selectedPrice) return;
+      await updateCartItem(product.id, selectedPrice.id, quantity + 1);
+    },
+    [updateCartItem, product.id, selectedPrice, quantity]
+  );
 
-  const getImageUrl = (imagePath) => {
+  const handleDecrease = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      if (!selectedPrice) return;
+      if (quantity <= 1) {
+        await removeFromCart(product.id, selectedPrice.id);
+      } else {
+        await updateCartItem(product.id, selectedPrice.id, quantity - 1);
+      }
+    },
+    [removeFromCart, updateCartItem, product.id, selectedPrice, quantity]
+  );
+
+  const handleViewDetails = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      navigate(`/products/${product.id}`);
+    },
+    [navigate, product.id]
+  );
+
+  const handleGoToCart = useCallback(
+    (e) => {
+      e.stopPropagation();
+      navigate("/cart");
+    },
+    [navigate]
+  );
+
+  const handlePriceSelect = useCallback((price) => {
+    setSelectedPrice(price);
+  }, []);
+
+  const getImageUrl = useCallback((imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
-      imagePath.startsWith("/") ? "" : "/"
-    }${imagePath}`;
-  };
+    return `${API_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+  }, []);
+
+  const renderPrices = useCallback(() => {
+    if (!product.prices?.length) {
+      return <div className="price-none">Цена не указана</div>;
+    }
+
+    if (product.prices.length === 1) {
+      const price = product.prices[0];
+      return (
+        <div className="price-single">
+          <span className="price-value">{formatPrice(price.price)} ₽</span>
+          <span className="price-unit">/ {price.unit_type_short}</span>
+          {price.quantity_per_unit && (
+            <span className="price-pack"> ({price.quantity_per_unit} шт)</span>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="price-multiple">
+        <div className="price-buttons">
+          {product.prices.map((price) => (
+            <button
+              key={price.id}
+              className={`price-button ${
+                selectedPrice?.id === price.id ? "active" : ""
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePriceSelect(price);
+              }}
+              type="button"
+            >
+              <span className="price-value">{formatPrice(price.price)}</span>
+              <span className="price-unit">/{price.unit_type_short}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }, [product.prices, selectedPrice, formatPrice, handlePriceSelect]);
+
+  // Мемоизация JSX для улучшения производительности
+  const actionButtons = useMemo(() => {
+    if (quantity === 0) {
+      return (
+        <Button
+          variant="contained"
+          size="medium"
+          startIcon={<ShoppingCart size={18} />}
+          onClick={handleAddToCart}
+          className="cart-action-btn"
+          disabled={!selectedPrice && product.prices?.length > 0}
+          fullWidth
+        >
+          В корзину
+        </Button>
+      );
+    }
+
+    return (
+      <div className="cart-controls">
+        <div className="cart-counter">
+          <IconButton
+            size="small"
+            onClick={handleDecrease}
+            className="counter-btn"
+          >
+            <Minus size={16} />
+          </IconButton>
+
+          <input
+            type="number"
+            min="1"
+            value={quantity}
+            onClick={(e) => e.stopPropagation()}
+            onChange={async (e) => {
+              const newValue = parseInt(e.target.value);
+              if (!isNaN(newValue) && selectedPrice) {
+                if (newValue <= 0) {
+                  await removeFromCart(product.id, selectedPrice.id);
+                } else {
+                  await updateCartItem(product.id, selectedPrice.id, newValue);
+                }
+              }
+            }}
+            className="counter-input"
+          />
+
+          <IconButton
+            size="small"
+            onClick={handleIncrease}
+            className="counter-btn"
+          >
+            <Plus size={16} />
+          </IconButton>
+        </div>
+        <Button
+          variant="contained"
+          size="medium"
+          startIcon={<ShoppingCart size={18} />}
+          onClick={handleGoToCart}
+          className="cart-go-btn"
+        >
+          Перейти в корзину
+        </Button>
+      </div>
+    );
+  }, [
+    quantity,
+    handleAddToCart,
+    handleDecrease,
+    handleIncrease,
+    handleGoToCart,
+    selectedPrice,
+    product.prices?.length,
+    removeFromCart,
+    updateCartItem,
+    product.id,
+  ]);
 
   return (
-    <Card className="product-card" onClick={(e) => handleViewDetails(e)}>
+    <div className="product-card" onClick={handleViewDetails}>
       <div className="product-image-container">
         <img
           src={getImageUrl(product.main_image)}
           alt={product.name}
           className="product-image"
+          loading="lazy"
           onError={(e) => {
             e.target.src = "/default-product.jpg";
           }}
         />
         {quantity > 0 && (
-          <div className="product-quantity-badge">{quantity} шт</div>
+          <div className="product-quantity-badge">{quantity}</div>
         )}
       </div>
 
       <CardContent className="product-content">
         <h3 className="product-name">{product.name}</h3>
-        {/* <div className="product-category">{product.category}</div> */}
 
         {(product.wood_type || product.grade) && (
           <div className="product-wood-info">
@@ -85,76 +258,11 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        <div className="product-price">
-          {product.price ? `${product.price} руб.` : "Цена по запросу"}
-        </div>
+        <div className="product-prices-container">{renderPrices()}</div>
 
-        <div className="product-actions">
-          {quantity === 0 ? (
-            <Button
-              variant="contained"
-              size="medium"
-              startIcon={<ShoppingCart size={18} />}
-              onClick={handleAddToCart}
-              className="cart-action-btn"
-              fullWidth
-            >
-              В корзину
-            </Button>
-          ) : (
-            <div className="cart-controls">
-              <div className="cart-counter">
-                <IconButton
-                  size="small"
-                  onClick={handleDecrease}
-                  className="counter-btn"
-                  // Убираем disabled - кнопка всегда активна
-                >
-                  <Minus size={16} />
-                </IconButton>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onClick={(e) => e.stopPropagation()}
-                  onFocus={(e) => e.stopPropagation()}
-                  onChange={async (e) => {
-                    const newValue = parseInt(e.target.value);
-                    if (!isNaN(newValue)) {
-                      if (newValue <= 0) {
-                        // Если ввели 0 или меньше - удаляем
-                        await removeFromCart(product.id);
-                      } else {
-                        await updateCartItem(product.id, newValue);
-                      }
-                    }
-                  }}
-                  className="counter-input"
-                />
-
-                <IconButton
-                  size="small"
-                  onClick={handleIncrease}
-                  className="counter-btn"
-                >
-                  <Plus size={16} />
-                </IconButton>
-              </div>
-              <Button
-                variant="contained"
-                size="medium"
-                startIcon={<ShoppingCart size={18} />}
-                onClick={handleGoToCart}
-                className="cart-go-btn"
-              >
-                Перейти
-              </Button>
-            </div>
-          )}
-        </div>
+        <div className="product-actions">{actionButtons}</div>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

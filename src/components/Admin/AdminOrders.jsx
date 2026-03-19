@@ -247,12 +247,37 @@ const AdminOrders = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ maxHeight: 150, overflow: "auto" }}>
-                    {order.items?.map((item) => (
-                      <Typography key={item.id} variant="body2">
-                        {item.product?.name} - {item.quantity} шт. (по{" "}
-                        {item.price} руб.)
-                      </Typography>
-                    ))}
+                    {order.items?.map((item) => {
+                      // Определяем единицу измерения
+                      let unitDisplay = "шт";
+                      if (item.selected_price_info) {
+                        unitDisplay =
+                          item.selected_price_info.unit_type_short ||
+                          item.selected_price_info.unit_type ||
+                          "шт";
+                      } else if (item.unit_type) {
+                        const unitMap = {
+                          piece: "шт",
+                          cubic: "м³",
+                          square: "м²",
+                          pack: "уп",
+                          linear: "п.м",
+                        };
+                        unitDisplay = unitMap[item.unit_type] || item.unit_type;
+                      }
+
+                      // Форматируем цену
+                      const priceFormatted = new Intl.NumberFormat(
+                        "ru-RU"
+                      ).format(item.price_per_unit);
+
+                      return (
+                        <Typography key={item.id} variant="body2">
+                          {item.product?.name} - {item.quantity} {unitDisplay}
+                          (по {priceFormatted} руб./{unitDisplay})
+                        </Typography>
+                      );
+                    })}
                   </Box>
                 </TableCell>
                 <TableCell>

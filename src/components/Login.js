@@ -1,3 +1,4 @@
+// src/components/Login.js
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../AuthContext";
 import { CartContext } from "../CartContext";
@@ -10,12 +11,14 @@ import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 import { Helmet } from "react-helmet";
 
+const GUEST_CART_KEY = "guestCart";
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
-  const { syncGuestCartWithServer } = useContext(CartContext);
+  const { syncGuestCartWithServer, refreshCart } = useContext(CartContext);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/profile";
@@ -25,39 +28,50 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(username, password);
-      await syncGuestCartWithServer();
-      notifySuccess("Успешный вход в систему");
-      navigate(from, { replace: true });
+      const result = await login(username, password);
+
+      if (result.success) {
+        localStorage.setItem("lastLoggedInUser", username);
+
+        // Проверяем наличие гостевой корзины
+        const guestCart = localStorage.getItem(GUEST_CART_KEY);
+        if (guestCart && Object.keys(JSON.parse(guestCart)).length > 0) {
+          await syncGuestCartWithServer(username);
+        }
+
+        // Обновляем корзину
+        await refreshCart();
+        
+        notifySuccess("Успешный вход в систему");
+        navigate(from, { replace: true });
+      } else {
+        notifyError(result.error || "Ошибка при входе");
+        setLoading(false);
+      }
     } catch (error) {
       notifyError("Ошибка при входе. Проверьте логин и пароль.");
-    } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoBack = () => {
-    navigate(-1); // Возврат на предыдущую страницу
   };
 
   return (
     <>
       <Helmet>
-        <title>Вход в личный кабинет - Prime-Forest | Пиломатериалы</title>
-        <meta name="description" content="Вход в личный кабинет Prime-Forest. Отслеживайте статус заказов, сохраняйте историю покупок пиломатериалов." />
+        <title>Вход в личный кабинет - Prime-Forest</title>
       </Helmet>
+      
       <div className="login-page">
         <div className="login-header">
-          <IconButton 
-            className="back-button" 
-            onClick={handleGoBack}
+          <IconButton
+            className="back-button"
+            onClick={() => navigate(-1)}
             aria-label="назад"
           >
             <ArrowBackIcon />
             <span className="back-button-text">Назад</span>
           </IconButton>
         </div>
-        
+
         <div className="login-form">
           <h2>Вход</h2>
           <form onSubmit={handleSubmit}>
@@ -68,6 +82,7 @@ const Login = () => {
               fullWidth
               margin="normal"
               required
+              autoComplete="username"
             />
             <TextField
               label="Пароль"
@@ -77,6 +92,7 @@ const Login = () => {
               fullWidth
               margin="normal"
               required
+              autoComplete="current-password"
             />
             <Button
               type="submit"

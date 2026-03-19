@@ -1,22 +1,32 @@
+// src/components/ProtectedRoute.js
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
+import { CircularProgress, Box } from "@mui/material";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) {
-    // Показываем заглушку во время проверки аутентификации
-    return <div>Проверка авторизации...</div>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress size={60} />
+      </Box>
+    );
   }
 
   if (!user) {
-    // Пользователь не аутентифицирован
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: window.location.pathname }} />;
   }
 
   if (adminOnly && !user.is_staff) {
-    // Пользователь не администратор, но требуется админский доступ
     return <Navigate to="/" replace />;
   }
 

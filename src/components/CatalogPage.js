@@ -1,5 +1,5 @@
 // src/components/CatalogPage.js
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import ProductList from "./ProductList";
@@ -15,32 +15,34 @@ const CatalogPage = () => {
   // Показываем категории только если нет выбранной категории и нет поиска
   const showCategories = !categoryId && !searchParam;
 
-  // Определяем заголовок в зависимости от параметров
-  const getTitle = () => {
-    if (searchParam) return `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`;
-    if (categoryId) return `Категория - пиломатериалы | Prime-Forest`;
-    return "Каталог пиломатериалов - Prime-Forest";
-  };
-
-  const getDescription = () => {
+  // Мемоизируем заголовок и описание для предотвращения лишних вычислений
+  const pageMeta = React.useMemo(() => {
     if (searchParam) {
-      return `Результаты поиска "${searchParam}" в каталоге пиломатериалов. Доска строганная, брус, OSB, фанера, вагонка с доставкой по Москве и МО.`;
+      return {
+        title: `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`,
+        description: `Результаты поиска "${searchParam}" в каталоге пиломатериалов. Доска строганная, брус, OSB, фанера, вагонка с доставкой по Москве и МО.`
+      };
     }
-    return "Широкий ассортимент пиломатериалов от производителя: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области.";
-  };
+    if (categoryId) {
+      return {
+        title: `Категория - пиломатериалы | Prime-Forest`,
+        description: "Пиломатериалы выбранной категории от производителя. Доставка по Москве и области."
+      };
+    }
+    return {
+      title: "Каталог пиломатериалов - Prime-Forest",
+      description: "Широкий ассортимент пиломатериалов от производителя: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области."
+    };
+  }, [searchParam, categoryId]);
 
   return (
     <>
       <Helmet>
-        <title>{getTitle()}</title>
-        <meta name="description" content={getDescription()} />
+        <title>{pageMeta.title}</title>
+        <meta name="description" content={pageMeta.description} />
       </Helmet>
       <div className="catalog-page">
-        {showCategories ? (
-          <CategoryList />
-        ) : (
-          <ProductList />
-        )}
+        {showCategories ? <CategoryList /> : <ProductList />}
       </div>
     </>
   );

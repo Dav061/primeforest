@@ -1,69 +1,102 @@
+// src/AuthContext.js
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Начальное состояние - загрузка
+  const [loading, setLoading] = useState(true);
 
-  // Функция для установки/удаления токена в axios
-  const setAuthToken = (token) => {
+  const setAuthToken = useCallback((token) => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     } else {
       delete axios.defaults.headers.common["Authorization"];
     }
-  };
-
-  // Функция для выхода (обернута в useCallback)
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("token");
-    setAuthToken(null);
-    setUser(null);
   }, []);
 
-  // Функция для получения данных пользователя (обернута в useCallback)
+  const handleLogout = useCallback(() => {
+    const username = localStorage.getItem("lastLoggedInUser");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
+    if (username) {
+      localStorage.removeItem(`guestCartSynced_${username}`);
+    }
+    setAuthToken(null);
+    setUser(null);
+  }, [setAuthToken]);
+
   const fetchUserData = useCallback(async () => {
     try {
-      const response = await axios.get("https://prime-forest.ru/api/user/");
-      setUser({ ...response.data, token: localStorage.getItem("token") });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      setAuthToken(token);
+
+      const response = await axios.get(`${API_URL}/api/user/`);
+      setUser(response.data);
     } catch (error) {
-      console.error("Ошибка при загрузке данных пользователя:", error);
-      handleLogout(); // Если токен невалидный, делаем логаут
+      if (error.response?.status === 401) {
+        try {
+          const refresh = localStorage.getItem("refresh");
+          if (refresh) {
+            const refreshResponse = await axios.post(
+              `${API_URL}/api/token/refresh/`,
+              { refresh }
+            );
+            const { access } = refreshResponse.data;
+            localStorage.setItem("token", access);
+            setAuthToken(access);
+
+            const userResponse = await axios.get(`${API_URL}/api/user/`);
+            setUser(userResponse.data);
+          } else {
+            handleLogout();
+          }
+        } catch {
+          handleLogout();
+        }
+      } else {
+        handleLogout();
+      }
     } finally {
       setLoading(false);
     }
-  }, [handleLogout]);
+  }, [handleLogout, setAuthToken]);
 
-  // Проверяем, авторизован ли пользователь
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setAuthToken(token);
-
-    if (token) {
-      fetchUserData().finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    fetchUserData();
   }, [fetchUserData]);
 
-  // Функция для входа
-  // В методе login AuthContext
   const login = async (username, password) => {
     try {
-      const response = await axios.post("https://prime-forest.ru/api/token/", {
+      const response = await axios.post(`${API_URL}/api/token/`, {
         username,
         password,
       });
-      const { access } = response.data;
+
+      const { access, refresh } = response.data;
       localStorage.setItem("token", access);
-      setAuthToken(access); // Убедитесь, что это вызывается
-      await fetchUserData(); // Загружаем данные пользователя
-      return true;
+      localStorage.setItem("refresh", refresh);
+      setAuthToken(access);
+
+      const userResponse = await axios.get(`${API_URL}/api/user/`, {
+        headers: { Authorization: `Bearer ${access}` },
+      });
+
+      setUser(userResponse.data);
+      return { success: true };
     } catch (error) {
-      console.error("Ошибка при входе:", error);
-      throw error;
+      return {
+        success: false,
+        error: error.response?.data?.detail || "Ошибка входа",
+      };
     }
   };
 

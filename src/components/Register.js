@@ -1,4 +1,4 @@
-// src/components/Register.js - исправленная версия
+// src/components/Register.js
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,8 @@ import { Helmet } from "react-helmet";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +22,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { getSessionKey, syncGuestCartWithServer } = useContext(CartContext);
+  const { syncGuestCartWithServer } = useContext(CartContext); // убрали getSessionKey
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,15 +30,9 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "https://prime-forest.ru/api/register/",
-        {
-          username,
-          password,
-          email,
-        },
-        {
-          withCredentials: true,
-        }
+        `${API_URL}/api/register/`,
+        { username, password, email },
+        { withCredentials: true }
       );
 
       localStorage.setItem("token", response.data.tokens.access);
@@ -53,16 +49,17 @@ const Register = () => {
       notifySuccess("Регистрация прошла успешно!");
       navigate("/profile");
     } catch (error) {
-      console.error("Registration error:", error);
-      notifyError(error.response?.data?.error || "Ошибка при регистрации");
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Ошибка при регистрации";
+      notifyError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const handleGoBack = () => navigate(-1);
 
   return (
     <>
@@ -73,6 +70,7 @@ const Register = () => {
           content="Регистрация в интернет-магазине пиломатериалов Prime-Forest. Сохраняйте историю заказов, отслеживайте доставку по Москве и МО."
         />
       </Helmet>
+
       <div className="register-page">
         <div className="register-header">
           <IconButton
@@ -95,6 +93,7 @@ const Register = () => {
               fullWidth
               margin="normal"
               required
+              autoComplete="username"
             />
             <TextField
               label="Пароль"
@@ -104,6 +103,7 @@ const Register = () => {
               fullWidth
               margin="normal"
               required
+              autoComplete="new-password"
             />
             <TextField
               label="Email"
@@ -112,6 +112,7 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               margin="normal"
+              autoComplete="email"
             />
             <Button
               type="submit"

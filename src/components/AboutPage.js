@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Box } from "@mui/material"; // убрали Container
+import { Typography, Box } from "@mui/material";
 import aboutImage from "../images/about-image.jpg";
 import "../styles.scss";
 import { Helmet } from "react-helmet";
@@ -11,16 +11,7 @@ const AboutPage = () => {
         <title>О компании Prime-Forest - производитель пиломатериалов в Москве</title>
         <meta name="description" content="Prime-Forest более 10 лет производит качественные пиломатериалы. Собственное производство, экологически чистые материалы, доставка по Москве и области. Доска, брус, вагонка, имитация бруса, блок хаус и другие материалы." />
       </Helmet>
-      <Box className="about-page"> {/* вместо Container */}
-        {/* <Typography
-          variant="h2"
-          align="center"
-          gutterBottom
-          className="page-title"
-        >
-          О нас
-        </Typography> */}
-
+      <Box className="about-page">
         <Box className="about-content">
           <Box className="about-text-block">
             <Typography variant="body1" className="about-text" component="p">

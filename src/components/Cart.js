@@ -1,11 +1,5 @@
-// src/components/Cart.js - исправленная версия
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
+// src/components/Cart.js - Оптимизированная версия для продакшена
+import React, { useEffect, useState, useContext, useRef } from "react"; // убрали useCallback
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -19,8 +13,8 @@ import { Helmet } from "react-helmet";
 
 const Cart = () => {
   const { user } = useContext(AuthContext);
-  const { cart, cartItems, loading, updateCartItem, removeFromCart } =
-    useContext(CartContext);
+  const { cartItems, loading, updateCartItem, removeFromCart } =
+    useContext(CartContext); // убрали getItemQuantity
 
   const navigate = useNavigate();
   const [cartProducts, setCartProducts] = useState([]);
@@ -30,161 +24,102 @@ const Cart = () => {
   const [inputValues, setInputValues] = useState({});
   const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  // Ref для хранения таймаутов
   const timeouts = useRef({});
-  // Ref для хранения ссылок на инпуты
-  const inputRefs = useRef({});
 
-  // Загружаем данные о товарах
   useEffect(() => {
-    const loadCartData = async () => {
-      if (user) {
-        // Для авторизованных - данные уже в cart из контекста
-        if (cart?.items && cart.items.length > 0) {
-          setCartProducts(cart.items);
-          calculateTotal(cart.items);
-
-          const initialValues = {};
-          cart.items.forEach((item) => {
-            initialValues[item.product.id] = item.quantity.toString();
-          });
-          setInputValues(initialValues);
-          setLocalLoading(false);
-          setInitialLoadDone(true);
-        } else if (cart?.items && cart.items.length === 0) {
-          // Корзина пуста
-          setCartProducts([]);
-          setTotalPrice(0);
-          setInputValues({});
-          setLocalLoading(false);
-          setInitialLoadDone(true);
-        } else {
-          // Данные еще загружаются в контексте
-        }
-      } else {
-        // Для гостей - загружаем данные о товарах из localStorage
-        const productIds = Object.keys(cartItems);
-        if (productIds.length === 0) {
-          setCartProducts([]);
-          setTotalPrice(0);
-          setLocalLoading(false);
-          setInitialLoadDone(true);
-          return;
-        }
-
-        try {
-          const productsData = [];
-          let total = 0;
-          const initialValues = {};
-
-          for (const productId of productIds) {
-            const response = await axios.get(
-              `https://prime-forest.ru/api/products/${productId}/`
-            );
-            const product = response.data;
-            const quantity = cartItems[productId];
-
-            productsData.push({
-              id: `guest-${productId}`,
-              product: {
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                main_image: product.main_image,
-              },
-              quantity: quantity,
-            });
-
-            initialValues[productId] = quantity.toString();
-            total += product.price * quantity;
-          }
-
-          setCartProducts(productsData);
-          setInputValues(initialValues);
-          setTotalPrice(total);
-        } catch (error) {
-          console.error("Error fetching guest cart products:", error);
-          notifyError("Ошибка при загрузке корзины");
-        } finally {
-          setLocalLoading(false);
-          setInitialLoadDone(true);
-        }
-      }
-    };
-
-    loadCartData();
-  }, [user, cart, cartItems]);
-
-  // Отдельный эффект для обновления данных при изменении cart (для авторизованных)
-  useEffect(() => {
-    if (user && cart?.items && initialLoadDone) {
-      setCartProducts(cart.items);
-      calculateTotal(cart.items);
-
-      const newInputValues = {};
-      cart.items.forEach((item) => {
-        newInputValues[item.product.id] = item.quantity.toString();
-      });
-      setInputValues(newInputValues);
+    // Убрали console.log для продакшена
+    if (cartItems && Object.keys(cartItems).length > 0) {
+      loadCartData();
+    } else {
+      setCartProducts([]);
+      setTotalPrice(0);
+      setLocalLoading(false);
+      setInitialLoadDone(true);
     }
-  }, [user, cart, initialLoadDone]);
+  }, [cartItems]);
 
-  const calculateTotal = useCallback((items) => {
-    const total = items.reduce(
-      (sum, item) => sum + (item.product?.price || 0) * item.quantity,
-      0
-    );
-    setTotalPrice(total);
-  }, []);
-
-  const performUpdate = async (productId, newQuantity, isGuest) => {
-    setUpdatingItems((prev) => ({ ...prev, [productId]: true }));
-
-    const oldProduct = cartProducts.find(
-      (item) => item.product.id === productId
-    );
-    const oldQuantity = oldProduct?.quantity;
+  const loadCartData = async () => {
+    if (!cartItems || Object.keys(cartItems).length === 0) {
+      setCartProducts([]);
+      setTotalPrice(0);
+      setLocalLoading(false);
+      setInitialLoadDone(true);
+      return;
+    }
 
     try {
-      setCartProducts((prevProducts) => {
-        const updatedProducts = prevProducts.map((item) => {
-          if (item.product.id === productId) {
-            return { ...item, quantity: newQuantity };
-          }
-          return item;
-        });
-        calculateTotal(updatedProducts);
-        return updatedProducts;
-      });
+      const productsData = [];
+      let total = 0;
+      const initialValues = {};
 
-      await updateCartItem(productId, newQuantity);
+      // Получаем уникальные ID цен
+      const priceIds = [
+        ...new Set(Object.keys(cartItems).map((key) => key.split("_")[1])),
+      ];
+
+      // Кэшируем цены
+      const pricesCache = {};
+      await Promise.all(
+        priceIds.map(async (priceId) => {
+          try {
+            const response = await axios.get(
+              `https://prime-forest.ru/api/product-prices/${priceId}/`
+            );
+            pricesCache[priceId] = response.data;
+          } catch (error) {
+            console.error(`Ошибка загрузки цены ${priceId}:`, error);
+          }
+        })
+      );
+
+      // Загружаем товары параллельно
+      await Promise.all(
+        Object.entries(cartItems).map(async ([key, quantity]) => {
+          const [productId, priceId] = key.split("_").map(Number);
+          const priceInfo = pricesCache[priceId];
+
+          if (!priceInfo) return;
+
+          try {
+            const productResponse = await axios.get(
+              `https://prime-forest.ru/api/products/${productId}/`
+            );
+            const product = productResponse.data;
+
+            productsData.push({
+              id: key,
+              productId,
+              productName: product.name,
+              productImage: product.main_image,
+              priceId,
+              price: priceInfo.price,
+              unitType: priceInfo.unit_type_short,
+              unitCode: priceInfo.unit_type_code,
+              quantity,
+              quantityPerUnit: priceInfo.quantity_per_unit,
+            });
+
+            initialValues[key] = quantity.toString();
+            total += priceInfo.price * quantity;
+          } catch (error) {
+            console.error(`Ошибка загрузки товара ${productId}:`, error);
+          }
+        })
+      );
+
+      setCartProducts(productsData);
+      setInputValues(initialValues);
+      setTotalPrice(total);
     } catch (error) {
-      console.error("Error updating quantity:", error);
-      notifyError("Ошибка при обновлении количества");
-
-      setCartProducts((prevProducts) => {
-        const updatedProducts = prevProducts.map((item) => {
-          if (item.product.id === productId) {
-            return { ...item, quantity: oldQuantity };
-          }
-          return item;
-        });
-        calculateTotal(updatedProducts);
-        return updatedProducts;
-      });
-
-      setInputValues((prev) => ({
-        ...prev,
-        [productId]: oldQuantity?.toString() || "1",
-      }));
+      console.error("Error loading cart:", error);
+      notifyError("Ошибка при загрузке корзины");
     } finally {
-      setUpdatingItems((prev) => ({ ...prev, [productId]: false }));
+      setLocalLoading(false);
+      setInitialLoadDone(true);
     }
   };
 
-  // Функция для перехода на детальную страницу товара
   const handleProductClick = (productId, e) => {
-    // Предотвращаем переход, если клик был по интерактивным элементам
     if (
       e.target.tagName === "INPUT" ||
       e.target.tagName === "BUTTON" ||
@@ -197,111 +132,120 @@ const Cart = () => {
     navigate(`/products/${productId}`);
   };
 
-  const handleInputChange = (productId, value) => {
-    setInputValues((prev) => ({
-      ...prev,
-      [productId]: value,
-    }));
-  };
+  const performUpdate = async (itemKey, productId, priceId, newQuantity) => {
+    setUpdatingItems((prev) => ({ ...prev, [itemKey]: true }));
 
-  const handleInputBlur = (productId, value, isGuest) => {
-    const newQuantity = parseInt(value);
-
-    if (!isNaN(newQuantity) && newQuantity >= 1) {
-      const currentProduct = cartProducts.find(
-        (item) => item.product.id === productId
-      );
-
-      if (currentProduct && newQuantity !== currentProduct.quantity) {
-        if (timeouts.current[productId]) {
-          clearTimeout(timeouts.current[productId]);
-        }
-
-        performUpdate(productId, newQuantity, isGuest);
-      }
-    } else {
-      const currentProduct = cartProducts.find(
-        (item) => item.product.id === productId
-      );
-      if (currentProduct) {
-        setInputValues((prev) => ({
-          ...prev,
-          [productId]: currentProduct.quantity.toString(),
-        }));
-      }
-    }
-  };
-
-  const handleInputKeyDown = (e, productId, isGuest) => {
-    if (e.key === "Enter") {
-      e.target.blur();
-    }
-  };
-
-  const handleButtonClick = async (productId, newQuantity, isGuest) => {
-    if (timeouts.current[productId]) {
-      clearTimeout(timeouts.current[productId]);
-    }
-
-    setInputValues((prev) => ({
-      ...prev,
-      [productId]: newQuantity.toString(),
-    }));
-
-    await performUpdate(productId, newQuantity, isGuest);
-  };
-
-  const handleRemove = async (productId, isGuest = false, e) => {
-    e.stopPropagation(); // Предотвращаем переход на детальную страницу
-
-    setUpdatingItems((prev) => ({ ...prev, [productId]: true }));
-
-    const removedItem = cartProducts.find(
-      (item) => item.product.id === productId
-    );
+    const oldItem = cartProducts.find((item) => item.id === itemKey);
+    const oldQuantity = oldItem?.quantity;
 
     try {
       setCartProducts((prevProducts) => {
-        const updatedProducts = prevProducts.filter(
-          (item) => item.product.id !== productId
+        const updatedProducts = prevProducts.map((item) =>
+          item.id === itemKey ? { ...item, quantity: newQuantity } : item
         );
-        calculateTotal(updatedProducts);
+        setTotalPrice(
+          updatedProducts.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          )
+        );
+        return updatedProducts;
+      });
+
+      await updateCartItem(productId, priceId, newQuantity);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      notifyError("Ошибка при обновлении количества");
+
+      // Откат при ошибке
+      setCartProducts((prevProducts) => {
+        const updatedProducts = prevProducts.map((item) =>
+          item.id === itemKey ? { ...item, quantity: oldQuantity } : item
+        );
+        setTotalPrice(
+          updatedProducts.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          )
+        );
+        return updatedProducts;
+      });
+
+      setInputValues((prev) => ({
+        ...prev,
+        [itemKey]: oldQuantity?.toString() || "1",
+      }));
+    } finally {
+      setUpdatingItems((prev) => ({ ...prev, [itemKey]: false }));
+    }
+  };
+
+  const handleInputChange = (itemKey, value) => {
+    setInputValues((prev) => ({ ...prev, [itemKey]: value }));
+  };
+
+  const handleInputBlur = (itemKey, value) => {
+    const item = cartProducts.find((i) => i.id === itemKey);
+    if (!item) return;
+
+    const newQuantity = parseInt(value);
+    if (
+      !isNaN(newQuantity) &&
+      newQuantity >= 1 &&
+      newQuantity !== item.quantity
+    ) {
+      if (timeouts.current[itemKey]) clearTimeout(timeouts.current[itemKey]);
+      performUpdate(itemKey, item.productId, item.priceId, newQuantity);
+    } else {
+      setInputValues((prev) => ({
+        ...prev,
+        [itemKey]: item.quantity.toString(),
+      }));
+    }
+  };
+
+  const handleButtonClick = async (itemKey, newQuantity) => {
+    const item = cartProducts.find((i) => i.id === itemKey);
+    if (!item) return;
+
+    setInputValues((prev) => ({ ...prev, [itemKey]: newQuantity.toString() }));
+    await performUpdate(itemKey, item.productId, item.priceId, newQuantity);
+  };
+
+  const handleRemove = async (itemKey, e) => {
+    e.stopPropagation();
+
+    const item = cartProducts.find((i) => i.id === itemKey);
+    if (!item) return;
+
+    setUpdatingItems((prev) => ({ ...prev, [itemKey]: true }));
+
+    try {
+      setCartProducts((prevProducts) => {
+        const updatedProducts = prevProducts.filter((i) => i.id !== itemKey);
+        setTotalPrice(
+          updatedProducts.reduce((sum, i) => sum + i.price * i.quantity, 0)
+        );
         return updatedProducts;
       });
 
       setInputValues((prev) => {
         const newValues = { ...prev };
-        delete newValues[productId];
+        delete newValues[itemKey];
         return newValues;
       });
 
-      await removeFromCart(productId);
-      // notifySuccess("Товар удален из корзины");
+      await removeFromCart(item.productId, item.priceId);
+      notifySuccess("Товар удален из корзины");
     } catch (error) {
       console.error("Error removing item:", error);
       notifyError("Ошибка при удалении товара");
-
-      if (removedItem) {
-        setCartProducts((prevProducts) => {
-          const updatedProducts = [...prevProducts, removedItem];
-          calculateTotal(updatedProducts);
-          return updatedProducts;
-        });
-
-        setInputValues((prev) => ({
-          ...prev,
-          [productId]: removedItem.quantity.toString(),
-        }));
-      }
     } finally {
-      setUpdatingItems((prev) => ({ ...prev, [productId]: false }));
+      setUpdatingItems((prev) => ({ ...prev, [itemKey]: false }));
     }
   };
 
-  // ИСПРАВЛЕННАЯ ФУНКЦИЯ - теперь просто переходим на checkout для всех
-  const handleCheckout = () => {
-    navigate("/checkout");
-  };
+  const handleCheckout = () => navigate("/checkout");
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
@@ -311,7 +255,6 @@ const Cart = () => {
     }${imagePath}`;
   };
 
-  // Показываем загрузку, пока не завершится начальная загрузка
   if (loading || localLoading || !initialLoadDone) {
     return (
       <Box className="loading-container">
@@ -321,17 +264,10 @@ const Cart = () => {
     );
   }
 
-  const itemsToShow = cartProducts;
-  const isGuestCart = !user && Object.keys(cartItems).length > 0;
-
   return (
     <>
       <Helmet>
-        <title>Корзина - Prime-Forest | Пиломатериалы в Москве</title>
-        <meta
-          name="description"
-          content="Ваша корзина с пиломатериалами. Доска, брус, OSB, фанера и другие материалы. Оформляйте заказ с доставкой по Москве и Московской области."
-        />
+        <title>Корзина - Prime-Forest</title>
       </Helmet>
       <div className="container cart">
         <h1 className="page-title">Корзина</h1>
@@ -339,17 +275,17 @@ const Cart = () => {
         {!user && (
           <div className="guest-cart-notice">
             <p>
-              ⚡ Для сохранения истории заказа, пожалуйста,{" "}
+              ⚡ У вас гостевая корзина.{" "}
               <Link to="/login" state={{ from: "/cart" }}>
-                войдите
+                Войдите
               </Link>{" "}
-              или <Link to="/register">зарегистрируйтесь</Link>. Собранная
-              корзина автоматически синхронизируется.
+              или <Link to="/register">зарегистрируйтесь</Link>, чтобы после
+              оформления заказа следить за его статусом 😊.
             </p>
           </div>
         )}
 
-        {itemsToShow.length === 0 ? (
+        {cartProducts.length === 0 ? (
           <div className="empty-cart">
             <h2>Ваша корзина пуста</h2>
             <p>Добавьте товары из каталога, чтобы оформить заказ</p>
@@ -360,38 +296,41 @@ const Cart = () => {
         ) : (
           <div className="cart-content">
             <div className="cart-items">
-              {itemsToShow.map((item) => (
+              {cartProducts.map((item) => (
                 <div
                   key={item.id}
                   className={`cart-item ${
-                    updatingItems[item.product.id] ? "updating" : ""
+                    updatingItems[item.id] ? "updating" : ""
                   }`}
-                  onClick={(e) => handleProductClick(item.product.id, e)}
-                  style={{ cursor: "pointer" }}
+                  onClick={(e) => handleProductClick(item.productId, e)}
                 >
                   <div className="cart-item-image">
                     <img
-                      src={getImageUrl(item.product?.main_image)}
-                      alt={item.product?.name}
+                      src={getImageUrl(item.productImage)}
+                      alt={item.productName}
                       onError={(e) => {
                         e.target.src = "/default-product.jpg";
                       }}
                     />
-                    {updatingItems[item.product.id] && (
+                    {updatingItems[item.id] && (
                       <div className="item-update-loader">
                         <CircularProgress size={24} />
                       </div>
                     )}
-                    {/* Добавляем иконку для указания возможности перехода */}
                     <div className="cart-item-view-overlay">
                       <Eye size={20} />
                     </div>
                   </div>
 
                   <div className="cart-item-info">
-                    <h3 className="cart-item-title">{item.product?.name}</h3>
-                    <div className="cart-item-price">
-                      {item.product?.price} руб.
+                    <h3 className="cart-item-title">{item.productName}</h3>
+
+                    <div className="cart-item-price-info">
+                      <span className="price-per-unit">
+                        {item.price.toLocaleString()} ₽/{item.unitType}
+                        {item.quantityPerUnit &&
+                          ` (${item.quantityPerUnit} шт в упаковке)`}
+                      </span>
                     </div>
 
                     <div className="cart-item-details">
@@ -400,75 +339,52 @@ const Cart = () => {
                           className="counter-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleButtonClick(
-                              item.product.id,
-                              item.quantity - 1,
-                              !user
-                            );
+                            handleButtonClick(item.id, item.quantity - 1);
                           }}
-                          onMouseUp={(e) => e.target.blur()}
                           disabled={
-                            item.quantity <= 1 || updatingItems[item.product.id]
+                            item.quantity <= 1 || updatingItems[item.id]
                           }
                         >
                           <Minus size={16} />
                         </button>
 
                         <input
-                          ref={(el) =>
-                            (inputRefs.current[item.product.id] = el)
-                          }
                           type="number"
                           min="1"
                           value={
-                            inputValues[item.product.id] ||
-                            item.quantity.toString()
+                            inputValues[item.id] || item.quantity.toString()
                           }
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) =>
-                            handleInputChange(item.product.id, e.target.value)
+                            handleInputChange(item.id, e.target.value)
                           }
                           onBlur={(e) =>
-                            handleInputBlur(
-                              item.product.id,
-                              e.target.value,
-                              !user
-                            )
-                          }
-                          onKeyDown={(e) =>
-                            handleInputKeyDown(e, item.product.id, !user)
+                            handleInputBlur(item.id, e.target.value)
                           }
                           className="counter-input"
-                          disabled={updatingItems[item.product.id]}
+                          disabled={updatingItems[item.id]}
                         />
 
                         <button
                           className="counter-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleButtonClick(
-                              item.product.id,
-                              item.quantity + 1,
-                              !user
-                            );
+                            handleButtonClick(item.id, item.quantity + 1);
                           }}
-                          onMouseUp={(e) => e.target.blur()}
-                          disabled={updatingItems[item.product.id]}
+                          disabled={updatingItems[item.id]}
                         >
                           <Plus size={16} />
                         </button>
                       </div>
 
                       <span className="item-total">
-                        {(item.product?.price * item.quantity).toFixed(2)} руб.
+                        {(item.price * item.quantity).toLocaleString()} руб.
                       </span>
 
                       <button
                         className="remove-btn"
-                        onClick={(e) => handleRemove(item.product.id, !user, e)}
-                        onMouseUp={(e) => e.target.blur()}
-                        disabled={updatingItems[item.product.id]}
-                        title="Удалить"
+                        onClick={(e) => handleRemove(item.id, e)}
+                        disabled={updatingItems[item.id]}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -481,19 +397,14 @@ const Cart = () => {
             <div className="cart-summary">
               <h2>Ваш заказ</h2>
               <div className="summary-row">
-                <span>Позиций ({itemsToShow.length})</span>
-                <span>{totalPrice.toFixed(2)} руб.</span>
-              </div>
-              <div className="summary-row">
-                <span>Доставка</span>
-                <span>Рассчитывается менеджером</span>
+                <span>Позиций ({cartProducts.length})</span>
+                <span>{totalPrice.toLocaleString()} руб.</span>
               </div>
               <div className="summary-row total">
                 <span>Итого</span>
-                <span>{totalPrice.toFixed(2)} руб.</span>
+                <span>{totalPrice.toLocaleString()} руб.</span>
               </div>
 
-              {/* ИСПРАВЛЕННАЯ КНОПКА - теперь всегда "Оформить заказ" */}
               <button onClick={handleCheckout} className="checkout-btn">
                 Оформить заказ
               </button>

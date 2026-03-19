@@ -13,17 +13,20 @@ import {
   AccordionDetails,
   Typography,
 } from "@mui/material";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import "../styles.scss";
+
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const FilterPanel = ({ onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
+  // Начальные значения фильтров из URL
   const [filters, setFilters] = useState({
     wood_type: queryParams.get("wood_type") || "",
     grade: queryParams.get("grade") || "",
@@ -43,19 +46,25 @@ const FilterPanel = ({ onClose }) => {
     lengths: [],
   });
 
-  // Загружаем доступные значения для фильтров с учетом текущих параметров
+  // Загружаем доступные значения для фильтров
   useEffect(() => {
     fetchFilterValues();
-  }, [location.search]); // Перезагружаем при изменении URL
+  }, [location.search]);
+
+  // Вспомогательная функция для извлечения уникальных значений
+  const extractUnique = (products, field, isNumber = false) => {
+    const values = [...new Set(products.map((p) => p[field]).filter(Boolean))];
+    if (isNumber) {
+      return values.sort((a, b) => a - b).map((v) => v.toString());
+    }
+    return values;
+  };
 
   const fetchFilterValues = async () => {
     try {
-      // Копируем все текущие параметры из URL
+      // Сохраняем только основные параметры (не фильтры)
       const params = {};
-
-      // Добавляем все параметры, которые есть в URL
       for (let [key, value] of queryParams.entries()) {
-        // Не включаем фильтры, для которых мы собираем значения
         if (
           ![
             "wood_type",
@@ -72,49 +81,15 @@ const FilterPanel = ({ onClose }) => {
         }
       }
 
-      console.log("📊 Fetching filter values with params:", params);
-
-      const response = await axios.get(
-        "https://prime-forest.ru/api/products/",
-        {
-          params,
-        }
-      );
+      const response = await axios.get(`${API_URL}/api/products/`, { params });
       const products = response.data.results || [];
 
-      // Извлекаем уникальные значения из отфильтрованных товаров
-      const wood_types = [
-        ...new Set(products.map((p) => p.wood_type).filter(Boolean)),
-      ];
-      const grades = [...new Set(products.map((p) => p.grade).filter(Boolean))];
-
-      // Извлекаем размеры и сортируем
-      const widths = [
-        ...new Set(products.map((p) => p.width).filter(Boolean)),
-      ].sort((a, b) => a - b);
-
-      const thicknesses = [
-        ...new Set(products.map((p) => p.thickness).filter(Boolean)),
-      ].sort((a, b) => a - b);
-
-      const lengths = [
-        ...new Set(products.map((p) => p.length).filter(Boolean)),
-      ].sort((a, b) => a - b);
-
-      console.log("📊 Available values:", {
-        wood_types,
-        grades,
-        widths,
-        thicknesses,
-        lengths,
-      });
-
       setAvailableValues({
-        wood_types,
-        grades,
-        widths: widths.map((w) => w.toString()),
-        thicknesses: thicknesses.map((t) => t.toString()),
-        lengths: lengths.map((l) => l.toString()),
+        wood_types: extractUnique(products, "wood_type"),
+        grades: extractUnique(products, "grade"),
+        widths: extractUnique(products, "width", true),
+        thicknesses: extractUnique(products, "thickness", true),
+        lengths: extractUnique(products, "length", true),
       });
     } catch (error) {
       console.error("Error fetching filter values:", error);
@@ -123,36 +98,31 @@ const FilterPanel = ({ onClose }) => {
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams();
 
-    // Добавляем ВСЕ текущие параметры из URL
+    // Сохраняем все существующие параметры
     for (let [key, value] of queryParams.entries()) {
       params.append(key, value);
     }
 
-    // Добавляем/обновляем фильтры
+    // Обновляем фильтры
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== "") {
-        params.set(key, value); // set заменяет существующее значение
+        params.set(key, value);
       } else {
-        params.delete(key); // удаляем пустые
+        params.delete(key);
       }
     });
 
-    console.log("🎯 Applying filters:", params.toString());
-    navigate(`/catalog?${params.toString()}`); // ИЗМЕНЕНО: было /products, стало /catalog
+    navigate(`/catalog?${params.toString()}`);
     if (onClose) onClose();
   };
 
   const handleResetFilters = () => {
-    // Сбрасываем фильтры
     setFilters({
       wood_type: "",
       grade: "",
@@ -164,36 +134,15 @@ const FilterPanel = ({ onClose }) => {
       ordering: "",
     });
 
-    // Создаем новые параметры без фильтров
-    const params = new URLSearchParams();
-
     // Сохраняем только search и category
-    const searchParam = queryParams.get("search");
-    if (searchParam) {
-      params.append("search", searchParam);
-    }
-
-    const categoryParam = queryParams.get("category");
-    if (categoryParam) {
-      params.append("category", categoryParam);
-    }
-
-    console.log("🔄 Resetting filters, keeping only:", params.toString());
-    navigate(`/catalog?${params.toString()}`); // ИЗМЕНЕНО: было /products, стало /catalog
-    if (onClose) onClose();
-  };
-
-  // Функция для сброса поиска
-  const handleClearSearch = () => {
     const params = new URLSearchParams();
-
-    // Сохраняем только category
+    const searchParam = queryParams.get("search");
     const categoryParam = queryParams.get("category");
-    if (categoryParam) {
-      params.append("category", categoryParam);
-    }
 
-    navigate(`/products?${params.toString()}`);
+    if (searchParam) params.append("search", searchParam);
+    if (categoryParam) params.append("category", categoryParam);
+
+    navigate(`/catalog?${params.toString()}`);
     if (onClose) onClose();
   };
 
@@ -205,9 +154,8 @@ const FilterPanel = ({ onClose }) => {
     { value: "-price", label: "По цене (убывание)" },
   ];
 
-  const hasActiveFilters = () => {
-    return Object.values(filters).some((v) => v && v !== "");
-  };
+  const hasActiveFilters = () =>
+    Object.values(filters).some((v) => v && v !== "");
 
   const hasSearch = queryParams.get("search");
 
@@ -222,6 +170,7 @@ const FilterPanel = ({ onClose }) => {
           content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена. Доска, брус, OSB, фанера, вагонка."
         />
       </Helmet>
+
       <Box className="filter-panel">
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ChevronDown size={20} />}>

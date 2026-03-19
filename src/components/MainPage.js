@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Percent,
-  Truck,
   Shield,
   Ruler,
   TreePine,
@@ -22,15 +21,15 @@ import {
 import "../styles.scss";
 import { Helmet } from "react-helmet";
 
-// Ручной список ID популярных товаров
-const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // Добавьте сюда реальные ID популярных товаров из вашей базы
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // ID популярных товаров
 
 const MainPage = () => {
   const navigate = useNavigate();
   const [popularProducts, setPopularProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     products: 1500,
     customers: 5000,
     years: 12,
@@ -40,23 +39,15 @@ const MainPage = () => {
   useEffect(() => {
     const fetchPopularProducts = async () => {
       try {
-        // Загружаем все товары
-        const response = await axios.get(
-          "https://prime-forest.ru/api/products/",
-          {
-            params: {
-              limit: 100, // Загружаем достаточно товаров для фильтрации
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/api/products/`, {
+          params: { limit: 100 },
+        });
 
-        if (response.data && Array.isArray(response.data.results)) {
+        if (response.data?.results) {
           // Фильтруем товары по ID из списка популярных
           const popular = response.data.results.filter((product) =>
             POPULAR_PRODUCT_IDS.includes(product.id)
           );
-
-          console.log("✅ Найдено популярных товаров:", popular.length);
 
           // Если популярных товаров меньше 4, добавляем первые товары из общего списка
           if (popular.length < 4) {
@@ -70,11 +61,10 @@ const MainPage = () => {
             setPopularProducts(popular.slice(0, 4));
           }
         } else {
-          console.log("⚠️ Нет данных о товарах");
           setPopularProducts([]);
         }
       } catch (error) {
-        console.error("❌ Ошибка загрузки популярных товаров:", error);
+        console.error("Error loading popular products:", error);
         setPopularProducts([]);
       } finally {
         setLoading(false);
@@ -82,17 +72,6 @@ const MainPage = () => {
     };
 
     fetchPopularProducts();
-
-    // Загружаем статистику (если есть эндпоинт)
-    // axios
-    //   .get("https://prime-forest.ru/api/stats/")
-    //   .then((response) => {
-    //     setStats(response.data);
-    //   })
-    //   .catch(() => {
-    //     // Если нет эндпоинта, оставляем демо-данные
-    //     console.log("📊 Используются демо-данные статистики");
-    //   });
   }, []);
 
   const handleSearch = (e) => {
@@ -103,20 +82,95 @@ const MainPage = () => {
   };
 
   const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch(e);
-    }
+    if (e.key === "Enter") handleSearch(e);
   };
 
-  // Функция для получения URL изображения
   const getImageUrl = (imagePath) => {
     if (!imagePath)
       return "https://images.unsplash.com/photo-1581517066154-d9ca0f8c456a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
-      imagePath.startsWith("/") ? "" : "/"
-    }${imagePath}`;
+    return `${API_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   };
+
+  const formatPrice = (price) => new Intl.NumberFormat("ru-RU").format(price);
+
+  const renderProductPrices = (product) => {
+    if (!product.prices?.length) {
+      return <div className="product-price">Цена по запросу</div>;
+    }
+
+    if (product.prices.length === 1) {
+      const price = product.prices[0];
+      return (
+        <div className="product-price">
+          <span className="price-value">{formatPrice(price.price)} ₽</span>
+          <span className="price-unit">/{price.unit_type_short}</span>
+          {price.quantity_per_unit && (
+            <span className="price-pack"> ({price.quantity_per_unit} шт)</span>
+          )}
+        </div>
+      );
+    }
+
+    const minPrice = Math.min(...product.prices.map((p) => p.price));
+    const mainUnit =
+      product.prices.find((p) => p.price === minPrice)?.unit_type_short || "шт";
+
+    return (
+      <div className="product-price">
+        <span className="price-from">от </span>
+        <span className="price-value">{formatPrice(minPrice)} ₽</span>
+        <span className="price-unit">/{mainUnit}</span>
+      </div>
+    );
+  };
+
+  const advantages = [
+    {
+      icon: TreePine,
+      title: "Собственное производство",
+      desc: "Контроль качества на всех этапах",
+    },
+    {
+      icon: Ruler,
+      title: "Любые размеры",
+      desc: "Изготовление нестандартных размеров",
+    },
+    { icon: Warehouse, title: "Склад в наличии", desc: "Более 1000 позиций" },
+    {
+      icon: Award,
+      title: "Сертификаты качества",
+      desc: "Вся продукция сертифицирована",
+    },
+  ];
+
+  const applications = [
+    { path: "construction", icon: Home, text: "Строительство домов" },
+    { path: "bath", icon: Warehouse, text: "Бани и сауны" },
+    { path: "fence", icon: Fence, text: "Заборы и ограждения" },
+    { path: "furniture", icon: Hammer, text: "Мебельное производство" },
+  ];
+
+  const reviews = [
+    {
+      initials: "АП",
+      name: "Александр Петров",
+      date: "12.03.2026",
+      text: "Отличное качество досок. Быстрая доставка. Буду заказывать ещё.",
+    },
+    {
+      initials: "ИС",
+      name: "Иван Сидоров",
+      date: "10.03.2026",
+      text: "Большой выбор пиломатериалов. Цены ниже чем у конкурентов. Рекомендую!",
+    },
+    {
+      initials: "МИ",
+      name: "Михаил Иванов",
+      date: "05.03.2026",
+      text: "Заказывал брус для строительства бани. Качество отличное, доставили вовремя.",
+    },
+  ];
 
   return (
     <>
@@ -129,6 +183,7 @@ const MainPage = () => {
           content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области."
         />
       </Helmet>
+
       <div className="main-page">
         {/* ГЕРОЙ СЕКЦИЯ */}
         <section className="hero-section">
@@ -179,6 +234,7 @@ const MainPage = () => {
               src="https://images2.imgbox.com/03/06/nzoPgdfx_o.jpeg"
               alt="Пиломатериалы"
               className="hero-img"
+              loading="lazy"
             />
           </div>
         </section>
@@ -187,41 +243,19 @@ const MainPage = () => {
         <section className="advantages-section">
           <h2 className="section-title">
             Почему выбирают нас
-            <span className="section-title-decoration"></span>
+            <span className="section-title-decoration" />
           </h2>
 
           <div className="advantages-grid">
-            <div className="advantage-card">
-              <div className="advantage-icon">
-                <TreePine size={40} />
+            {advantages.map(({ icon: Icon, title, desc }, index) => (
+              <div key={index} className="advantage-card">
+                <div className="advantage-icon">
+                  <Icon size={40} />
+                </div>
+                <h3>{title}</h3>
+                <p>{desc}</p>
               </div>
-              <h3>Собственное производство</h3>
-              <p>Контроль качества на всех этапах производства</p>
-            </div>
-
-            <div className="advantage-card">
-              <div className="advantage-icon">
-                <Ruler size={40} />
-              </div>
-              <h3>Любые размеры</h3>
-              <p>Изготовление под заказ любых нестандартных размеров</p>
-            </div>
-
-            <div className="advantage-card">
-              <div className="advantage-icon">
-                <Warehouse size={40} />
-              </div>
-              <h3>Склад в наличии</h3>
-              <p>Постоянное наличие более 1000 позиций</p>
-            </div>
-
-            <div className="advantage-card">
-              <div className="advantage-icon">
-                <Award size={40} />
-              </div>
-              <h3>Сертификаты качества</h3>
-              <p>Вся продукция имеет сертификаты соответствия</p>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -229,12 +263,12 @@ const MainPage = () => {
         <section className="popular-products-section">
           <h2 className="section-title">
             Популярные товары
-            <span className="section-title-decoration"></span>
+            <span className="section-title-decoration" />
           </h2>
 
           {loading ? (
             <div className="loading-container">
-              <div className="loader"></div>
+              <div className="loader" />
               <p>Загрузка популярных товаров...</p>
             </div>
           ) : popularProducts.length > 0 ? (
@@ -251,6 +285,7 @@ const MainPage = () => {
                         src={getImageUrl(product.main_image)}
                         alt={product.name}
                         className="product-image"
+                        loading="lazy"
                         onError={(e) => {
                           e.target.src =
                             "https://via.placeholder.com/300x200?text=Пиломатериал";
@@ -265,11 +300,7 @@ const MainPage = () => {
                           product.category ||
                           "Пиломатериалы"}
                       </p>
-                      <div className="product-price">
-                        {product.price
-                          ? `${product.price} ₽`
-                          : "Цена по запросу"}
-                      </div>
+                      {renderProductPrices(product)}
                     </div>
                   </div>
                 </Link>
@@ -289,35 +320,20 @@ const MainPage = () => {
         <section className="applications-section">
           <h2 className="section-title">
             Применение пиломатериалов
-            <span className="section-title-decoration"></span>
+            <span className="section-title-decoration" />
           </h2>
 
           <div className="applications-grid">
-            <Link
-              to="/catalog?application=construction"
-              className="application-card"
-            >
-              <Home size={32} />
-              <span>Строительство домов</span>
-            </Link>
-
-            <Link to="/catalog?application=bath" className="application-card">
-              <Warehouse size={32} />
-              <span>Бани и сауны</span>
-            </Link>
-
-            <Link to="/catalog?application=fence" className="application-card">
-              <Fence size={32} />
-              <span>Заборы и ограждения</span>
-            </Link>
-
-            <Link
-              to="/catalog?application=furniture"
-              className="application-card"
-            >
-              <Hammer size={32} />
-              <span>Мебельное производство</span>
-            </Link>
+            {applications.map(({ path, icon: Icon, text }, index) => (
+              <Link
+                to={`/catalog?application=${path}`}
+                key={index}
+                className="application-card"
+              >
+                <Icon size={32} />
+                <span>{text}</span>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -347,66 +363,27 @@ const MainPage = () => {
         <section className="reviews-section">
           <h2 className="section-title">
             Отзывы наших клиентов
-            <span className="section-title-decoration"></span>
+            <span className="section-title-decoration" />
           </h2>
 
           <div className="reviews-grid">
-            <div className="review-card">
-              <div className="review-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} fill="currentColor" />
-                ))}
-              </div>
-              <p className="review-text">
-                "Отличное качество досок. Быстрая доставка. Буду заказывать
-                ещё."
-              </p>
-              <div className="review-author">
-                <div className="review-avatar-placeholder">АП</div>
-                <div>
-                  <div className="review-name">Александр Петров</div>
-                  <div className="review-date">12.03.2026</div>
+            {reviews.map(({ initials, name, date, text }, index) => (
+              <div key={index} className="review-card">
+                <div className="review-stars">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={16} fill="currentColor" />
+                  ))}
+                </div>
+                <p className="review-text">"{text}"</p>
+                <div className="review-author">
+                  <div className="review-avatar-placeholder">{initials}</div>
+                  <div>
+                    <div className="review-name">{name}</div>
+                    <div className="review-date">{date}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="review-card">
-              <div className="review-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} fill="currentColor" />
-                ))}
-              </div>
-              <p className="review-text">
-                "Большой выбор пиломатериалов. Цены ниже чем у конкурентов.
-                Рекомендую!"
-              </p>
-              <div className="review-author">
-                <div className="review-avatar-placeholder">ИС</div>
-                <div>
-                  <div className="review-name">Иван Сидоров</div>
-                  <div className="review-date">10.03.2026</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="review-card">
-              <div className="review-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={16} fill="currentColor" />
-                ))}
-              </div>
-              <p className="review-text">
-                "Заказывал брус для строительства бани. Качество отличное,
-                доставили вовремя."
-              </p>
-              <div className="review-author">
-                <div className="review-avatar-placeholder">МИ</div>
-                <div>
-                  <div className="review-name">Михаил Иванов</div>
-                  <div className="review-date">05.03.2026</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -447,11 +424,13 @@ const MainPage = () => {
 
           <div className="contact-map">
             <iframe
-              src="https://yandex.ru/map-widget/v1/?um=constructor%3Ab5bd6e0f4259e1283bf85db928e68523230beaf6ddf73fcb9c4dbb8a70b3e21a&amp;source=constructor"
-              width="600"
+              src="https://yandex.ru/map-widget/v1/?um=constructor%3Ab5bd6e0f4259e1283bf85db928e68523230beaf6ddf73fcb9c4dbb8a70b3e21a&source=constructor"
+              width="100%"
               height="320"
-              frameborder="0"
-            ></iframe>
+              frameBorder="0"
+              title="Карта проезда"
+              loading="lazy"
+            />
           </div>
         </section>
       </div>

@@ -1,7 +1,7 @@
 // src/components/OrderSuccess.js
 import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Button, Paper, Typography, Box, Alert } from "@mui/material";
+import { Button, Paper, Typography, Box } from "@mui/material"; // убрали Alert
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Helmet } from "react-helmet";
 import "../styles.scss";
@@ -11,12 +11,22 @@ const OrderSuccess = () => {
   const navigate = useNavigate();
   const { orderId, isGuest, phoneNumber, email } = location.state || {};
 
+  if (!orderId) {
+    // Если заказа нет (прямой переход на страницу)
+    navigate('/');
+    return null;
+  }
+
   return (
     <>
       <Helmet>
         <title>Заказ оформлен - Prime-Forest | Пиломатериалы</title>
-        <meta name="description" content="Ваш заказ пиломатериалов успешно оформлен. Мы свяжемся с вами для подтверждения доставки." />
+        <meta 
+          name="description" 
+          content="Ваш заказ пиломатериалов успешно оформлен. Мы свяжемся с вами для подтверждения доставки." 
+        />
       </Helmet>
+      
       <div className="order-success">
         <Paper className="success-card" elevation={3}>
           <CheckCircleIcon className="success-icon" />
@@ -67,10 +77,10 @@ const OrderSuccess = () => {
               </Box>
             </Box>
           ) : (
-            <Box>
+            <Box sx={{ textAlign: 'center' }}>
               <Typography paragraph>
-                Статус заказа можно отслеживать в 
-                <Link to="/profile"> личном кабинете</Link>
+                Статус заказа можно отслеживать в{" "}
+                <Link to="/profile">личном кабинете</Link>
               </Typography>
               
               <Button 

@@ -1,4 +1,4 @@
-// src/components/Navbar.js (исправленная версия)
+// src/components/Navbar.js
 import React, { useContext, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
@@ -8,7 +8,6 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
 import {
   ShoppingCart,
   User,
@@ -34,110 +33,63 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Получаем параметры из URL
   const queryParams = new URLSearchParams(location.search);
+  const shouldShowFilters = queryParams.has("category") || queryParams.has("search");
 
-  // Проверяем, нужно ли показывать фильтры (есть категория ИЛИ поиск)
-  const shouldShowFilters =
-    queryParams.has("category") || queryParams.has("search");
-
-  // Синхронизируем searchQuery с URL при изменении
+  // Синхронизируем searchQuery с URL
   useEffect(() => {
-    const searchParam = queryParams.get("search");
-    setSearchQuery(searchParam || "");
+    setSearchQuery(queryParams.get("search") || "");
   }, [location.search]);
-
-  // Устанавливаем начальное значение поиска из URL при загрузке
-  useEffect(() => {
-    const searchParam = queryParams.get("search");
-    if (searchParam) {
-      setSearchQuery(searchParam);
-    }
-  }, []);
 
   // Закрываем мобильное меню при переходе на десктоп
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 900) {
-        setMenuOpen(false);
-      }
+      if (window.innerWidth > 900) setMenuOpen(false);
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Блокируем прокрутку страницы при открытом меню
+  // Блокируем прокрутку при открытом меню
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
+    document.body.style.overflow = menuOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [menuOpen]);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
-
-  const toggleFilterDrawer = () => {
-    setFilterDrawerOpen(!filterDrawerOpen);
-  };
+  const toggleMenu = () => setMenuOpen(prev => !prev);
+  const closeMenu = () => setMenuOpen(false);
+  const toggleFilterDrawer = () => setFilterDrawerOpen(prev => !prev);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Получаем ВСЕ текущие параметры из URL
       const params = new URLSearchParams(location.search);
-
-      // Обновляем или добавляем поисковый запрос
       params.set("search", searchQuery.trim());
-
-      // Удаляем параметр page, так как при новом поиске начинаем с первой страницы
       params.delete("page");
-
-      // Навигируем с сохраненными параметрами
       navigate(`/catalog?${params.toString()}`);
     }
   };
 
   const handleClearSearch = () => {
-    console.log("🔍 handleClearSearch вызван");
-
     setSearchQuery("");
-
-    // Получаем параметры ИЗ ТЕКУЩЕГО location.search
     const params = new URLSearchParams(location.search);
-    console.log("📦 Текущие параметры из URL:", Object.fromEntries(params));
-
-    // Удаляем ТОЛЬКО search
     params.delete("search");
-    console.log("📦 После удаления search:", Object.fromEntries(params));
-
-    // Навигируем
     navigate(`/catalog?${params.toString()}`);
   };
 
   const navLinks = [
-    { path: "/", label: "Главная", icon: null },
-    { path: "/catalog", label: "Каталог", icon: null },
-    { path: "/promotions", label: "Акции", icon: null },
-    { path: "/about", label: "О нас", icon: null },
-    { path: "/contacts", label: "Контакты", icon: null },
+    { path: "/", label: "Главная" },
+    { path: "/catalog", label: "Каталог" },
+    { path: "/promotions", label: "Акции" },
+    { path: "/about", label: "О нас" },
+    { path: "/contacts", label: "Контакты" },
   ];
 
   const isActivePath = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
+    if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
 
@@ -147,9 +99,7 @@ const Navbar = () => {
         <Toolbar className="top-toolbar">
           <div className="left-section">
             <div className="logo-section">
-              <Link to="/" className="logo-link">
-                Prime-Forest
-              </Link>
+              <Link to="/" className="logo-link">Prime-Forest</Link>
               <a
                 href="https://yandex.ru/maps/-/CPB24ZOi"
                 className="logo-address"
@@ -169,64 +119,40 @@ const Navbar = () => {
             </a>
 
             <div className="nav-icons">
-              <IconButton
-                component={Link}
-                to="/cart"
-                className="nav-icon-btn"
-                aria-label="Корзина"
-              >
+              <IconButton component={Link} to="/cart" className="nav-icon-btn">
                 <ShoppingCart />
-                {cartCount > 0 && (
-                  <span className="cart-count">{cartCount}</span>
-                )}
+                {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
               </IconButton>
 
-              {user ? (
-                <IconButton
-                  component={Link}
-                  to="/profile"
-                  className="nav-icon-btn"
-                  aria-label="Профиль"
-                >
-                  <User />
-                </IconButton>
-              ) : (
-                <IconButton
-                  component={Link}
-                  to="/login"
-                  className="nav-icon-btn"
-                  aria-label="Войти"
-                >
-                  <LogIn />
-                </IconButton>
-              )}
+              <IconButton
+                component={Link}
+                to={user ? "/profile" : "/login"}
+                className="nav-icon-btn"
+              >
+                {user ? <User /> : <LogIn />}
+              </IconButton>
             </div>
           </div>
         </Toolbar>
 
-        {/* Десктопная навигация с поиском */}
+        {/* Десктопная навигация */}
         <div className="nav-desktop-wrapper">
           <nav className="navDesktop">
             <ul>
-              {navLinks.map((link) => (
-                <li key={link.path}>
+              {navLinks.map(({ path, label }) => (
+                <li key={path}>
                   <Link
-                    to={link.path}
-                    className={`section-link ${
-                      isActivePath(link.path) ? "active" : ""
-                    }`}
+                    to={path}
+                    className={`section-link ${isActivePath(path) ? "active" : ""}`}
                   >
-                    {link.icon && (
-                      <span className="link-icon">{link.icon}</span>
-                    )}
-                    {link.label}
+                    {label}
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* Поиск и фильтры для десктопа */}
+          {/* Десктопный поиск */}
           <div className="nav-search-section">
             <form onSubmit={handleSearch} className="nav-search-form">
               <TextField
@@ -243,28 +169,18 @@ const Navbar = () => {
                   ),
                   endAdornment: searchQuery && (
                     <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={handleClearSearch}
-                        className="clear-search-icon"
-                      >
+                      <IconButton size="small" onClick={handleClearSearch}>
                         <X size={16} />
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-              <Button
-                type="submit"
-                variant="contained"
-                size="small"
-                className="nav-search-button"
-              >
+              <Button type="submit" variant="contained" size="small" className="nav-search-button">
                 Найти
               </Button>
             </form>
 
-            {/* Показываем кнопку фильтров только когда есть категория или поиск */}
             {shouldShowFilters && (
               <Button
                 variant="outlined"
@@ -279,17 +195,10 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Мобильная поисковая строка с бургер-меню слева */}
+        {/* Мобильный поиск */}
         <div className="mobile-search-container">
-          {/* Простой бургер - всегда на заднем плане */}
-          <button
-            className="burgerButton"
-            onClick={toggleMenu}
-            aria-label="Меню"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+          <button className="burgerButton" onClick={toggleMenu}>
+            <span /><span /><span />
           </button>
 
           <div className="mobile-search-wrapper">
@@ -302,36 +211,22 @@ const Navbar = () => {
                 className="mobile-search-input"
                 fullWidth
                 InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search size={18} />
-                    </InputAdornment>
-                  ),
+                  startAdornment: <InputAdornment position="start"><Search size={18} /></InputAdornment>,
                   endAdornment: searchQuery && (
                     <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={handleClearSearch}
-                        className="clear-search-icon"
-                      >
+                      <IconButton size="small" onClick={handleClearSearch}>
                         <X size={16} />
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-              <Button
-                type="submit"
-                variant="contained"
-                size="small"
-                className="mobile-search-button"
-              >
+              <Button type="submit" variant="contained" size="small" className="mobile-search-button">
                 Найти
               </Button>
             </form>
           </div>
 
-          {/* Показываем кнопку фильтров только когда есть категория или поиск */}
           {shouldShowFilters && (
             <Button
               variant="outlined"
@@ -344,7 +239,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Мобильное меню - накладывается поверх */}
+        {/* Мобильное меню */}
         <div className={`mobileMenu ${menuOpen ? "mobileMenuOpen" : ""}`}>
           <div className="mobile-menu-header">
             <button className="mobile-menu-close" onClick={closeMenu}>
@@ -353,16 +248,14 @@ const Navbar = () => {
           </div>
           <nav>
             <ul>
-              {navLinks.map((link) => (
-                <li key={link.path}>
+              {navLinks.map(({ path, label }) => (
+                <li key={path}>
                   <Link
-                    to={link.path}
-                    className={`section-link ${
-                      isActivePath(link.path) ? "active" : ""
-                    }`}
+                    to={path}
+                    className={`section-link ${isActivePath(path) ? "active" : ""}`}
                     onClick={closeMenu}
                   >
-                    {link.label}
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -370,10 +263,9 @@ const Navbar = () => {
           </nav>
         </div>
 
-        {/* Затемнение фона при открытом меню */}
-        {menuOpen && <div className="menu-overlay" onClick={closeMenu}></div>}
+        {menuOpen && <div className="menu-overlay" onClick={closeMenu} />}
 
-        {/* Drawer с фильтрами */}
+        {/* Фильтры */}
         <Drawer
           anchor="right"
           open={filterDrawerOpen}
