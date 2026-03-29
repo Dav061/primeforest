@@ -119,11 +119,11 @@ const AdminProducts = () => {
         gradesRes,
         unitTypesRes,
       ] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/products/"),
-        axios.get("http://127.0.0.1:8000/api/categories/"),
-        axios.get("http://127.0.0.1:8000/api/woodtypes/"),
-        axios.get("http://127.0.0.1:8000/api/grades/"),
-        axios.get("http://127.0.0.1:8000/api/unit-types/"),
+        axios.get("https://prime-forest.ru/api/products/"),
+        axios.get("https://prime-forest.ru/api/categories/"),
+        axios.get("https://prime-forest.ru/api/woodtypes/"),
+        axios.get("https://prime-forest.ru/api/grades/"),
+        axios.get("https://prime-forest.ru/api/unit-types/"),
       ]);
 
       const productsData = productsRes.data.results || productsRes.data;
@@ -382,13 +382,13 @@ const AdminProducts = () => {
       let response;
       if (currentProduct.id) {
         response = await axios.patch(
-          `http://127.0.0.1:8000/api/products/${currentProduct.id}/`,
+          `https://prime-forest.ru/api/products/${currentProduct.id}/`,
           productData
         );
         setSuccessMessage(`Товар "${currentProduct.name}" успешно обновлен!`);
       } else {
         response = await axios.post(
-          "http://127.0.0.1:8000/api/products/",
+          "https://prime-forest.ru/api/products/",
           productData
         );
         setSuccessMessage(`Товар "${currentProduct.name}" успешно добавлен!`);
@@ -431,7 +431,7 @@ const AdminProducts = () => {
       productName: product.name,
       onConfirm: async () => {
         try {
-          await axios.delete(`http://127.0.0.1:8000/api/products/${id}/`);
+          await axios.delete(`https://prime-forest.ru/api/products/${id}/`);
           setSuccessMessage(`Товар "${product.name}" успешно удалён!`);
           fetchData();
           setConfirmDialog((prev) => ({ ...prev, open: false }));
@@ -455,7 +455,7 @@ const AdminProducts = () => {
         try {
           setLoading(true);
           await axios.post(
-            `http://127.0.0.1:8000/api/products/${id}/activate/`
+            `https://prime-forest.ru/api/products/${id}/activate/`
           );
           setSuccessMessage(`Товар "${product.name}" успешно активирован!`);
           fetchData();

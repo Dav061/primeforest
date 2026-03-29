@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { CartContext } from "../CartContext";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();

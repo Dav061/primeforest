@@ -13,7 +13,7 @@ import { notifySuccess, notifyError } from "./utils/notifications";
 export const CartContext = createContext();
 
 export const GUEST_CART_KEY = "guestCart";
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);

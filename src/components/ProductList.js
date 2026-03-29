@@ -1,5 +1,11 @@
 // src/components/ProductList.js
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -19,7 +25,7 @@ import "../styles.scss";
 import ProductCard from "./ProductCard";
 import { Helmet } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const ProductList = () => {
   const location = useLocation();
@@ -98,7 +104,7 @@ const ProductList = () => {
         // 2. Если это родительская категория - загружаем подкатегории
         if (category.parent === null) {
           setParentCategory(null);
-          
+
           const subcatsResponse = await axios.get(
             `${API_URL}/api/categories/`,
             {
@@ -106,12 +112,14 @@ const ProductList = () => {
               signal,
             }
           );
-          const allSubcats = subcatsResponse.data.results || subcatsResponse.data;
+          const allSubcats =
+            subcatsResponse.data.results || subcatsResponse.data;
           const filteredSubcats = allSubcats.filter(
-            (subcat) => subcat.id !== category.id && subcat.parent === category.id
+            (subcat) =>
+              subcat.id !== category.id && subcat.parent === category.id
           );
           setSubcategories(filteredSubcats);
-          
+
           // Добавляем ID подкатегорий для поиска товаров
           if (filteredSubcats.length > 0) {
             hasSubcategories = true;
@@ -121,7 +129,7 @@ const ProductList = () => {
         } else {
           // Это подкатегория - загружаем родителя
           setSubcategories([]);
-          
+
           const parentResponse = await axios.get(
             `${API_URL}/api/categories/${category.parent}/`,
             { signal }
@@ -132,7 +140,9 @@ const ProductList = () => {
         // 3. Загружаем товары (всегда загружаем, даже для родительской категории)
         const params = {
           is_active: true,
-          category__in: [...new Set(allCategoryIds)].sort((a, b) => a - b).join(",")
+          category__in: [...new Set(allCategoryIds)]
+            .sort((a, b) => a - b)
+            .join(","),
         };
 
         if (searchParam) params.search = searchParam;
@@ -167,7 +177,9 @@ const ProductList = () => {
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Ошибка:", error);
-          setError(error.response?.data?.detail || "Ошибка при загрузке данных");
+          setError(
+            error.response?.data?.detail || "Ошибка при загрузке данных"
+          );
         }
       } finally {
         setLoading(false);
@@ -292,9 +304,12 @@ const ProductList = () => {
       "-price": "По цене (убыв.)",
     };
 
-    if (key === "ordering" && orderingLabels[value]) return orderingLabels[value];
-    if (key === "min_price" || key === "max_price") return `${labels[key]}: ${value} ₽`;
-    if (key === "width" || key === "thickness" || key === "length") return `${labels[key]}: ${value} мм`;
+    if (key === "ordering" && orderingLabels[value])
+      return orderingLabels[value];
+    if (key === "min_price" || key === "max_price")
+      return `${labels[key]}: ${value} ₽`;
+    if (key === "width" || key === "thickness" || key === "length")
+      return `${labels[key]}: ${value} мм`;
     return `${labels[key]}: ${value}`;
   };
 
@@ -363,7 +378,8 @@ const ProductList = () => {
   // 1. Есть подкатегории
   // 2. Текущая категория - родительская (parent === null)
   // 3. Показываем их над товарами для удобной навигации
-  const showSubcategories = subcategories.length > 0 && currentCategory?.parent === null;
+  const showSubcategories =
+    subcategories.length > 0 && currentCategory?.parent === null;
 
   return (
     <>
@@ -422,7 +438,10 @@ const ProductList = () => {
         {/* Кнопка возврата к родительской категории - только для подкатегорий */}
         {parentCategory && currentCategory?.parent !== null && (
           <div className="parent-category-info">
-            <button className="back-to-parent-button" onClick={handleBackToParent}>
+            <button
+              className="back-to-parent-button"
+              onClick={handleBackToParent}
+            >
               ← Показать все товары в категории "{parentCategory.name}"
             </button>
           </div>

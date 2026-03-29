@@ -19,12 +19,12 @@ import axios from "axios";
 import { Helmet } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const FilterPanel = ({ onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [filters, setFilters] = useState({
     wood_type: "",
     grade: "",
@@ -45,7 +45,7 @@ const FilterPanel = ({ onClose }) => {
   });
 
   const [loading, setLoading] = useState(true);
-  
+
   // Refs для предотвращения множественных запросов
   const isMounted = useRef(true);
   const abortControllerRef = useRef(null);
@@ -71,7 +71,7 @@ const FilterPanel = ({ onClose }) => {
     const queryParams = new URLSearchParams(location.search);
     const categoryId = queryParams.get("category");
     const searchParam = queryParams.get("search");
-    
+
     // Если нет категории, не делаем запрос
     if (!categoryId) {
       if (isMounted.current) {
@@ -87,15 +87,15 @@ const FilterPanel = ({ onClose }) => {
       }
       return;
     }
-    
+
     // Создаем ключ для проверки уникальности запроса
     const paramsKey = JSON.stringify({ categoryId, searchParam });
-    
+
     // Если параметры не изменились и уже загружали - пропускаем
     if (paramsKey === lastFetchedParamsRef.current && initialLoadDone.current) {
       return;
     }
-    
+
     lastFetchedParamsRef.current = paramsKey;
     isFetchingRef.current = true;
 
@@ -131,16 +131,22 @@ const FilterPanel = ({ onClose }) => {
           const allSubcats =
             subcatsResponse.data.results || subcatsResponse.data;
           const subcategoryIds = allSubcats
-            .filter((subcat) => subcat.id !== parseInt(categoryId) && subcat.parent === parseInt(categoryId))
+            .filter(
+              (subcat) =>
+                subcat.id !== parseInt(categoryId) &&
+                subcat.parent === parseInt(categoryId)
+            )
             .map((subcat) => subcat.id);
 
           if (subcategoryIds.length > 0) {
             allCategoryIds = [...allCategoryIds, ...subcategoryIds];
           }
         }
-        
+
         // Для фильтров используем category__in, чтобы получить все товары из категории и подкатегорий
-        params.category__in = [...new Set(allCategoryIds)].sort((a, b) => a - b).join(",");
+        params.category__in = [...new Set(allCategoryIds)]
+          .sort((a, b) => a - b)
+          .join(",");
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Error fetching category:", error);
@@ -158,7 +164,7 @@ const FilterPanel = ({ onClose }) => {
         params,
         signal: abortControllerRef.current.signal,
       });
-      
+
       const products = response.data.results || [];
 
       console.log(`Found ${products.length} products for filters`);
@@ -203,7 +209,7 @@ const FilterPanel = ({ onClose }) => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const categoryId = queryParams.get("category");
-    
+
     if (categoryId) {
       setLoading(true);
       // Очищаем предыдущий таймаут
@@ -261,7 +267,7 @@ const FilterPanel = ({ onClose }) => {
     // Сохраняем существующие параметры (category, search)
     const categoryParam = queryParams.get("category");
     const searchParam = queryParams.get("search");
-    
+
     if (categoryParam) params.set("category", categoryParam);
     if (searchParam) params.set("search", searchParam);
 
@@ -316,7 +322,11 @@ const FilterPanel = ({ onClose }) => {
     availableValues.lengths.length > 0;
 
   // Показываем загрузку только при первой загрузке
-  if (loading && !initialLoadDone.current && availableValues.wood_types.length === 0) {
+  if (
+    loading &&
+    !initialLoadDone.current &&
+    availableValues.wood_types.length === 0
+  ) {
     return (
       <Box className="filter-panel">
         <Box sx={{ p: 2, textAlign: "center" }}>
@@ -480,10 +490,7 @@ const FilterPanel = ({ onClose }) => {
                 >
                   <MenuItem value="">Любая толщина</MenuItem>
                   {availableValues.thicknesses.map((thickness) => (
-                    <MenuItem
-                      key={`thickness-${thickness}`}
-                      value={thickness}
-                    >
+                    <MenuItem key={`thickness-${thickness}`} value={thickness}>
                       {thickness} мм
                     </MenuItem>
                   ))}
