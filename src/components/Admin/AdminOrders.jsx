@@ -47,7 +47,7 @@ const AdminOrders = () => {
           return;
         }
 
-        let url = "https://prime-forest.ru/api/orders/";
+        let url = "http://127.0.0.1:8000/api/orders/";
         const params = new URLSearchParams();
 
         if (statusFilter) params.append("status", statusFilter);
@@ -100,7 +100,7 @@ const AdminOrders = () => {
       }
 
       const response = await axios.patch(
-        `https://prime-forest.ru/api/orders/${orderId}/`,
+        `http://127.0.0.1:8000/api/orders/${orderId}/`,
         { status: newStatus },
         {
           headers: {

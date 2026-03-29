@@ -1,35 +1,35 @@
 import React from "react";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
 const Contacts = () => {
   const phoneNumbers = [
     { href: "tel:+79990000629", display: "+7 (999) 000-06-29" },
-    { href: "tel:+79055983500", display: "+7 (905) 598-35-00" }
+    { href: "tel:+79055983500", display: "+7 (905) 598-35-00" },
   ];
 
   const deliveryInfo = [
     "В пределах МКАД: от 1500 ₽",
     "За МКАД (до 30 км): от 1000 ₽ + 80 ₽/км",
-    "Дальше 30 км: рассчитывается менеджером"
+    "Дальше 30 км: рассчитывается менеджером",
   ];
 
   const paymentMethods = [
     "Банковские карты (Visa, MasterCard, Мир)",
     "Безналичный расчёт для юридических лиц",
-    "Наличные в офисе"
+    "Наличные в офисе",
   ];
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Контакты - Prime-Forest | Адрес, телефон, график работы</title>
-        <meta 
-          name="description" 
-          content="Контакты компании Prime-Forest в Москве. Адрес: Рублёвское шоссе, 151к2. Телефоны: +7 (999) 000-06-29, +7 (905) 598-35-00. График работы, WhatsApp, схема проезда." 
+        <meta
+          name="description"
+          content="Контакты компании Prime-Forest в Москве. Адрес: Рублёвское шоссе, 151к2. Телефоны: +7 (999) 000-06-29, +7 (905) 598-35-00. График работы, WhatsApp, схема проезда."
         />
-      </Helmet>
-      
+      </HelmetProvider>
+
       <div className="contacts-container">
         <div className="contacts-grid">
           <div className="contact-card">
@@ -92,15 +92,22 @@ const Contacts = () => {
           <div className="requisites-container">
             <h2 className="section-title">🚚 Информация о доставке</h2>
             <div className="delivery-info">
-              <p>Стоимость доставки рассчитывается индивидуально для каждого адреса</p>
+              <p>
+                Стоимость доставки рассчитывается индивидуально для каждого
+                адреса
+              </p>
               <div className="delivery-calculator">
-                <p><strong>Ориентировочная стоимость:</strong></p>
+                <p>
+                  <strong>Ориентировочная стоимость:</strong>
+                </p>
                 {deliveryInfo.map((item, index) => (
                   <p key={index}>• {item}</p>
                 ))}
               </div>
               <p>
-                <small>Точную стоимость просьба уточнять перед оформлением заказа</small>
+                <small>
+                  Точную стоимость просьба уточнять перед оформлением заказа
+                </small>
               </p>
             </div>
           </div>
@@ -115,7 +122,9 @@ const Contacts = () => {
                 ))}
               </div>
               <p>
-                <small>Точную информацию просьба уточнять перед оформлением заказа</small>
+                <small>
+                  Точную информацию просьба уточнять перед оформлением заказа
+                </small>
               </p>
             </div>
           </div>

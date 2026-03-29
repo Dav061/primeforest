@@ -9,7 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 
 const GUEST_CART_KEY = "guestCart";
 
@@ -41,7 +41,7 @@ const Login = () => {
 
         // Обновляем корзину
         await refreshCart();
-        
+
         notifySuccess("Успешный вход в систему");
         navigate(from, { replace: true });
       } else {
@@ -56,10 +56,10 @@ const Login = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Вход в личный кабинет - Prime-Forest</title>
-      </Helmet>
-      
+      </HelmetProvider>
+
       <div className="login-page">
         <div className="login-header">
           <IconButton

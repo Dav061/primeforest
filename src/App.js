@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useLayoutEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async"; // или 'react-helmet' - оба работают
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./AuthContext";
 import { CartProvider } from "./CartContext";
 import Navbar from "./components/Navbar";

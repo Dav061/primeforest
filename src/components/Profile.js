@@ -23,10 +23,10 @@ import {
   Paper,
 } from "@mui/material";
 import { MapPin, Calendar, Package } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
@@ -196,13 +196,13 @@ const Profile = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Личный кабинет - Prime-Forest | История заказов</title>
         <meta
           name="description"
           content="Личный кабинет Prime-Forest. Просмотр истории заказов пиломатериалов, отслеживание статуса доставки по Москве и МО."
         />
-      </Helmet>
+      </HelmetProvider>
 
       <div className="profile">
         <h1 className="page-title">Личный кабинет</h1>

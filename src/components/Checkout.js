@@ -9,14 +9,14 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
 // Константы
 const PHONE_REGEX =
   /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -126,9 +126,9 @@ const Checkout = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Оформление заказа - Prime-Forest</title>
-      </Helmet>
+      </HelmetProvider>
 
       <div className="checkout-page">
         <div className="checkout-header">

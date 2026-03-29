@@ -13,12 +13,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { ShoppingCart, Minus, Plus, Ruler } from "lucide-react";
 import { CartContext } from "../CartContext";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import PriceSelector from "./PriceSelector";
 import "../styles.scss";
 import { IconButton } from "@mui/material";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -147,13 +147,13 @@ const ProductDetail = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>{product.name} - купить в Москве | Prime-Forest</title>
         <meta
           name="description"
           content={product.description?.substring(0, 160)}
         />
-      </Helmet>
+      </HelmetProvider>
 
       <div className="product-detail">
         <Button

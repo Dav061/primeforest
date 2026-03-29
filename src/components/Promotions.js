@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Truck } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
 const Promotions = () => {
@@ -10,30 +10,32 @@ const Promotions = () => {
     {
       number: 1,
       title: "Выберите товары",
-      description: "Добавьте в корзину пиломатериалы на сумму от 50 000 ₽"
+      description: "Добавьте в корзину пиломатериалы на сумму от 50 000 ₽",
     },
     {
       number: 2,
       title: "Оформите заказ",
-      description: "Укажите адрес доставки и удобное время"
+      description: "Укажите адрес доставки и удобное время",
     },
     {
       number: 3,
       title: "Получите скидку",
-      description: "Менеджер рассчитает стоимость доставки со скидкой 5%"
-    }
+      description: "Менеджер рассчитает стоимость доставки со скидкой 5%",
+    },
   ];
 
   return (
     <>
-      <Helmet>
-        <title>Акции на пиломатериалы - скидка на доставку 5% | Prime-Forest</title>
-        <meta 
-          name="description" 
-          content="Акции на пиломатериалы в Москве. Скидка на доставку 5% при заказе от 50 000 ₽. Доска, брус, OSB, фанера, вагонка по выгодным ценам." 
+      <HelmetProvider>
+        <title>
+          Акции на пиломатериалы - скидка на доставку 5% | Prime-Forest
+        </title>
+        <meta
+          name="description"
+          content="Акции на пиломатериалы в Москве. Скидка на доставку 5% при заказе от 50 000 ₽. Доска, брус, OSB, фанера, вагонка по выгодным ценам."
         />
-      </Helmet>
-      
+      </HelmetProvider>
+
       <div className="promotions-page">
         <div className="delivery-promo-banner">
           <div className="promo-content">

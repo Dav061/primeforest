@@ -9,7 +9,7 @@ import { CartContext } from "../CartContext";
 import { AuthContext } from "../AuthContext";
 import "../styles.scss";
 import { notifyError, notifySuccess } from "../utils/notifications";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 
 const Cart = () => {
   const { user } = useContext(AuthContext);
@@ -63,7 +63,7 @@ const Cart = () => {
         priceIds.map(async (priceId) => {
           try {
             const response = await axios.get(
-              `https://prime-forest.ru/api/product-prices/${priceId}/`
+              `http://127.0.0.1:8000/api/product-prices/${priceId}/`
             );
             pricesCache[priceId] = response.data;
           } catch (error) {
@@ -82,7 +82,7 @@ const Cart = () => {
 
           try {
             const productResponse = await axios.get(
-              `https://prime-forest.ru/api/products/${productId}/`
+              `http://127.0.0.1:8000/api/products/${productId}/`
             );
             const product = productResponse.data;
 
@@ -250,7 +250,7 @@ const Cart = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `https://prime-forest.ru${
+    return `http://127.0.0.1:8000${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -266,9 +266,9 @@ const Cart = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Корзина - Prime-Forest</title>
-      </Helmet>
+      </HelmetProvider>
       <div className="container cart">
         <h1 className="page-title">Корзина</h1>
 

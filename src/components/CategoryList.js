@@ -8,10 +8,10 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { ChevronRight } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -21,8 +21,16 @@ const CategoryList = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        // Загружаем ВСЕ категории
         const response = await axios.get(`${API_URL}/api/categories/`);
-        setCategories(response.data.results || []);
+        const allCategories = response.data.results || [];
+
+        // Фильтруем только родительские категории (parent = null)
+        const parentCategories = allCategories.filter(
+          (cat) => cat.parent === null
+        );
+
+        setCategories(parentCategories);
       } catch (error) {
         setError("Ошибка при загрузке категорий: " + error.message);
       } finally {
@@ -54,7 +62,7 @@ const CategoryList = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>
           Категории пиломатериалов - Prime-Forest | Доска, брус, OSB, фанера
         </title>
@@ -62,13 +70,13 @@ const CategoryList = () => {
           name="description"
           content="Все категории пиломатериалов: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и МО."
         />
-      </Helmet>
+      </HelmetProvider>
 
       <div className="category-list">
         <div className="categories-grid">
           {categories.map((category) => (
             <Link
-              to={`/catalog?category=${category.id}`}
+              to={`/products?category=${category.id}`}
               key={category.id}
               className="category-link"
             >

@@ -19,9 +19,9 @@ import {
   Search,
 } from "lucide-react";
 import "../styles.scss";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // ID популярных товаров
 
 const MainPage = () => {
@@ -174,7 +174,7 @@ const MainPage = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>
           Prime-Forest - пиломатериалы от производителя в Москве и МО
         </title>
@@ -182,7 +182,7 @@ const MainPage = () => {
           name="description"
           content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области."
         />
-      </Helmet>
+      </HelmetProvider>
 
       <div className="main-page">
         {/* ГЕРОЙ СЕКЦИЯ */}

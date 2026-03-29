@@ -1,5 +1,5 @@
 // src/components/FilterPanel.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   FormControl,
   InputLabel,
@@ -16,26 +16,24 @@ import {
 import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const FilterPanel = ({ onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
-  // Начальные значения фильтров из URL
+  
   const [filters, setFilters] = useState({
-    wood_type: queryParams.get("wood_type") || "",
-    grade: queryParams.get("grade") || "",
-    width: queryParams.get("width") || "",
-    thickness: queryParams.get("thickness") || "",
-    length: queryParams.get("length") || "",
-    min_price: queryParams.get("min_price") || "",
-    max_price: queryParams.get("max_price") || "",
-    ordering: queryParams.get("ordering") || "",
+    wood_type: "",
+    grade: "",
+    width: "",
+    thickness: "",
+    length: "",
+    min_price: "",
+    max_price: "",
+    ordering: "",
   });
 
   const [availableValues, setAvailableValues] = useState({
@@ -46,55 +44,210 @@ const FilterPanel = ({ onClose }) => {
     lengths: [],
   });
 
-  // Загружаем доступные значения для фильтров
-  useEffect(() => {
-    fetchFilterValues();
-  }, [location.search]);
+  const [loading, setLoading] = useState(true);
+  
+  // Refs для предотвращения множественных запросов
+  const isMounted = useRef(true);
+  const abortControllerRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const lastFetchedParamsRef = useRef("");
+  const isFetchingRef = useRef(false);
+  const initialLoadDone = useRef(false);
 
-  // Вспомогательная функция для извлечения уникальных значений
   const extractUnique = (products, field, isNumber = false) => {
     const values = [...new Set(products.map((p) => p[field]).filter(Boolean))];
     if (isNumber) {
       return values.sort((a, b) => a - b).map((v) => v.toString());
     }
-    return values;
+    return values.sort();
   };
 
-  const fetchFilterValues = async () => {
+  const fetchFilterValues = useCallback(async () => {
+    // Предотвращаем одновременные запросы
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    const queryParams = new URLSearchParams(location.search);
+    const categoryId = queryParams.get("category");
+    const searchParam = queryParams.get("search");
+    
+    // Если нет категории, не делаем запрос
+    if (!categoryId) {
+      if (isMounted.current) {
+        setAvailableValues({
+          wood_types: [],
+          grades: [],
+          widths: [],
+          thicknesses: [],
+          lengths: [],
+        });
+        setLoading(false);
+        initialLoadDone.current = true;
+      }
+      return;
+    }
+    
+    // Создаем ключ для проверки уникальности запроса
+    const paramsKey = JSON.stringify({ categoryId, searchParam });
+    
+    // Если параметры не изменились и уже загружали - пропускаем
+    if (paramsKey === lastFetchedParamsRef.current && initialLoadDone.current) {
+      return;
+    }
+    
+    lastFetchedParamsRef.current = paramsKey;
+    isFetchingRef.current = true;
+
+    // Отменяем предыдущий запрос
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+
     try {
-      // Сохраняем только основные параметры (не фильтры)
-      const params = {};
-      for (let [key, value] of queryParams.entries()) {
-        if (
-          ![
-            "wood_type",
-            "grade",
-            "width",
-            "thickness",
-            "length",
-            "min_price",
-            "max_price",
-            "ordering",
-          ].includes(key)
-        ) {
-          params[key] = value;
+      const params = { is_active: true };
+
+      // Получаем информацию о категории
+      try {
+        const categoryResponse = await axios.get(
+          `${API_URL}/api/categories/${categoryId}/`,
+          { signal: abortControllerRef.current.signal }
+        );
+        const category = categoryResponse.data;
+
+        let allCategoryIds = [parseInt(categoryId)];
+
+        // Если это родительская категория, загружаем все подкатегории
+        if (category.parent === null) {
+          const subcatsResponse = await axios.get(
+            `${API_URL}/api/categories/`,
+            {
+              params: { parent: categoryId },
+              signal: abortControllerRef.current.signal,
+            }
+          );
+          const allSubcats =
+            subcatsResponse.data.results || subcatsResponse.data;
+          const subcategoryIds = allSubcats
+            .filter((subcat) => subcat.id !== parseInt(categoryId) && subcat.parent === parseInt(categoryId))
+            .map((subcat) => subcat.id);
+
+          if (subcategoryIds.length > 0) {
+            allCategoryIds = [...allCategoryIds, ...subcategoryIds];
+          }
         }
+        
+        // Для фильтров используем category__in, чтобы получить все товары из категории и подкатегорий
+        params.category__in = [...new Set(allCategoryIds)].sort((a, b) => a - b).join(",");
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Error fetching category:", error);
+        }
+        params.category = categoryId;
       }
 
-      const response = await axios.get(`${API_URL}/api/products/`, { params });
+      if (searchParam) {
+        params.search = searchParam;
+      }
+
+      console.log("Fetching filter values with params:", params);
+
+      const response = await axios.get(`${API_URL}/api/products/`, {
+        params,
+        signal: abortControllerRef.current.signal,
+      });
+      
       const products = response.data.results || [];
 
-      setAvailableValues({
-        wood_types: extractUnique(products, "wood_type"),
-        grades: extractUnique(products, "grade"),
-        widths: extractUnique(products, "width", true),
-        thicknesses: extractUnique(products, "thickness", true),
-        lengths: extractUnique(products, "length", true),
-      });
+      console.log(`Found ${products.length} products for filters`);
+
+      if (isMounted.current) {
+        setAvailableValues({
+          wood_types: extractUnique(products, "wood_type"),
+          grades: extractUnique(products, "grade"),
+          widths: extractUnique(products, "width", true),
+          thicknesses: extractUnique(products, "thickness", true),
+          lengths: extractUnique(products, "length", true),
+        });
+        setLoading(false);
+        initialLoadDone.current = true;
+      }
     } catch (error) {
-      console.error("Error fetching filter values:", error);
+      if (error.name !== "AbortError" && isMounted.current) {
+        console.error("Error fetching filter values:", error);
+        setLoading(false);
+      }
+    } finally {
+      isFetchingRef.current = false;
     }
-  };
+  }, [location.search]);
+
+  // Инициализация filters из URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    setFilters({
+      wood_type: queryParams.get("wood_type") || "",
+      grade: queryParams.get("grade") || "",
+      width: queryParams.get("width") || "",
+      thickness: queryParams.get("thickness") || "",
+      length: queryParams.get("length") || "",
+      min_price: queryParams.get("min_price") || "",
+      max_price: queryParams.get("max_price") || "",
+      ordering: queryParams.get("ordering") || "",
+    });
+  }, [location.search]);
+
+  // Загрузка фильтров - только при изменении category или search
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const categoryId = queryParams.get("category");
+    
+    if (categoryId) {
+      setLoading(true);
+      // Очищаем предыдущий таймаут
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Устанавливаем новый таймаут
+      timeoutRef.current = setTimeout(() => {
+        if (isMounted.current) {
+          fetchFilterValues();
+        }
+      }, 100);
+    } else {
+      setAvailableValues({
+        wood_types: [],
+        grades: [],
+        widths: [],
+        thicknesses: [],
+        lengths: [],
+      });
+      setLoading(false);
+      initialLoadDone.current = false;
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [location.search, fetchFilterValues]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -102,19 +255,20 @@ const FilterPanel = ({ onClose }) => {
   };
 
   const handleApplyFilters = () => {
+    const queryParams = new URLSearchParams(location.search);
     const params = new URLSearchParams();
 
-    // Сохраняем все существующие параметры
-    for (let [key, value] of queryParams.entries()) {
-      params.append(key, value);
-    }
+    // Сохраняем существующие параметры (category, search)
+    const categoryParam = queryParams.get("category");
+    const searchParam = queryParams.get("search");
+    
+    if (categoryParam) params.set("category", categoryParam);
+    if (searchParam) params.set("search", searchParam);
 
-    // Обновляем фильтры
+    // Добавляем выбранные фильтры
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== "") {
         params.set(key, value);
-      } else {
-        params.delete(key);
       }
     });
 
@@ -123,6 +277,7 @@ const FilterPanel = ({ onClose }) => {
   };
 
   const handleResetFilters = () => {
+    const queryParams = new URLSearchParams(location.search);
     setFilters({
       wood_type: "",
       grade: "",
@@ -134,13 +289,12 @@ const FilterPanel = ({ onClose }) => {
       ordering: "",
     });
 
-    // Сохраняем только search и category
     const params = new URLSearchParams();
     const searchParam = queryParams.get("search");
     const categoryParam = queryParams.get("category");
 
-    if (searchParam) params.append("search", searchParam);
-    if (categoryParam) params.append("category", categoryParam);
+    if (searchParam) params.set("search", searchParam);
+    if (categoryParam) params.set("category", categoryParam);
 
     navigate(`/catalog?${params.toString()}`);
     if (onClose) onClose();
@@ -154,10 +308,23 @@ const FilterPanel = ({ onClose }) => {
     { value: "-price", label: "По цене (убывание)" },
   ];
 
-  const hasActiveFilters = () =>
-    Object.values(filters).some((v) => v && v !== "");
+  const hasAnyFilters =
+    availableValues.wood_types.length > 0 ||
+    availableValues.grades.length > 0 ||
+    availableValues.widths.length > 0 ||
+    availableValues.thicknesses.length > 0 ||
+    availableValues.lengths.length > 0;
 
-  const hasSearch = queryParams.get("search");
+  // Показываем загрузку только при первой загрузке
+  if (loading && !initialLoadDone.current && availableValues.wood_types.length === 0) {
+    return (
+      <Box className="filter-panel">
+        <Box sx={{ p: 2, textAlign: "center" }}>
+          <Typography>Загрузка фильтров...</Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -167,7 +334,7 @@ const FilterPanel = ({ onClose }) => {
         </title>
         <meta
           name="description"
-          content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена. Доска, брус, OSB, фанера, вагонка."
+          content="Удобный фильтр для подбора пиломатериалов по параметрам: порода дерева, сорт, размеры, цена."
         />
       </Helmet>
 
@@ -237,8 +404,8 @@ const FilterPanel = ({ onClose }) => {
                   displayEmpty
                 >
                   <MenuItem value="">Все породы</MenuItem>
-                  {availableValues.wood_types.map((type, index) => (
-                    <MenuItem key={index} value={type}>
+                  {availableValues.wood_types.map((type) => (
+                    <MenuItem key={`wood-type-${type}`} value={type}>
                       {type}
                     </MenuItem>
                   ))}
@@ -262,8 +429,8 @@ const FilterPanel = ({ onClose }) => {
                   displayEmpty
                 >
                   <MenuItem value="">Все сорта</MenuItem>
-                  {availableValues.grades.map((grade, index) => (
-                    <MenuItem key={index} value={grade}>
+                  {availableValues.grades.map((grade) => (
+                    <MenuItem key={`grade-${grade}`} value={grade}>
                       {grade}
                     </MenuItem>
                   ))}
@@ -287,8 +454,8 @@ const FilterPanel = ({ onClose }) => {
                   displayEmpty
                 >
                   <MenuItem value="">Любая ширина</MenuItem>
-                  {availableValues.widths.map((width, index) => (
-                    <MenuItem key={index} value={width}>
+                  {availableValues.widths.map((width) => (
+                    <MenuItem key={`width-${width}`} value={width}>
                       {width} мм
                     </MenuItem>
                   ))}
@@ -312,8 +479,11 @@ const FilterPanel = ({ onClose }) => {
                   displayEmpty
                 >
                   <MenuItem value="">Любая толщина</MenuItem>
-                  {availableValues.thicknesses.map((thickness, index) => (
-                    <MenuItem key={index} value={thickness}>
+                  {availableValues.thicknesses.map((thickness) => (
+                    <MenuItem
+                      key={`thickness-${thickness}`}
+                      value={thickness}
+                    >
                       {thickness} мм
                     </MenuItem>
                   ))}
@@ -337,8 +507,8 @@ const FilterPanel = ({ onClose }) => {
                   displayEmpty
                 >
                   <MenuItem value="">Любая длина</MenuItem>
-                  {availableValues.lengths.map((length, index) => (
-                    <MenuItem key={index} value={length}>
+                  {availableValues.lengths.map((length) => (
+                    <MenuItem key={`length-${length}`} value={length}>
                       {length} мм
                     </MenuItem>
                   ))}
@@ -348,21 +518,19 @@ const FilterPanel = ({ onClose }) => {
           </Accordion>
         )}
 
+        {!hasAnyFilters && !loading && initialLoadDone.current && (
+          <Box sx={{ p: 2, textAlign: "center", color: "text.secondary" }}>
+            <Typography variant="body2">
+              В этой категории пока нет товаров
+            </Typography>
+          </Box>
+        )}
+
         <Box className="filter-actions">
-          <Button
-            variant="contained"
-            onClick={handleApplyFilters}
-            fullWidth
-            disabled={!hasActiveFilters() && !hasSearch}
-          >
+          <Button variant="contained" onClick={handleApplyFilters} fullWidth>
             Применить
           </Button>
-          <Button
-            variant="outlined"
-            onClick={handleResetFilters}
-            fullWidth
-            disabled={!hasActiveFilters() && !hasSearch}
-          >
+          <Button variant="outlined" onClick={handleResetFilters} fullWidth>
             Сбросить фильтры
           </Button>
         </Box>

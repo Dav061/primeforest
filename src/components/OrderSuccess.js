@@ -3,7 +3,7 @@ import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Button, Paper, Typography, Box } from "@mui/material"; // убрали Alert
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
 const OrderSuccess = () => {
@@ -13,30 +13,31 @@ const OrderSuccess = () => {
 
   if (!orderId) {
     // Если заказа нет (прямой переход на страницу)
-    navigate('/');
+    navigate("/");
     return null;
   }
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Заказ оформлен - Prime-Forest | Пиломатериалы</title>
-        <meta 
-          name="description" 
-          content="Ваш заказ пиломатериалов успешно оформлен. Мы свяжемся с вами для подтверждения доставки." 
+        <meta
+          name="description"
+          content="Ваш заказ пиломатериалов успешно оформлен. Мы свяжемся с вами для подтверждения доставки."
         />
-      </Helmet>
-      
+      </HelmetProvider>
+
       <div className="order-success">
         <Paper className="success-card" elevation={3}>
           <CheckCircleIcon className="success-icon" />
-          
+
           <Typography variant="h4" gutterBottom>
             Заказ #{orderId} оформлен!
           </Typography>
-          
+
           <Typography variant="body1" color="textSecondary" paragraph>
-            Спасибо за ваш заказ. Мы свяжемся с вами в ближайшее время для подтверждения.
+            Спасибо за ваш заказ. Мы свяжемся с вами в ближайшее время для
+            подтверждения.
           </Typography>
 
           {isGuest ? (
@@ -44,15 +45,15 @@ const OrderSuccess = () => {
               <Typography variant="h6" gutterBottom>
                 📝 Важная информация
               </Typography>
-              
+
               <Typography paragraph>
                 <strong>Номер вашего заказа:</strong> #{orderId}
               </Typography>
-              
+
               <Typography paragraph>
                 <strong>Контактный телефон:</strong> {phoneNumber}
               </Typography>
-              
+
               {email && (
                 <Typography paragraph>
                   <strong>Email:</strong> {email}
@@ -60,33 +61,30 @@ const OrderSuccess = () => {
               )}
 
               <Box className="guest-actions">
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   color="primary"
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate("/register")}
                   sx={{ mr: 2 }}
                 >
                   Зарегистрироваться
                 </Button>
-                <Button 
-                  variant="outlined"
-                  onClick={() => navigate('/')}
-                >
+                <Button variant="outlined" onClick={() => navigate("/")}>
                   На главную
                 </Button>
               </Box>
             </Box>
           ) : (
-            <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ textAlign: "center" }}>
               <Typography paragraph>
                 Статус заказа можно отслеживать в{" "}
                 <Link to="/profile">личном кабинете</Link>
               </Typography>
-              
-              <Button 
-                variant="contained" 
+
+              <Button
+                variant="contained"
                 color="primary"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate("/profile")}
               >
                 Перейти в личный кабинет
               </Button>

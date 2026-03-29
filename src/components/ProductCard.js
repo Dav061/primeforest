@@ -1,4 +1,5 @@
-// src/components/ProductCard.js
+// src/components/ProductCard.js - исправленная версия
+
 import React, {
   useContext,
   useState,
@@ -6,13 +7,13 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { CardContent, Button, IconButton } from "@mui/material"; // убрали Card
+import { CardContent, Button, IconButton } from "@mui/material";
 import { ShoppingCart, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../CartContext";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -124,12 +125,14 @@ const ProductCard = ({ product }) => {
       );
     }
 
+    // В ProductCard.js, обновите функцию renderPrices:
+
     return (
       <div className="price-multiple">
         <div className="price-buttons">
-          {product.prices.map((price) => (
+          {product.prices.map((price, index) => (
             <button
-              key={price.id}
+              key={`${product.id}_price_${price.id}_${price.price}_${index}`} // Более уникальный ключ
               className={`price-button ${
                 selectedPrice?.id === price.id ? "active" : ""
               }`}
@@ -146,7 +149,13 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
     );
-  }, [product.prices, selectedPrice, formatPrice, handlePriceSelect]);
+  }, [
+    product.prices,
+    product.id,
+    selectedPrice,
+    formatPrice,
+    handlePriceSelect,
+  ]);
 
   // Мемоизация JSX для улучшения производительности
   const actionButtons = useMemo(() => {
@@ -222,9 +231,9 @@ const ProductCard = ({ product }) => {
     handleGoToCart,
     selectedPrice,
     product.prices?.length,
+    product.id,
     removeFromCart,
     updateCartItem,
-    product.id,
   ]);
 
   return (

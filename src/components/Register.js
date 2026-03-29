@@ -8,11 +8,11 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Helmet } from "react-helmet";
+import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -63,13 +63,13 @@ const Register = () => {
 
   return (
     <>
-      <Helmet>
+      <HelmetProvider>
         <title>Регистрация - Prime-Forest | Создание личного кабинета</title>
         <meta
           name="description"
           content="Регистрация в интернет-магазине пиломатериалов Prime-Forest. Сохраняйте историю заказов, отслеживайте доставку по Москве и МО."
         />
-      </Helmet>
+      </HelmetProvider>
 
       <div className="register-page">
         <div className="register-header">
