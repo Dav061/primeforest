@@ -25,7 +25,7 @@ import "../styles.scss";
 import ProductCard from "./ProductCard";
 import { Helmet } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const ProductList = () => {
   const location = useLocation();

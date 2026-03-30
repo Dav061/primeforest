@@ -21,7 +21,7 @@ import {
 import "../styles.scss";
 import { HelmetProvider } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // ID популярных товаров
 
 const MainPage = () => {

@@ -11,7 +11,7 @@ import { ChevronRight } from "lucide-react";
 import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
