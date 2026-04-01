@@ -19,7 +19,7 @@ import axios from "axios";
 import { Helmet } from "react-helmet-async";
 import "../styles.scss";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const FilterPanel = ({ onClose }) => {
   const navigate = useNavigate();
@@ -45,8 +45,9 @@ const FilterPanel = ({ onClose }) => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [categoryId, setCategoryId] = useState(null);
+  const [categorySlug, setCategorySlug] = useState(null);
 
-  // Refs для предотвращения множественных запросов
   const isMounted = useRef(true);
   const abortControllerRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -62,14 +63,40 @@ const FilterPanel = ({ onClose }) => {
     return values.sort();
   };
 
-  const fetchFilterValues = useCallback(async () => {
-    // Предотвращаем одновременные запросы
-    if (isFetchingRef.current) {
-      return;
+  // Получаем categoryId из slug
+  useEffect(() => {
+    const pathParts = location.pathname.split("/");
+    const slugFromPath = pathParts[2]; // /catalog/:slug
+
+    if (slugFromPath && slugFromPath !== "catalog") {
+      setCategorySlug(slugFromPath);
+
+      const fetchCategoryId = async () => {
+        try {
+          const response = await axios.get(`${API_URL}/api/categories/`);
+          const categories = response.data.results || response.data;
+          const category = categories.find((c) => c.slug === slugFromPath);
+          if (category) {
+            setCategoryId(category.id);
+          } else {
+            setCategoryId(null);
+          }
+        } catch (error) {
+          console.error("Error fetching category by slug:", error);
+          setCategoryId(null);
+        }
+      };
+      fetchCategoryId();
+    } else {
+      setCategorySlug(null);
+      setCategoryId(null);
     }
+  }, [location.pathname]);
+
+  const fetchFilterValues = useCallback(async () => {
+    if (isFetchingRef.current) return;
 
     const queryParams = new URLSearchParams(location.search);
-    const categoryId = queryParams.get("category");
     const searchParam = queryParams.get("search");
 
     // Если нет категории, не делаем запрос
@@ -88,10 +115,8 @@ const FilterPanel = ({ onClose }) => {
       return;
     }
 
-    // Создаем ключ для проверки уникальности запроса
     const paramsKey = JSON.stringify({ categoryId, searchParam });
 
-    // Если параметры не изменились и уже загружали - пропускаем
     if (paramsKey === lastFetchedParamsRef.current && initialLoadDone.current) {
       return;
     }
@@ -99,7 +124,6 @@ const FilterPanel = ({ onClose }) => {
     lastFetchedParamsRef.current = paramsKey;
     isFetchingRef.current = true;
 
-    // Отменяем предыдущий запрос
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -109,7 +133,6 @@ const FilterPanel = ({ onClose }) => {
     try {
       const params = { is_active: true };
 
-      // Получаем информацию о категории
       try {
         const categoryResponse = await axios.get(
           `${API_URL}/api/categories/${categoryId}/`,
@@ -119,7 +142,6 @@ const FilterPanel = ({ onClose }) => {
 
         let allCategoryIds = [parseInt(categoryId)];
 
-        // Если это родительская категория, загружаем все подкатегории
         if (category.parent === null) {
           const subcatsResponse = await axios.get(
             `${API_URL}/api/categories/`,
@@ -143,7 +165,6 @@ const FilterPanel = ({ onClose }) => {
           }
         }
 
-        // Для фильтров используем category__in, чтобы получить все товары из категории и подкатегорий
         params.category__in = [...new Set(allCategoryIds)]
           .sort((a, b) => a - b)
           .join(",");
@@ -158,16 +179,12 @@ const FilterPanel = ({ onClose }) => {
         params.search = searchParam;
       }
 
-      console.log("Fetching filter values with params:", params);
-
       const response = await axios.get(`${API_URL}/api/products/`, {
         params,
         signal: abortControllerRef.current.signal,
       });
 
       const products = response.data.results || [];
-
-      console.log(`Found ${products.length} products for filters`);
 
       if (isMounted.current) {
         setAvailableValues({
@@ -188,7 +205,7 @@ const FilterPanel = ({ onClose }) => {
     } finally {
       isFetchingRef.current = false;
     }
-  }, [location.search]);
+  }, [location.search, categoryId]);
 
   // Инициализация filters из URL
   useEffect(() => {
@@ -205,18 +222,13 @@ const FilterPanel = ({ onClose }) => {
     });
   }, [location.search]);
 
-  // Загрузка фильтров - только при изменении category или search
+  // Загрузка фильтров
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const categoryId = queryParams.get("category");
-
     if (categoryId) {
       setLoading(true);
-      // Очищаем предыдущий таймаут
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      // Устанавливаем новый таймаут
       timeoutRef.current = setTimeout(() => {
         if (isMounted.current) {
           fetchFilterValues();
@@ -239,9 +251,8 @@ const FilterPanel = ({ onClose }) => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [location.search, fetchFilterValues]);
+  }, [location.search, categoryId, fetchFilterValues]);
 
-  // Cleanup on unmount
   useEffect(() => {
     isMounted.current = true;
     return () => {
@@ -264,26 +275,25 @@ const FilterPanel = ({ onClose }) => {
     const queryParams = new URLSearchParams(location.search);
     const params = new URLSearchParams();
 
-    // Сохраняем существующие параметры (category, search)
-    const categoryParam = queryParams.get("category");
     const searchParam = queryParams.get("search");
 
-    if (categoryParam) params.set("category", categoryParam);
     if (searchParam) params.set("search", searchParam);
 
-    // Добавляем выбранные фильтры
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== "") {
         params.set(key, value);
       }
     });
 
-    navigate(`/catalog?${params.toString()}`);
+    if (categorySlug) {
+      navigate(`/catalog/${categorySlug}?${params.toString()}`);
+    } else {
+      navigate(`/catalog?${params.toString()}`);
+    }
     if (onClose) onClose();
   };
 
   const handleResetFilters = () => {
-    const queryParams = new URLSearchParams(location.search);
     setFilters({
       wood_type: "",
       grade: "",
@@ -296,13 +306,14 @@ const FilterPanel = ({ onClose }) => {
     });
 
     const params = new URLSearchParams();
-    const searchParam = queryParams.get("search");
-    const categoryParam = queryParams.get("category");
-
+    const searchParam = new URLSearchParams(location.search).get("search");
     if (searchParam) params.set("search", searchParam);
-    if (categoryParam) params.set("category", categoryParam);
 
-    navigate(`/catalog?${params.toString()}`);
+    if (categorySlug) {
+      navigate(`/catalog/${categorySlug}?${params.toString()}`);
+    } else {
+      navigate(`/catalog?${params.toString()}`);
+    }
     if (onClose) onClose();
   };
 
@@ -321,7 +332,6 @@ const FilterPanel = ({ onClose }) => {
     availableValues.thicknesses.length > 0 ||
     availableValues.lengths.length > 0;
 
-  // Показываем загрузку только при первой загрузке
   if (
     loading &&
     !initialLoadDone.current &&

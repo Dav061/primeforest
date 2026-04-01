@@ -63,7 +63,7 @@ const Cart = () => {
         priceIds.map(async (priceId) => {
           try {
             const response = await axios.get(
-              `http://127.0.0.1:8000/api/product-prices/${priceId}/`
+              `https://prime-forest.ru/api/product-prices/${priceId}/`
             );
             pricesCache[priceId] = response.data;
           } catch (error) {
@@ -82,7 +82,7 @@ const Cart = () => {
 
           try {
             const productResponse = await axios.get(
-              `http://127.0.0.1:8000/api/products/${productId}/`
+              `https://prime-forest.ru/api/products/${productId}/`
             );
             const product = productResponse.data;
 
@@ -90,6 +90,7 @@ const Cart = () => {
               id: key,
               productId,
               productName: product.name,
+              productSlug: product.slug, // ← ДОБАВИТЬ ЭТУ СТРОКУ
               productImage: product.main_image,
               priceId,
               price: priceInfo.price,
@@ -119,7 +120,8 @@ const Cart = () => {
     }
   };
 
-  const handleProductClick = (productId, e) => {
+  const handleProductClick = (productSlug, e) => {
+    // ← ИЗМЕНИТЬ ПАРАМЕТР
     if (
       e.target.tagName === "INPUT" ||
       e.target.tagName === "BUTTON" ||
@@ -129,7 +131,7 @@ const Cart = () => {
     ) {
       return;
     }
-    navigate(`/products/${productId}`);
+    navigate(`/products/${productSlug}`); // ← ИСПРАВЛЕНО
   };
 
   const performUpdate = async (itemKey, productId, priceId, newQuantity) => {
@@ -250,7 +252,7 @@ const Cart = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/default-product.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://127.0.0.1:8000${
+    return `https://prime-forest.ru${
       imagePath.startsWith("/") ? "" : "/"
     }${imagePath}`;
   };
@@ -302,7 +304,7 @@ const Cart = () => {
                   className={`cart-item ${
                     updatingItems[item.id] ? "updating" : ""
                   }`}
-                  onClick={(e) => handleProductClick(item.productId, e)}
+                  onClick={(e) => handleProductClick(item.productSlug, e)}
                 >
                   <div className="cart-item-image">
                     <img

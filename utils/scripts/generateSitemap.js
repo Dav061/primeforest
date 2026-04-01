@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const slugify = require("./slugify");
 
 const BASE_URL = "https://prime-forest.ru";
 
@@ -27,7 +26,7 @@ const noIndexPages = [
 
 const generateSitemap = async () => {
   console.log("🚀 Начинаем генерацию sitemap...");
-  
+
   let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
   sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
@@ -38,7 +37,9 @@ const generateSitemap = async () => {
   staticPages.forEach((page) => {
     sitemap += `  <url>\n`;
     sitemap += `    <loc>${BASE_URL}${page.url}</loc>\n`;
-    sitemap += `    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n`;
+    sitemap += `    <lastmod>${
+      new Date().toISOString().split("T")[0]
+    }</lastmod>\n`;
     sitemap += `    <changefreq>${page.changefreq}</changefreq>\n`;
     sitemap += `    <priority>${page.priority}</priority>\n`;
     sitemap += `  </url>\n`;
@@ -48,7 +49,9 @@ const generateSitemap = async () => {
   noIndexPages.forEach((url) => {
     sitemap += `  <url>\n`;
     sitemap += `    <loc>${BASE_URL}${url}</loc>\n`;
-    sitemap += `    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n`;
+    sitemap += `    <lastmod>${
+      new Date().toISOString().split("T")[0]
+    }</lastmod>\n`;
     sitemap += `    <changefreq>never</changefreq>\n`;
     sitemap += `    <priority>0.1</priority>\n`;
     sitemap += `  </url>\n`;
@@ -62,18 +65,26 @@ const generateSitemap = async () => {
 
     categoriesCount = categories.length;
     console.log(`Найдено категорий: ${categoriesCount}`);
-    
+
     categories.forEach((category) => {
-      const slug = category.slug || slugify(category.name);
-      
+      // Используем slug из базы, если есть, иначе пропускаем категорию
+      if (!category.slug) {
+        console.warn(
+          `⚠️ Категория "${category.name}" не имеет slug, пропускаем`
+        );
+        return;
+      }
+
       sitemap += `  <url>\n`;
-      sitemap += `    <loc>${BASE_URL}/category/${slug}</loc>\n`;
-      sitemap += `    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n`;
+      sitemap += `    <loc>${BASE_URL}/catalog/${category.slug}</loc>\n`;
+      sitemap += `    <lastmod>${
+        new Date().toISOString().split("T")[0]
+      }</lastmod>\n`;
       sitemap += `    <changefreq>daily</changefreq>\n`;
       sitemap += `    <priority>0.8</priority>\n`;
       sitemap += `  </url>\n`;
     });
-    
+
     console.log(`✅ Добавлено ${categoriesCount} категорий`);
   } catch (error) {
     console.error("❌ Ошибка загрузки категорий:", error.message);
@@ -89,19 +100,27 @@ const generateSitemap = async () => {
 
     productsCount = products.length;
     console.log(`Найдено товаров: ${productsCount}`);
-    
+
+    let addedCount = 0;
     products.forEach((product) => {
-      const slug = product.slug || slugify(product.name);
-      
+      // Используем slug из базы, если есть
+      if (!product.slug) {
+        console.warn(`⚠️ Товар ID: ${product.id} не имеет slug, пропускаем`);
+        return;
+      }
+
       sitemap += `  <url>\n`;
-      sitemap += `    <loc>${BASE_URL}/product/${slug}</loc>\n`;
-      sitemap += `    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n`;
+      sitemap += `    <loc>${BASE_URL}/products/${product.slug}</loc>\n`;
+      sitemap += `    <lastmod>${
+        new Date().toISOString().split("T")[0]
+      }</lastmod>\n`;
       sitemap += `    <changefreq>weekly</changefreq>\n`;
       sitemap += `    <priority>0.7</priority>\n`;
       sitemap += `  </url>\n`;
+      addedCount++;
     });
-    
-    console.log(`✅ Добавлено ${productsCount} товаров`);
+
+    console.log(`✅ Добавлено ${addedCount} товаров из ${productsCount}`);
   } catch (error) {
     console.error("❌ Ошибка загрузки товаров:", error.message);
   }
@@ -112,7 +131,11 @@ const generateSitemap = async () => {
   const sitemapPath = path.join(__dirname, "../../public/sitemap.xml");
   fs.writeFileSync(sitemapPath, sitemap);
   console.log(`✅ Sitemap сохранен: ${sitemapPath}`);
-  console.log(`📊 Всего URL в sitemap: ${staticPages.length + noIndexPages.length + categoriesCount + productsCount}`);
+  console.log(
+    `📊 Всего URL в sitemap: ${
+      staticPages.length + noIndexPages.length + categoriesCount + productsCount
+    }`
+  );
 };
 
 // Запускаем генерацию

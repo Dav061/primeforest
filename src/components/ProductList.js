@@ -1,4 +1,4 @@
-// src/components/ProductList.js
+// src/components/ProductList.js - оптимизированная версия
 import React, {
   useEffect,
   useState,
@@ -25,20 +25,19 @@ import "../styles.scss";
 import ProductCard from "./ProductCard";
 import { Helmet } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
-const ProductList = () => {
+const ProductList = ({ categorySlug, searchParam: propSearchParam }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Получение параметров из URL
   const queryParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
   );
 
-  const categoryId = queryParams.get("category");
-  const searchParam = queryParams.get("search") || "";
+  const searchParam = propSearchParam || queryParams.get("search") || "";
+
   const woodTypeParam = queryParams.get("wood_type") || "";
   const gradeParam = queryParams.get("grade") || "";
   const orderingParam = queryParams.get("ordering") || "";
@@ -56,9 +55,11 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [categoryId, setCategoryId] = useState(null);
   const itemsPerPage = 12;
 
   const abortControllerRef = useRef(null);
+  const initialLoadDone = useRef(false);
 
   const getImageUrl = useCallback((imagePath) => {
     if (!imagePath) return "/default-product.jpg";
@@ -66,8 +67,13 @@ const ProductList = () => {
     return `${API_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   }, []);
 
-  // Загрузка информации о категории и товаров
+  // Единый useEffect для загрузки всех данных
   useEffect(() => {
+    if (!categorySlug && !searchParam) {
+      setLoading(false);
+      return;
+    }
+
     // Отменяем предыдущий запрос
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -76,106 +82,161 @@ const ProductList = () => {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
-    const fetchData = async () => {
-      if (!categoryId) {
-        setCurrentCategory(null);
-        setParentCategory(null);
-        setSubcategories([]);
-        setProducts([]);
-        setLoading(false);
-        return;
-      }
-
+    const fetchAllData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // 1. Загружаем информацию о категории
-        const categoryResponse = await axios.get(
-          `${API_URL}/api/categories/${categoryId}/`,
-          { signal }
-        );
-        const category = categoryResponse.data;
-        setCurrentCategory(category);
+        let targetCategoryId = null;
+        let targetCategory = null;
 
-        let allCategoryIds = [parseInt(categoryId)];
-        let hasSubcategories = false;
-
-        // 2. Если это родительская категория - загружаем подкатегории
-        if (category.parent === null) {
-          setParentCategory(null);
-
-          const subcatsResponse = await axios.get(
+        // Если есть categorySlug, получаем категорию по slug
+        if (categorySlug) {
+          const categoriesResponse = await axios.get(
             `${API_URL}/api/categories/`,
-            {
-              params: { parent: categoryId },
-              signal,
-            }
-          );
-          const allSubcats =
-            subcatsResponse.data.results || subcatsResponse.data;
-          const filteredSubcats = allSubcats.filter(
-            (subcat) =>
-              subcat.id !== category.id && subcat.parent === category.id
-          );
-          setSubcategories(filteredSubcats);
-
-          // Добавляем ID подкатегорий для поиска товаров
-          if (filteredSubcats.length > 0) {
-            hasSubcategories = true;
-            const subcategoryIds = filteredSubcats.map((subcat) => subcat.id);
-            allCategoryIds = [...allCategoryIds, ...subcategoryIds];
-          }
-        } else {
-          // Это подкатегория - загружаем родителя
-          setSubcategories([]);
-
-          const parentResponse = await axios.get(
-            `${API_URL}/api/categories/${category.parent}/`,
             { signal }
           );
-          setParentCategory(parentResponse.data);
+          const categories =
+            categoriesResponse.data.results || categoriesResponse.data;
+          targetCategory = categories.find((c) => c.slug === categorySlug);
+
+          if (!targetCategory) {
+            setError("Категория не найдена");
+            setLoading(false);
+            return;
+          }
+
+          targetCategoryId = targetCategory.id;
+          setCurrentCategory(targetCategory);
         }
 
-        // 3. Загружаем товары (всегда загружаем, даже для родительской категории)
-        const params = {
-          is_active: true,
-          category__in: [...new Set(allCategoryIds)]
-            .sort((a, b) => a - b)
-            .join(","),
-        };
+        if (targetCategoryId) {
+          // Загружаем полную информацию о категории
+          const categoryResponse = await axios.get(
+            `${API_URL}/api/categories/${targetCategoryId}/`,
+            { signal }
+          );
+          const fullCategory = categoryResponse.data;
 
-        if (searchParam) params.search = searchParam;
-        if (woodTypeParam) params.wood_type = woodTypeParam;
-        if (gradeParam) params.grade = gradeParam;
-        if (orderingParam) params.ordering = orderingParam;
-        if (widthParam) params.width = widthParam;
-        if (thicknessParam) params.thickness = thicknessParam;
-        if (lengthParam) params.length = lengthParam;
-        if (minPriceParam) params.min_price = minPriceParam;
-        if (maxPriceParam) params.max_price = maxPriceParam;
+          // Определяем parent для хлебных крошек
+          if (fullCategory.parent) {
+            const parentResponse = await axios.get(
+              `${API_URL}/api/categories/${fullCategory.parent}/`,
+              { signal }
+            );
+            setParentCategory(parentResponse.data);
+          } else {
+            setParentCategory(null);
 
-        console.log("Запрос товаров:", params);
+            // Загружаем подкатегории для родительской категории
+            const subcatsResponse = await axios.get(
+              `${API_URL}/api/categories/`,
+              {
+                params: { parent: targetCategoryId },
+                signal,
+              }
+            );
+            const allSubcats =
+              subcatsResponse.data.results || subcatsResponse.data;
+            const filteredSubcats = allSubcats.filter(
+              (subcat) => subcat.parent === targetCategoryId
+            );
+            setSubcategories(filteredSubcats);
+          }
 
-        const productsResponse = await axios.get(`${API_URL}/api/products/`, {
-          params,
-          signal,
-        });
+          // Формируем список ID категорий (включая подкатегории)
+          let allCategoryIds = [targetCategoryId];
 
-        const productsData = productsResponse.data.results || [];
-        const normalizedProducts = productsData.map((product) => ({
-          ...product,
-          main_image: getImageUrl(product.main_image),
-          images: product.images?.map((img) => ({
-            ...img,
-            image: getImageUrl(img.image_url),
-          })),
-        }));
+          if (fullCategory.parent === null) {
+            const subcatsResponse = await axios.get(
+              `${API_URL}/api/categories/`,
+              {
+                params: { parent: targetCategoryId },
+                signal,
+              }
+            );
+            const subcats =
+              subcatsResponse.data.results || subcatsResponse.data;
+            const subcategoryIds = subcats
+              .filter((subcat) => subcat.parent === targetCategoryId)
+              .map((subcat) => subcat.id);
 
-        setProducts(normalizedProducts);
+            allCategoryIds = [targetCategoryId, ...subcategoryIds];
+          }
+
+          // Загружаем товары
+          const productsParams = {
+            is_active: true,
+            category__in: allCategoryIds.join(","),
+          };
+
+          if (searchParam) productsParams.search = searchParam;
+          if (woodTypeParam) productsParams.wood_type = woodTypeParam;
+          if (gradeParam) productsParams.grade = gradeParam;
+          if (orderingParam) productsParams.ordering = orderingParam;
+          if (widthParam) productsParams.width = widthParam;
+          if (thicknessParam) productsParams.thickness = thicknessParam;
+          if (lengthParam) productsParams.length = lengthParam;
+          if (minPriceParam) productsParams.min_price = minPriceParam;
+          if (maxPriceParam) productsParams.max_price = maxPriceParam;
+
+          const productsResponse = await axios.get(`${API_URL}/api/products/`, {
+            params: productsParams,
+            signal,
+          });
+
+          const productsData = productsResponse.data.results || [];
+          const normalizedProducts = productsData.map((product) => ({
+            ...product,
+            main_image: getImageUrl(product.main_image),
+            images: product.images?.map((img) => ({
+              ...img,
+              image: getImageUrl(img.image_url),
+            })),
+          }));
+
+          setProducts(normalizedProducts);
+        } else if (searchParam) {
+          // Только поиск, без категории
+          const productsParams = {
+            is_active: true,
+            search: searchParam,
+          };
+
+          if (woodTypeParam) productsParams.wood_type = woodTypeParam;
+          if (gradeParam) productsParams.grade = gradeParam;
+          if (orderingParam) productsParams.ordering = orderingParam;
+          if (widthParam) productsParams.width = widthParam;
+          if (thicknessParam) productsParams.thickness = thicknessParam;
+          if (lengthParam) productsParams.length = lengthParam;
+          if (minPriceParam) productsParams.min_price = minPriceParam;
+          if (maxPriceParam) productsParams.max_price = maxPriceParam;
+
+          const productsResponse = await axios.get(`${API_URL}/api/products/`, {
+            params: productsParams,
+            signal,
+          });
+
+          const productsData = productsResponse.data.results || [];
+          const normalizedProducts = productsData.map((product) => ({
+            ...product,
+            main_image: getImageUrl(product.main_image),
+            images: product.images?.map((img) => ({
+              ...img,
+              image: getImageUrl(img.image_url),
+            })),
+          }));
+
+          setProducts(normalizedProducts);
+          setCurrentCategory(null);
+          setParentCategory(null);
+          setSubcategories([]);
+        }
+
         setPage(1);
+        initialLoadDone.current = true;
       } catch (error) {
-        if (error.name !== "AbortError") {
+        if (error.name !== "AbortError" && error.code !== "ERR_CANCELED") {
           console.error("Ошибка:", error);
           setError(
             error.response?.data?.detail || "Ошибка при загрузке данных"
@@ -186,7 +247,7 @@ const ProductList = () => {
       }
     };
 
-    fetchData();
+    fetchAllData();
 
     return () => {
       if (abortControllerRef.current) {
@@ -194,7 +255,7 @@ const ProductList = () => {
       }
     };
   }, [
-    categoryId,
+    categorySlug,
     searchParam,
     woodTypeParam,
     gradeParam,
@@ -223,42 +284,68 @@ const ProductList = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const navigateToCategory = (catId) => {
+  const navigateToCategory = (catSlug) => {
     setPage(1);
-    setProducts([]);
-    navigate(`/products?category=${catId}`);
+    navigate(`/catalog/${catSlug}`);
   };
 
   const handleBackToCategories = () => {
     navigate("/catalog");
   };
 
-  const handleSubcategoryClick = (subcatId) => {
-    navigateToCategory(subcatId);
+  const handleSubcategoryClick = (subcatSlug) => {
+    navigateToCategory(subcatSlug);
   };
 
   const handleBackToParent = () => {
     if (parentCategory) {
-      navigateToCategory(parentCategory.id);
+      navigateToCategory(parentCategory.slug);
     }
   };
 
   const handleClearSearch = () => {
-    const params = new URLSearchParams();
-    if (categoryId) params.set("category", categoryId);
-    navigate(`/products?${params.toString()}`);
+    console.log("=== handleClearSearch ===");
+    console.log("location.pathname:", location.pathname);
+    console.log("location.search:", location.search);
+
+    const pathParts = location.pathname.split("/");
+    console.log("pathParts:", pathParts);
+
+    const currentSlug = pathParts[2];
+    console.log("currentSlug:", currentSlug);
+
+    if (currentSlug && currentSlug !== "catalog") {
+      console.log("Navigating to:", `/catalog/${currentSlug}`);
+      navigate(`/catalog/${currentSlug}`);
+    } else {
+      console.log("Navigating to: /catalog");
+      navigate("/catalog");
+    }
   };
 
   const handleRemoveFilter = (filterName) => {
     const params = new URLSearchParams(location.search);
     params.delete(filterName);
-    navigate(`/products?${params.toString()}`);
+
+    const pathParts = location.pathname.split("/");
+    const currentSlug = pathParts[2];
+
+    if (currentSlug && currentSlug !== "catalog") {
+      navigate(`/catalog/${currentSlug}?${params.toString()}`);
+    } else {
+      navigate(`/catalog?${params.toString()}`);
+    }
   };
 
   const handleClearAllFilters = () => {
-    const params = new URLSearchParams();
-    if (categoryId) params.set("category", categoryId);
-    navigate(`/products?${params.toString()}`);
+    const pathParts = location.pathname.split("/");
+    const currentSlug = pathParts[2];
+
+    if (currentSlug && currentSlug !== "catalog") {
+      navigate(`/catalog/${currentSlug}`);
+    } else {
+      navigate("/catalog");
+    }
   };
 
   const hasActiveFilters = useMemo(
@@ -374,10 +461,6 @@ const ProductList = () => {
     ? `${currentCategory.name} от производителя. Доставка по Москве и МО.`
     : "Каталог пиломатериалов: доска, брус, фанера, OSB.";
 
-  // Показываем подкатегории если:
-  // 1. Есть подкатегории
-  // 2. Текущая категория - родительская (parent === null)
-  // 3. Показываем их над товарами для удобной навигации
   const showSubcategories =
     subcategories.length > 0 && currentCategory?.parent === null;
 
@@ -399,7 +482,7 @@ const ProductList = () => {
             <>
               <span className="breadcrumb-separator">/</span>
               <button
-                onClick={() => navigateToCategory(parentCategory.id)}
+                onClick={() => navigateToCategory(parentCategory.slug)}
                 className="breadcrumb-link"
               >
                 {parentCategory.name}
@@ -415,7 +498,7 @@ const ProductList = () => {
           )}
         </div>
 
-        {/* Подкатегории - показываем для удобной навигации */}
+        {/* Подкатегории */}
         {showSubcategories && (
           <div className="subcategories-section">
             <div className="subcategories-grid">
@@ -423,7 +506,7 @@ const ProductList = () => {
                 <button
                   key={subcat.id}
                   className="subcategory-card"
-                  onClick={() => handleSubcategoryClick(subcat.id)}
+                  onClick={() => handleSubcategoryClick(subcat.slug)}
                 >
                   <div className="subcategory-info">
                     <span className="subcategory-name">{subcat.name}</span>
@@ -435,7 +518,7 @@ const ProductList = () => {
           </div>
         )}
 
-        {/* Кнопка возврата к родительской категории - только для подкатегорий */}
+        {/* Кнопка возврата к родительской категории */}
         {parentCategory && currentCategory?.parent !== null && (
           <div className="parent-category-info">
             <button

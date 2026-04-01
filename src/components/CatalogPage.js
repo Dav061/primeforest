@@ -1,41 +1,40 @@
 // src/components/CatalogPage.js
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import ProductList from "./ProductList";
 import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
 const CatalogPage = () => {
+  const { slug } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const categoryId = queryParams.get("category");
   const searchParam = queryParams.get("search");
 
-  // Показываем категории только если нет выбранной категории и нет поиска
-  const showCategories = !categoryId && !searchParam;
+  // Показываем товары если есть slug в URL или поиск
+  const showProductList = slug || searchParam;
+  const showCategories = !showProductList;
 
-  // Мемоизируем заголовок и описание для предотвращения лишних вычислений
   const pageMeta = React.useMemo(() => {
     if (searchParam) {
       return {
         title: `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`,
-        description: `Результаты поиска "${searchParam}" в каталоге пиломатериалов. Доска строганная, брус, OSB, фанера, вагонка с доставкой по Москве и МО.`,
+        description: `Результаты поиска "${searchParam}" в каталоге пиломатериалов.`,
       };
     }
-    if (categoryId) {
+    if (slug) {
       return {
         title: `Категория - пиломатериалы | Prime-Forest`,
-        description:
-          "Пиломатериалы выбранной категории от производителя. Доставка по Москве и области.",
+        description: `Пиломатериалы выбранной категории от производителя.`,
       };
     }
     return {
       title: "Каталог пиломатериалов - Prime-Forest",
-      description:
-        "Широкий ассортимент пиломатериалов от производителя: доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области.",
+      description: "Широкий ассортимент пиломатериалов от производителя.",
     };
-  }, [searchParam, categoryId]);
+  }, [searchParam, slug]);
 
   return (
     <>
@@ -44,7 +43,11 @@ const CatalogPage = () => {
         <meta name="description" content={pageMeta.description} />
       </HelmetProvider>
       <div className="catalog-page">
-        {showCategories ? <CategoryList /> : <ProductList />}
+        {showCategories ? (
+          <CategoryList />
+        ) : (
+          <ProductList categorySlug={slug} searchParam={searchParam} />
+        )}
       </div>
     </>
   );

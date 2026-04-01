@@ -21,7 +21,7 @@ import {
 import "../styles.scss";
 import { HelmetProvider } from "react-helmet-async";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // ID популярных товаров
 
 const MainPage = () => {
@@ -275,7 +275,7 @@ const MainPage = () => {
             <div className="products-grid">
               {popularProducts.map((product) => (
                 <Link
-                  to={`/products/${product.id}`}
+                  to={`/products/${product.slug}`} // ← ИСПРАВЛЕНО
                   key={product.id}
                   className="product-link"
                 >

@@ -34,7 +34,8 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
-  const shouldShowFilters = queryParams.has("category") || queryParams.has("search");
+  const shouldShowFilters =
+    location.pathname.includes("/catalog/") || queryParams.has("search");
 
   // Синхронизируем searchQuery с URL
   useEffect(() => {
@@ -59,9 +60,9 @@ const Navbar = () => {
     };
   }, [menuOpen]);
 
-  const toggleMenu = () => setMenuOpen(prev => !prev);
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
   const closeMenu = () => setMenuOpen(false);
-  const toggleFilterDrawer = () => setFilterDrawerOpen(prev => !prev);
+  const toggleFilterDrawer = () => setFilterDrawerOpen((prev) => !prev);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -69,7 +70,18 @@ const Navbar = () => {
       const params = new URLSearchParams(location.search);
       params.set("search", searchQuery.trim());
       params.delete("page");
-      navigate(`/catalog?${params.toString()}`);
+
+      // Получаем slug из текущего URL, если есть
+      const pathParts = location.pathname.split("/");
+      const currentSlug = pathParts[2];
+
+      if (currentSlug && currentSlug !== "catalog") {
+        // Если мы в категории, остаемся в ней
+        navigate(`/catalog/${currentSlug}?${params.toString()}`);
+      } else {
+        // Если мы не в категории, просто добавляем поиск
+        navigate(`/catalog?${params.toString()}`);
+      }
     }
   };
 
@@ -77,7 +89,15 @@ const Navbar = () => {
     setSearchQuery("");
     const params = new URLSearchParams(location.search);
     params.delete("search");
-    navigate(`/catalog?${params.toString()}`);
+
+    const pathParts = location.pathname.split("/");
+    const currentSlug = pathParts[2];
+
+    if (currentSlug && currentSlug !== "catalog") {
+      navigate(`/catalog/${currentSlug}?${params.toString()}`);
+    } else {
+      navigate(`/catalog?${params.toString()}`);
+    }
   };
 
   const navLinks = [
@@ -99,7 +119,9 @@ const Navbar = () => {
         <Toolbar className="top-toolbar">
           <div className="left-section">
             <div className="logo-section">
-              <Link to="/" className="logo-link">Prime-Forest</Link>
+              <Link to="/" className="logo-link">
+                Prime-Forest
+              </Link>
               <a
                 href="https://yandex.ru/maps/-/CPB24ZOi"
                 className="logo-address"
@@ -121,7 +143,9 @@ const Navbar = () => {
             <div className="nav-icons">
               <IconButton component={Link} to="/cart" className="nav-icon-btn">
                 <ShoppingCart />
-                {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="cart-count">{cartCount}</span>
+                )}
               </IconButton>
 
               <IconButton
@@ -143,7 +167,9 @@ const Navbar = () => {
                 <li key={path}>
                   <Link
                     to={path}
-                    className={`section-link ${isActivePath(path) ? "active" : ""}`}
+                    className={`section-link ${
+                      isActivePath(path) ? "active" : ""
+                    }`}
                   >
                     {label}
                   </Link>
@@ -176,7 +202,12 @@ const Navbar = () => {
                   ),
                 }}
               />
-              <Button type="submit" variant="contained" size="small" className="nav-search-button">
+              <Button
+                type="submit"
+                variant="contained"
+                size="small"
+                className="nav-search-button"
+              >
                 Найти
               </Button>
             </form>
@@ -198,7 +229,9 @@ const Navbar = () => {
         {/* Мобильный поиск */}
         <div className="mobile-search-container">
           <button className="burgerButton" onClick={toggleMenu}>
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </button>
 
           <div className="mobile-search-wrapper">
@@ -211,7 +244,11 @@ const Navbar = () => {
                 className="mobile-search-input"
                 fullWidth
                 InputProps={{
-                  startAdornment: <InputAdornment position="start"><Search size={18} /></InputAdornment>,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search size={18} />
+                    </InputAdornment>
+                  ),
                   endAdornment: searchQuery && (
                     <InputAdornment position="end">
                       <IconButton size="small" onClick={handleClearSearch}>
@@ -221,7 +258,12 @@ const Navbar = () => {
                   ),
                 }}
               />
-              <Button type="submit" variant="contained" size="small" className="mobile-search-button">
+              <Button
+                type="submit"
+                variant="contained"
+                size="small"
+                className="mobile-search-button"
+              >
                 Найти
               </Button>
             </form>
@@ -252,7 +294,9 @@ const Navbar = () => {
                 <li key={path}>
                   <Link
                     to={path}
-                    className={`section-link ${isActivePath(path) ? "active" : ""}`}
+                    className={`section-link ${
+                      isActivePath(path) ? "active" : ""
+                    }`}
                     onClick={closeMenu}
                   >
                     {label}

@@ -1,3 +1,25 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt для Prime-Forest
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /login/
+Disallow: /register/
+Disallow: /profile/
+Disallow: /admin/
+Disallow: /order-success/
+
+# Запрещаем индексацию страниц с фильтрами и параметрами
+Disallow: /*?*page=
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Разрешаем индексацию всего остального
+Allow: /products/
+Allow: /catalog/
+Allow: /promotions/
+Allow: /about/
+Allow: /contacts/
+
+# Карта сайта
+Sitemap: https://prime-forest.ru/sitemap.xml

@@ -1,6 +1,11 @@
 // src/App.js
 import React, { useLayoutEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./AuthContext";
 import { CartProvider } from "./CartContext";
@@ -23,7 +28,6 @@ import Promotions from "./components/Promotions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -41,11 +45,15 @@ function AppContent() {
       <Navbar />
       <Routes>
         <Route path="/" element={<MainPage />} />
+        {/* Сначала более конкретные маршруты */}
+        <Route path="/catalog/:slug" element={<CatalogPage />} />{" "}
+        {/* ← ИСПРАВЛЕНО: было ProductDetail */}
+        <Route path="/products/:slug" element={<ProductDetail />} />
+        {/* Затем общие */}
         <Route path="/catalog" element={<CatalogPage />} />
         <Route path="/products" element={<CatalogPage />} />
         <Route path="/categories" element={<CategoryList />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/catalog/:id" element={<ProductDetail />} />
+        {/* Остальные маршруты */}
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success" element={<OrderSuccess />} />
@@ -77,7 +85,9 @@ function AppContent() {
 
 function App() {
   return (
-    <HelmetProvider> {/* ← ВАЖНО: добавьте этот компонент */}
+    <HelmetProvider>
+      {" "}
+      {/* ← ВАЖНО: добавьте этот компонент */}
       <AuthProvider>
         <CartProvider>
           <Router>

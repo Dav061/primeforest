@@ -13,15 +13,15 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { ShoppingCart, Minus, Plus, Ruler } from "lucide-react";
 import { CartContext } from "../CartContext";
-import { HelmetProvider } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 import PriceSelector from "./PriceSelector";
 import "../styles.scss";
 import { IconButton } from "@mui/material";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams(); // ИЗМЕНЕНО: id -> slug
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,7 +55,10 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/products/${id}/`);
+        // ИЗМЕНЕНО: запрос к API с slug вместо id
+        const response = await axios.get(
+          `${API_URL}/api/products/by-slug/${slug}/`
+        );
         const productData = response.data;
 
         const normalizedProduct = {
@@ -80,14 +83,20 @@ const ProductDetail = () => {
         setMainImage(normalizedProduct.main_image);
       } catch (error) {
         console.error("Error loading product:", error);
-        setError("Ошибка при загрузке товара");
+        if (error.response?.status === 404) {
+          setError("Товар не найден");
+        } else {
+          setError("Ошибка при загрузке товара");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [id, getImageUrl]);
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug, getImageUrl]);
 
   const handleAddToCart = useCallback(async () => {
     if (!selectedPrice) {
@@ -147,13 +156,13 @@ const ProductDetail = () => {
 
   return (
     <>
-      <HelmetProvider>
+      <Helmet>
         <title>{product.name} - купить в Москве | Prime-Forest</title>
         <meta
           name="description"
           content={product.description?.substring(0, 160)}
         />
-      </HelmetProvider>
+      </Helmet>
 
       <div className="product-detail">
         <Button
