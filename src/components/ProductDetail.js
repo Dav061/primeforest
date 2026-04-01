@@ -156,11 +156,23 @@ const ProductDetail = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{product.name} - купить в Москве | Prime-Forest</title>
+      <Helmet key={product?.id}>
+        <title>
+          {product?.name
+            ? `${product.name} - купить в Москве и МО | Prime-Forest`
+            : "Товар | Prime-Forest"}
+        </title>
         <meta
           name="description"
-          content={product.description?.substring(0, 160)}
+          content={
+            product?.description
+              ? product.description.substring(0, 160)
+              : "Пиломатериалы от производителя с доставкой по Москве и МО по лучшим ценам."
+          }
+        />
+        <link
+          rel="canonical"
+          href={`https://prime-forest.ru/products/${product?.slug}`}
         />
       </Helmet>
 

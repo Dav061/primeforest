@@ -452,7 +452,7 @@ const ProductList = ({ categorySlug, searchParam: propSearchParam }) => {
   const title = searchParam
     ? `Поиск: ${searchParam} - пиломатериалы | Prime-Forest`
     : currentCategory?.name
-    ? `${currentCategory.name} - купить в Москве | Prime-Forest`
+    ? `${currentCategory.name} - купить в Москве и МО | Prime-Forest`
     : "Пиломатериалы - каталог | Prime-Forest";
 
   const description = searchParam
