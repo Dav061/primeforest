@@ -1,5 +1,4 @@
-// src/components/Checkout.js - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ
-
+// src/components/Checkout.js
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
 
-// Константы
 const PHONE_REGEX =
   /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
 const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
@@ -23,7 +21,6 @@ const Checkout = () => {
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  // Состояния формы
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [comment, setComment] = useState("");

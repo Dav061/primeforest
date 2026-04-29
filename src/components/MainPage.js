@@ -16,24 +16,35 @@ import {
   Warehouse,
   Fence,
   Hammer,
-  Search,
+  X,
 } from "lucide-react";
 import "../styles.scss";
 import { HelmetProvider } from "react-helmet-async";
 
 const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
-const POPULAR_PRODUCT_IDS = [1, 2, 12, 5]; // ID популярных товаров
+const POPULAR_PRODUCT_IDS = [1, 2, 12, 5];
 
 const MainPage = () => {
   const navigate = useNavigate();
   const [popularProducts, setPopularProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [stats] = useState({
     products: 1500,
     customers: 5000,
     years: 12,
     deliveries: 12000,
+  });
+
+  // Состояния для формы обратного звонка
+  const [callbackForm, setCallbackForm] = useState({
+    name: "",
+    phone: "",
+  });
+  const [callbackStatus, setCallbackStatus] = useState({
+    loading: false,
+    success: false,
+    error: false,
+    message: "",
   });
 
   useEffect(() => {
@@ -44,12 +55,10 @@ const MainPage = () => {
         });
 
         if (response.data?.results) {
-          // Фильтруем товары по ID из списка популярных
           const popular = response.data.results.filter((product) =>
             POPULAR_PRODUCT_IDS.includes(product.id)
           );
 
-          // Если популярных товаров меньше 4, добавляем первые товары из общего списка
           if (popular.length < 4) {
             const remainingCount = 4 - popular.length;
             const otherProducts = response.data.results
@@ -74,15 +83,99 @@ const MainPage = () => {
     fetchPopularProducts();
   }, []);
 
-  const handleSearch = (e) => {
+  // Обработчик отправки формы обратного звонка
+  const handleCallbackSubmit = async (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
+
+    if (!callbackForm.name.trim()) {
+      setCallbackStatus({
+        loading: false,
+        success: false,
+        error: true,
+        message: "Пожалуйста, введите ваше имя",
+      });
+      return;
+    }
+
+    if (!callbackForm.phone.trim()) {
+      setCallbackStatus({
+        loading: false,
+        success: false,
+        error: true,
+        message: "Пожалуйста, введите номер телефона",
+      });
+      return;
+    }
+
+    const phoneRegex = /^[\d+\s()-]{10,}$/;
+    if (!phoneRegex.test(callbackForm.phone.trim())) {
+      setCallbackStatus({
+        loading: false,
+        success: false,
+        error: true,
+        message: "Пожалуйста, введите корректный номер телефона",
+      });
+      return;
+    }
+
+    setCallbackStatus({
+      loading: true,
+      success: false,
+      error: false,
+      message: "",
+    });
+
+    try {
+      const response = await axios.post(`${API_URL}/api/callback/`, {
+        name: callbackForm.name.trim(),
+        phone: callbackForm.phone.trim(),
+      });
+
+      setCallbackStatus({
+        loading: false,
+        success: true,
+        error: false,
+        message: "Спасибо! Мы перезвоним вам в ближайшее время.",
+      });
+
+      setCallbackForm({ name: "", phone: "" });
+
+      setTimeout(() => {
+        setCallbackStatus((prev) => ({ ...prev, success: false, message: "" }));
+      }, 5000);
+    } catch (error) {
+      console.error("Error sending callback request:", error);
+
+      let errorMessage = "Произошла ошибка. Пожалуйста, попробуйте позже.";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      setCallbackStatus({
+        loading: false,
+        success: false,
+        error: true,
+        message: errorMessage,
+      });
+
+      setTimeout(() => {
+        setCallbackStatus((prev) => ({ ...prev, error: false, message: "" }));
+      }, 5000);
     }
   };
 
-  const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") handleSearch(e);
+  const handleCallbackInputChange = (field, value) => {
+    setCallbackForm((prev) => ({ ...prev, [field]: value }));
+    if (callbackStatus.error || callbackStatus.success) {
+      setCallbackStatus({
+        loading: false,
+        success: false,
+        error: false,
+        message: "",
+      });
+    }
   };
 
   const getImageUrl = (imagePath) => {
@@ -180,7 +273,7 @@ const MainPage = () => {
         </title>
         <meta
           name="description"
-          content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доска строганная и обрезная, брус, OSB, фанера, вагонка, имитация бруса, блок хаус, мебельный щит, половая доска, погонаж. Доставка по Москве и области."
+          content="Prime-Forest - производство и продажа пиломатериалов в Москве и Московской области. Доставка по Москве и области."
         />
       </HelmetProvider>
 
@@ -189,27 +282,89 @@ const MainPage = () => {
         <section className="hero-section">
           <div className="hero-content">
             <h1 className="hero-title">
-              Пиломатериалы высшего качества
-              <span className="hero-title-highlight"> для вашего дома</span>
+              Пиломатериалы высшего качества для вашего дома
             </h1>
-            <p className="hero-subtitle">
-              Широкий выбор древесины от производителя.
-            </p>
 
-            <div className="hero-search">
-              <form onSubmit={handleSearch} className="search-wrapper">
-                <input
-                  type="text"
-                  placeholder="Поиск пиломатериалов..."
-                  className="hero-search-input"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleSearchKeyDown}
-                />
-                <button type="submit" className="hero-search-button">
-                  <Search size={20} />
-                  <span>Найти</span>
+            {/* ФОРМА ОБРАТНОГО ЗВОНКА вместо поиска */}
+            <div className="hero-callback">
+              <form
+                onSubmit={handleCallbackSubmit}
+                className="callback-wrapper"
+              >
+                <h3 className="callback-title">Заказать обратный звонок</h3>
+                <p className="callback-subtitle">
+                  Оставьте заявку и мы перезвоним вам в течение 15 минут
+                </p>
+
+                <div className="callback-form-group">
+                  <input
+                    type="text"
+                    placeholder="Ваше имя *"
+                    className="callback-input"
+                    value={callbackForm.name}
+                    onChange={(e) =>
+                      handleCallbackInputChange("name", e.target.value)
+                    }
+                    disabled={callbackStatus.loading}
+                  />
+                </div>
+
+                <div className="callback-form-group">
+                  <input
+                    type="tel"
+                    placeholder="Номер телефона *"
+                    className="callback-input"
+                    value={callbackForm.phone}
+                    onChange={(e) =>
+                      handleCallbackInputChange("phone", e.target.value)
+                    }
+                    disabled={callbackStatus.loading}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="callback-button"
+                  disabled={callbackStatus.loading}
+                >
+                  {callbackStatus.loading ? (
+                    <>
+                      <span className="callback-spinner"></span>
+                      Отправка...
+                    </>
+                  ) : (
+                    "Перезвоните мне"
+                  )}
                 </button>
+
+                {(callbackStatus.success || callbackStatus.error) && (
+                  <div
+                    className={`callback-message ${
+                      callbackStatus.success ? "success" : "error"
+                    }`}
+                  >
+                    <span>{callbackStatus.message}</span>
+                    <button
+                      type="button"
+                      className="callback-message-close"
+                      onClick={() =>
+                        setCallbackStatus({
+                          loading: false,
+                          success: false,
+                          error: false,
+                          message: "",
+                        })
+                      }
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+
+                <p className="callback-notice">
+                  Нажимая на кнопку, вы даете согласие на обработку персональных
+                  данных
+                </p>
               </form>
             </div>
 
@@ -239,13 +394,12 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* ПРЕИМУЩЕСТВА */}
+        {/* Остальные секции без изменений */}
         <section className="advantages-section">
           <h2 className="section-title">
             Почему выбирают нас
             <span className="section-title-decoration" />
           </h2>
-
           <div className="advantages-grid">
             {advantages.map(({ icon: Icon, title, desc }, index) => (
               <div key={index} className="advantage-card">
@@ -259,13 +413,11 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* ПОПУЛЯРНЫЕ ТОВАРЫ */}
         <section className="popular-products-section">
           <h2 className="section-title">
             Популярные товары
             <span className="section-title-decoration" />
           </h2>
-
           {loading ? (
             <div className="loading-container">
               <div className="loader" />
@@ -275,7 +427,7 @@ const MainPage = () => {
             <div className="products-grid">
               {popularProducts.map((product) => (
                 <Link
-                  to={`/products/${product.slug}`} // ← ИСПРАВЛЕНО
+                  to={`/products/${product.slug}`}
                   key={product.id}
                   className="product-link"
                 >
@@ -316,13 +468,11 @@ const MainPage = () => {
           )}
         </section>
 
-        {/* ПРИМЕНЕНИЕ ПИЛОМАТЕРИАЛОВ */}
         <section className="applications-section">
           <h2 className="section-title">
             Применение пиломатериалов
             <span className="section-title-decoration" />
           </h2>
-
           <div className="applications-grid">
             {applications.map(({ path, icon: Icon, text }, index) => (
               <Link
@@ -337,7 +487,6 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* СТАТИСТИКА */}
         <section className="stats-section">
           <div className="stats-container">
             <div className="stat-item">
@@ -359,13 +508,11 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* ОТЗЫВЫ */}
         <section className="reviews-section">
           <h2 className="section-title">
             Отзывы наших клиентов
             <span className="section-title-decoration" />
           </h2>
-
           <div className="reviews-grid">
             {reviews.map(({ initials, name, date, text }, index) => (
               <div key={index} className="review-card">
@@ -387,7 +534,6 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* КОНТАКТНАЯ ИНФОРМАЦИЯ */}
         <section className="contact-section">
           <div className="contact-info">
             <h2>Свяжитесь с нами</h2>
@@ -395,7 +541,6 @@ const MainPage = () => {
               Наши менеджеры помогут подобрать нужный материал и рассчитать
               стоимость
             </p>
-
             <div className="contact-details">
               <div className="contact-detail">
                 <Phone size={20} />
@@ -414,14 +559,12 @@ const MainPage = () => {
                 <span>Ежедневно: 9:00 - 18:00</span>
               </div>
             </div>
-
             <div className="contact-buttons">
               <Link to="/contacts" className="contact-btn primary">
                 Контакты
               </Link>
             </div>
           </div>
-
           <div className="contact-map">
             <iframe
               src="https://yandex.ru/map-widget/v1/?um=constructor%3Ab5bd6e0f4259e1283bf85db928e68523230beaf6ddf73fcb9c4dbb8a70b3e21a&source=constructor"
