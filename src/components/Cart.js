@@ -1,5 +1,5 @@
 // src/components/Cart.js - Оптимизированная версия для продакшена
-import React, { useEffect, useState, useContext, useRef } from "react"; // убрали useCallback
+import React, { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -14,7 +14,7 @@ import { HelmetProvider } from "react-helmet-async";
 const Cart = () => {
   const { user } = useContext(AuthContext);
   const { cartItems, loading, updateCartItem, removeFromCart } =
-    useContext(CartContext); // убрали getItemQuantity
+    useContext(CartContext);
 
   const navigate = useNavigate();
   const [cartProducts, setCartProducts] = useState([]);
@@ -27,7 +27,6 @@ const Cart = () => {
   const timeouts = useRef({});
 
   useEffect(() => {
-    // Убрали console.log для продакшена
     if (cartItems && Object.keys(cartItems).length > 0) {
       loadCartData();
     } else {
@@ -90,7 +89,7 @@ const Cart = () => {
               id: key,
               productId,
               productName: product.name,
-              productSlug: product.slug, // ← ДОБАВИТЬ ЭТУ СТРОКУ
+              productSlug: product.slug,
               productImage: product.main_image,
               priceId,
               price: priceInfo.price,
@@ -108,7 +107,13 @@ const Cart = () => {
         })
       );
 
-      setCartProducts(productsData);
+      // 🔥 СОРТИРОВКА ТОВАРОВ ПО ID (ПОРЯДОК НЕ МЕНЯЕТСЯ)
+      const sortedProducts = productsData.sort((a, b) => {
+        // Сортируем по productId (можно изменить на любой другой критерий)
+        return a.productId - b.productId;
+      });
+
+      setCartProducts(sortedProducts);
       setInputValues(initialValues);
       setTotalPrice(total);
     } catch (error) {
@@ -121,7 +126,6 @@ const Cart = () => {
   };
 
   const handleProductClick = (productSlug, e) => {
-    // ← ИЗМЕНИТЬ ПАРАМЕТР
     if (
       e.target.tagName === "INPUT" ||
       e.target.tagName === "BUTTON" ||
@@ -131,7 +135,7 @@ const Cart = () => {
     ) {
       return;
     }
-    navigate(`/products/${productSlug}`); // ← ИСПРАВЛЕНО
+    navigate(`/products/${productSlug}`);
   };
 
   const performUpdate = async (itemKey, productId, priceId, newQuantity) => {
