@@ -13,7 +13,7 @@ import { notifySuccess, notifyError } from "./utils/notifications";
 export const CartContext = createContext();
 
 export const GUEST_CART_KEY = "guestCart";
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
@@ -30,7 +30,6 @@ export const CartProvider = ({ children }) => {
     []
   );
 
-  // Загрузка корзины из localStorage для гостя
   const loadGuestCart = useCallback(() => {
     try {
       const savedCart = localStorage.getItem(GUEST_CART_KEY);
@@ -40,7 +39,6 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // Сохранение гостевой корзины
   const saveGuestCart = useCallback((items) => {
     try {
       localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
@@ -49,7 +47,6 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // Загрузка корзины с сервера
   const fetchUserCart = useCallback(async () => {
     if (!user) return;
 
@@ -87,7 +84,6 @@ export const CartProvider = ({ children }) => {
     }
   }, [user, getAuthHeader]);
 
-  // Синхронизация гостевой корзины с сервером
   const syncGuestCartWithServer = useCallback(
     async (username) => {
       const token = localStorage.getItem("token");
@@ -118,7 +114,6 @@ export const CartProvider = ({ children }) => {
           });
         }
 
-        // Объединяем корзины
         for (const [key, guestQuantity] of Object.entries(guestItems)) {
           const [productId, priceId] = key.split("_").map(Number);
           const currentQuantity = currentItems[key] || 0;
@@ -168,7 +163,6 @@ export const CartProvider = ({ children }) => {
     [getAuthHeader]
   );
 
-  // Эффект для загрузки корзины
   useEffect(() => {
     if (isSyncing) return;
 
@@ -179,7 +173,6 @@ export const CartProvider = ({ children }) => {
     }
   }, [user, isSyncing, fetchUserCart, loadGuestCart]);
 
-  // Подсчет количества
   useEffect(() => {
     const totalCount = Object.values(cartItems).reduce(
       (sum, qty) => sum + (typeof qty === "number" ? qty : 0),
@@ -188,7 +181,6 @@ export const CartProvider = ({ children }) => {
     setCartCount(totalCount);
   }, [cartItems]);
 
-  // Добавление товара
   const addToCart = async (productId, quantity = 1, selectedPrice) => {
     if (!selectedPrice) {
       notifyError("Выберите вариант цены");
@@ -214,6 +206,12 @@ export const CartProvider = ({ children }) => {
           [key]: (prev[key] || 0) + quantity,
         }));
 
+        // 🔥 ЦЕЛЬ: ДОБАВЛЕНИЕ В КОРЗИНУ
+        if (window.ym) {
+          window.ym(109693335, "reachGoal", "add_to_cart");
+          console.log("🎯 Цель: Добавление в корзину");
+        }
+
         notifySuccess("Товар добавлен в корзину");
         return true;
       } catch (error) {
@@ -227,12 +225,18 @@ export const CartProvider = ({ children }) => {
         saveGuestCart(newItems);
         return newItems;
       });
+
+      // 🔥 ЦЕЛЬ: ДОБАВЛЕНИЕ В КОРЗИНУ (для гостя)
+      if (window.ym) {
+        window.ym(109693335, "reachGoal", "add_to_cart");
+        console.log("🎯 Цель: Добавление в корзину");
+      }
+
       notifySuccess("Товар добавлен в корзину");
       return true;
     }
   };
 
-  // Обновление количества
   const updateCartItem = async (productId, priceId, newQuantity) => {
     const key = `${productId}_${priceId}`;
 
@@ -283,7 +287,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Удаление товара
   const removeFromCart = async (productId, priceId) => {
     const key = `${productId}_${priceId}`;
 
@@ -323,7 +326,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Получение количества
   const getItemQuantity = useCallback(
     (productId, priceId) => {
       if (!priceId) return 0;
@@ -332,7 +334,6 @@ export const CartProvider = ({ children }) => {
     [cartItems]
   );
 
-  // Очистка корзины
   const clearCart = async () => {
     if (user) {
       try {

@@ -1,8 +1,17 @@
-import React from "react";
+// src/components/Contacts.js
+import React, { useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 
 const Contacts = () => {
+  // 🔥 ЦЕЛЬ: ПРОСМОТР КОНТАКТОВ
+  useEffect(() => {
+    if (window.ym) {
+      window.ym(109693335, 'reachGoal', 'view_contacts');
+      console.log('🎯 Цель: Просмотр контактов');
+    }
+  }, []);
+
   const phoneNumbers = [
     { href: "tel:+79990000629", display: "+7 (999) 000-06-29" },
     { href: "tel:+79055983500", display: "+7 (905) 598-35-00" },

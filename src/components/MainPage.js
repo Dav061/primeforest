@@ -20,8 +20,9 @@ import {
 } from "lucide-react";
 import "../styles.scss";
 import { HelmetProvider } from "react-helmet-async";
+import { sendCallbackEmail } from "../services/emailService";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 const POPULAR_PRODUCT_IDS = [1, 2, 12, 5];
 
 const MainPage = () => {
@@ -83,7 +84,7 @@ const MainPage = () => {
     fetchPopularProducts();
   }, []);
 
-  // Обработчик отправки формы обратного звонка
+  // 🔥 ОБНОВЛЕННЫЙ ОБРАБОТЧИК: отправка через EmailJS вместо сервера
   const handleCallbackSubmit = async (e) => {
     e.preventDefault();
 
@@ -126,42 +127,45 @@ const MainPage = () => {
     });
 
     try {
-      const response = await axios.post(`${API_URL}/api/callback/`, {
+      // 🔥 ОТПРАВКА ЧЕРЕЗ EMAILJS (минуя бэкенд)
+      const result = await sendCallbackEmail({
         name: callbackForm.name.trim(),
         phone: callbackForm.phone.trim(),
       });
 
-      setCallbackStatus({
-        loading: false,
-        success: true,
-        error: false,
-        message: "Спасибо! Мы перезвоним вам в ближайшее время.",
-      });
+      if (result.success) {
+        if (window.ym) {
+          window.ym(109693335, "reachGoal", "callback_request");
+          console.log("🎯 Цель: Заявка на звонок");
+        }
+        setCallbackStatus({
+          loading: false,
+          success: true,
+          error: false,
+          message: "Спасибо! Мы перезвоним вам в ближайшее время.",
+        });
 
-      setCallbackForm({ name: "", phone: "" });
-
-      setTimeout(() => {
-        setCallbackStatus((prev) => ({ ...prev, success: false, message: "" }));
-      }, 5000);
+        setCallbackForm({ name: "", phone: "" });
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error("Error sending callback request:", error);
-
-      let errorMessage = "Произошла ошибка. Пожалуйста, попробуйте позже.";
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      }
 
       setCallbackStatus({
         loading: false,
         success: false,
         error: true,
-        message: errorMessage,
+        message: "Произошла ошибка. Пожалуйста, попробуйте позже.",
       });
-
+    } finally {
       setTimeout(() => {
-        setCallbackStatus((prev) => ({ ...prev, error: false, message: "" }));
+        setCallbackStatus((prev) => ({
+          ...prev,
+          success: false,
+          error: false,
+          message: "",
+        }));
       }, 5000);
     }
   };
@@ -285,7 +289,7 @@ const MainPage = () => {
               Пиломатериалы высшего качества для вашего дома
             </h1>
 
-            {/* ФОРМА ОБРАТНОГО ЗВОНКА вместо поиска */}
+            {/* ФОРМА ОБРАТНОГО ЗВОНКА */}
             <div className="hero-callback">
               <form
                 onSubmit={handleCallbackSubmit}

@@ -18,7 +18,7 @@ import PriceSelector from "./PriceSelector";
 import "../styles.scss";
 import { IconButton } from "@mui/material";
 
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const ProductDetail = () => {
   const { slug } = useParams(); // ИЗМЕНЕНО: id -> slug
@@ -172,7 +172,7 @@ const ProductDetail = () => {
         />
         <link
           rel="canonical"
-          href={`https://prime-forest.ru/products/${product?.slug}`}
+          href={`http://127.0.0.1:8000/products/${product?.slug}`}
         />
       </Helmet>
 

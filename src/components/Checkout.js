@@ -1,5 +1,5 @@
 // src/components/Checkout.js
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
@@ -11,14 +11,15 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { HelmetProvider } from "react-helmet-async";
 import "../styles.scss";
 import { notifySuccess, notifyError } from "../utils/notifications";
+import { sendOrderEmail } from "../services/emailService";
 
 const PHONE_REGEX =
   /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
-const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
-  const { cartItems, clearCart } = useContext(CartContext);
+  const { cartItems, clearCart, cart } = useContext(CartContext);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
@@ -28,6 +29,60 @@ const Checkout = () => {
   const [guestEmail, setGuestEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [cartProductsData, setCartProductsData] = useState([]);
+
+  useEffect(() => {
+    if (cart?.items && cart.items.length > 0) {
+      const products = cart.items.map((item) => ({
+        id: item.product.id,
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.selected_price?.price || 0,
+        unitShort: item.selected_price?.unit_type_short || "шт",
+        total: (item.selected_price?.price || 0) * item.quantity,
+      }));
+      setCartProductsData(products);
+    } else if (!user && Object.keys(cartItems).length > 0) {
+      const fetchGuestProducts = async () => {
+        const productsList = [];
+        for (const [key, quantity] of Object.entries(cartItems)) {
+          const [productId, priceId] = key.split("_").map(Number);
+          try {
+            const response = await axios.get(
+              `${API_URL}/api/products/${productId}/`
+            );
+            const product = response.data;
+            const selectedPrice = product.prices?.find((p) => p.id === priceId);
+            productsList.push({
+              id: productId,
+              name: product.name,
+              quantity: quantity,
+              price: selectedPrice?.price || 0,
+              unitShort: selectedPrice?.unit_type_short || "шт",
+              total: (selectedPrice?.price || 0) * quantity,
+            });
+          } catch (err) {
+            console.error(`Ошибка загрузки товара ${productId}:`, err);
+          }
+        }
+        setCartProductsData(productsList);
+      };
+      fetchGuestProducts();
+    }
+  }, [cart, cartItems, user]);
+
+  const calculateTotalPrice = () => {
+    return cartProductsData.reduce((sum, item) => sum + item.total, 0);
+  };
+
+  const formatItemsList = () => {
+    return cartProductsData
+      .map(
+        (item) =>
+          `${item.name} - ${item.quantity} ${item.unitShort} × ${item.price} руб. = ${item.total} руб.`
+      )
+      .join("\n");
+  };
 
   const validateForm = () => {
     if (!address || !phoneNumber) {
@@ -40,7 +95,10 @@ const Checkout = () => {
       return false;
     }
 
-    if (Object.keys(cartItems).length === 0) {
+    if (
+      Object.keys(cartItems).length === 0 &&
+      (!cart?.items || cart.items.length === 0)
+    ) {
       notifyError("Корзина пуста");
       return false;
     }
@@ -90,6 +148,32 @@ const Checkout = () => {
         headers,
       });
 
+      // 🔥 ЦЕЛЬ: ЗАКАЗ ОФОРМЛЕН
+      if (window.ym) {
+        window.ym(109693335, "reachGoal", "order_completed");
+        console.log("🎯 Цель: Заказ оформлен");
+      }
+
+      const totalPrice = calculateTotalPrice();
+      const itemsList = formatItemsList();
+
+      const emailResult = await sendOrderEmail({
+        name: user ? user.username : guestName || "Гость",
+        email: user ? user.email : guestEmail || "Не указан",
+        phone: phoneNumber,
+        address: address,
+        comment: comment || "Нет комментария",
+        orderId: data.id,
+        itemsList: itemsList || "Нет товаров",
+        totalPrice: totalPrice,
+      });
+
+      if (emailResult.success) {
+        console.log("✅ Уведомление отправлено на почту");
+      } else {
+        console.warn("⚠️ Не удалось отправить уведомление:", emailResult.error);
+      }
+
       await clearCart();
       notifySuccess(`✅ Заказ #${data.id} успешно оформлен!`);
 
@@ -119,7 +203,7 @@ const Checkout = () => {
     }
   };
 
-  const isFormValid = address && phoneNumber;
+  const isFormValid = address && phoneNumber && cartProductsData.length > 0;
 
   return (
     <>
@@ -223,6 +307,44 @@ const Checkout = () => {
               rows={3}
             />
           </div>
+
+          {cartProductsData.length > 0 && (
+            <div className="form-section">
+              <h2>Ваш заказ</h2>
+              <div
+                style={{
+                  background: "#f5f5f5",
+                  padding: "15px",
+                  borderRadius: "8px",
+                }}
+              >
+                {cartProductsData.map((item, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      marginBottom: "10px",
+                      borderBottom: "1px solid #ddd",
+                      paddingBottom: "5px",
+                    }}
+                  >
+                    <strong>{item.name}</strong>
+                    <br />
+                    {item.quantity} {item.unitShort} × {item.price} руб. ={" "}
+                    {item.total} руб.
+                  </div>
+                ))}
+                <div
+                  style={{
+                    marginTop: "10px",
+                    fontWeight: "bold",
+                    textAlign: "right",
+                  }}
+                >
+                  Итого: {calculateTotalPrice()} руб.
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="checkout-actions">
             <Button

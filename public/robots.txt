@@ -13,13 +13,11 @@ Disallow: /order-success/
 Disallow: /*?*page=
 Disallow: /*?*sort=
 Disallow: /*?*filter=
-
-# Разрешаем индексацию всего остального
-Allow: /products/
-Allow: /catalog/
-Allow: /promotions/
-Allow: /about/
-Allow: /contacts/
+Disallow: /*?*ordering=
+Disallow: /*?*search=
 
 # Карта сайта
-Sitemap: https://prime-forest.ru/sitemap.xml
+Sitemap: http://127.0.0.1:8000/sitemap.xml
+
+# Хост (для Яндекса)
+Host: http://127.0.0.1:8000

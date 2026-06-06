@@ -2,7 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 
-const BASE_URL = "https://prime-forest.ru";
+// ⚠️ ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ ДОМЕН ⚠️
+const BASE_URL = "http://127.0.0.1:8000"; // ← ИСПРАВИТЬ!
 
 // Статические страницы
 const staticPages = [
@@ -13,7 +14,7 @@ const staticPages = [
   { url: "/promotions", priority: 0.8, changefreq: "weekly" },
 ];
 
-// Страницы, которые не нужно индексировать
+// Страницы, которые не нужно индексировать (но добавим с низким приоритетом)
 const noIndexPages = [
   "/cart",
   "/login",
@@ -26,6 +27,7 @@ const noIndexPages = [
 
 const generateSitemap = async () => {
   console.log("🚀 Начинаем генерацию sitemap...");
+  console.log(`📍 BASE_URL: ${BASE_URL}`);
 
   let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
   sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -45,7 +47,7 @@ const generateSitemap = async () => {
     sitemap += `  </url>\n`;
   });
 
-  // Добавляем страницы с noindex
+  // Добавляем страницы с низким приоритетом (но не запрещаем полностью)
   noIndexPages.forEach((url) => {
     sitemap += `  <url>\n`;
     sitemap += `    <loc>${BASE_URL}${url}</loc>\n`;
@@ -67,7 +69,6 @@ const generateSitemap = async () => {
     console.log(`Найдено категорий: ${categoriesCount}`);
 
     categories.forEach((category) => {
-      // Используем slug из базы, если есть, иначе пропускаем категорию
       if (!category.slug) {
         console.warn(
           `⚠️ Категория "${category.name}" не имеет slug, пропускаем`
@@ -103,7 +104,6 @@ const generateSitemap = async () => {
 
     let addedCount = 0;
     products.forEach((product) => {
-      // Используем slug из базы, если есть
       if (!product.slug) {
         console.warn(`⚠️ Товар ID: ${product.id} не имеет slug, пропускаем`);
         return;
@@ -127,8 +127,15 @@ const generateSitemap = async () => {
 
   sitemap += "</urlset>";
 
-  // Сохраняем файл
+  // Сохраняем файл в public/
   const sitemapPath = path.join(__dirname, "../../public/sitemap.xml");
+
+  // Убедимся, что папка public существует
+  const publicDir = path.join(__dirname, "../../public");
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+  }
+
   fs.writeFileSync(sitemapPath, sitemap);
   console.log(`✅ Sitemap сохранен: ${sitemapPath}`);
   console.log(

@@ -1,3 +1,4 @@
+// src/index.js
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -5,15 +6,34 @@ import App from "./App";
 import "./styles.scss";
 import reportWebVitals from "./reportWebVitals";
 import axios from "axios";
+import { BrowserRouter } from "react-router-dom";
+import { YandexMetrika } from "yandex-metrika-react";
 
-// Настройка axios по умолчанию
+// Настройка axios
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "https://prime-forest.ru";
+axios.defaults.baseURL = "http://127.0.0.1:8000";
+
+// ID счётчика Яндекс.Метрики
+const METRIKA_ID = 109693335;
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <YandexMetrika
+      counterId={METRIKA_ID}
+      options={{
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+        triggerEvent: true,
+      }}
+    >
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </YandexMetrika>
+  </React.StrictMode>
+);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
