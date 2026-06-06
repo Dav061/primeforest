@@ -3,7 +3,7 @@ const path = require("path");
 const axios = require("axios");
 
 // ⚠️ ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ ДОМЕН ⚠️
-const BASE_URL = "http://127.0.0.1:8000"; // ← ИСПРАВИТЬ!
+const BASE_URL = "https://prime-forest.ru"; // ← ИСПРАВИТЬ!
 
 // Статические страницы
 const staticPages = [

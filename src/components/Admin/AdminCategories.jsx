@@ -62,7 +62,9 @@ const AdminCategories = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("http://127.0.0.1:8000/api/categories/");
+      const response = await axios.get(
+        "https://prime-forest.ru/api/categories/"
+      );
       setCategories(response.data.results || response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -102,7 +104,7 @@ const AdminCategories = () => {
 
       if (currentCategory.id) {
         await axios.put(
-          `http://127.0.0.1:8000/api/categories/${currentCategory.id}/`,
+          `https://prime-forest.ru/api/categories/${currentCategory.id}/`,
           currentCategory
         );
         setSuccessMessage(
@@ -110,7 +112,7 @@ const AdminCategories = () => {
         );
       } else {
         await axios.post(
-          "http://127.0.0.1:8000/api/categories/",
+          "https://prime-forest.ru/api/categories/",
           currentCategory
         );
         setSuccessMessage(
@@ -135,7 +137,7 @@ const AdminCategories = () => {
   const checkCategoryHasProducts = async (categoryId) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/products/?category=${categoryId}`
+        `https://prime-forest.ru/api/products/?category=${categoryId}`
       );
       return (response.data.results || response.data).length > 0;
     } catch (error) {
@@ -168,7 +170,7 @@ const AdminCategories = () => {
         onConfirm: async () => {
           try {
             const response = await axios.delete(
-              `http://127.0.0.1:8000/api/categories/${id}/`
+              `https://prime-forest.ru/api/categories/${id}/`
             );
 
             if (response.status === 204) {

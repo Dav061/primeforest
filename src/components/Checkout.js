@@ -15,7 +15,7 @@ import { sendOrderEmail } from "../services/emailService";
 
 const PHONE_REGEX =
   /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
-const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);

@@ -17,7 +17,7 @@ Disallow: /*?*ordering=
 Disallow: /*?*search=
 
 # Карта сайта
-Sitemap: http://127.0.0.1:8000/sitemap.xml
+Sitemap: https://prime-forest.ru/sitemap.xml
 
 # Хост (для Яндекса)
-Host: http://127.0.0.1:8000
+Host: https://prime-forest.ru

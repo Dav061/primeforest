@@ -11,7 +11,7 @@ import { YandexMetrika } from "yandex-metrika-react";
 
 // Настройка axios
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://127.0.0.1:8000";
+axios.defaults.baseURL = "https://prime-forest.ru";
 
 // ID счётчика Яндекс.Метрики
 const METRIKA_ID = 109693335;

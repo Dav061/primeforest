@@ -1,1573 +1,1573 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://127.0.0.1:8000/</loc>
+    <loc>https://prime-forest.ru/</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog</loc>
+    <loc>https://prime-forest.ru/catalog</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/about</loc>
+    <loc>https://prime-forest.ru/about</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/contacts</loc>
+    <loc>https://prime-forest.ru/contacts</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/promotions</loc>
+    <loc>https://prime-forest.ru/promotions</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/cart</loc>
+    <loc>https://prime-forest.ru/cart</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/login</loc>
+    <loc>https://prime-forest.ru/login</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/register</loc>
+    <loc>https://prime-forest.ru/register</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/checkout</loc>
+    <loc>https://prime-forest.ru/checkout</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/profile</loc>
+    <loc>https://prime-forest.ru/profile</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/order-success</loc>
+    <loc>https://prime-forest.ru/order-success</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/admin</loc>
+    <loc>https://prime-forest.ru/admin</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznaya-doska-2-sort</loc>
+    <loc>https://prime-forest.ru/catalog/obreznaya-doska-2-sort</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznaya-doska-tu</loc>
+    <loc>https://prime-forest.ru/catalog/obreznaya-doska-tu</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznoy-brus-1-sort</loc>
+    <loc>https://prime-forest.ru/catalog/obreznoy-brus-1-sort</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznoy-brus-tu</loc>
+    <loc>https://prime-forest.ru/catalog/obreznoy-brus-tu</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/mebelnyy-schit-18-mm</loc>
+    <loc>https://prime-forest.ru/catalog/mebelnyy-schit-18-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/mebelnyy-schit-28-mm</loc>
+    <loc>https://prime-forest.ru/catalog/mebelnyy-schit-28-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/mebelnyy-schit-40-mm</loc>
+    <loc>https://prime-forest.ru/catalog/mebelnyy-schit-40-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/fanera-fk</loc>
+    <loc>https://prime-forest.ru/catalog/fanera-fk</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/fanera-fsf</loc>
+    <loc>https://prime-forest.ru/catalog/fanera-fsf</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/fanera-laminirovannaya</loc>
+    <loc>https://prime-forest.ru/catalog/fanera-laminirovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/vagonka-shtil</loc>
+    <loc>https://prime-forest.ru/catalog/vagonka-shtil</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznoy-brusok</loc>
+    <loc>https://prime-forest.ru/catalog/obreznoy-brusok</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/strogannyy-brusok</loc>
+    <loc>https://prime-forest.ru/catalog/strogannyy-brusok</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/obreznaya-doska-1-sort</loc>
+    <loc>https://prime-forest.ru/catalog/obreznaya-doska-1-sort</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/stupen</loc>
+    <loc>https://prime-forest.ru/catalog/stupen</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/stolb-nachalnyy</loc>
+    <loc>https://prime-forest.ru/catalog/stolb-nachalnyy</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/brus-strogannyy</loc>
+    <loc>https://prime-forest.ru/catalog/brus-strogannyy</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/polovaya-doska</loc>
+    <loc>https://prime-forest.ru/catalog/polovaya-doska</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/imitatsiya-brusa</loc>
+    <loc>https://prime-forest.ru/catalog/imitatsiya-brusa</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/doska-strogannaya</loc>
+    <loc>https://prime-forest.ru/catalog/doska-strogannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/kleenyy-brus</loc>
+    <loc>https://prime-forest.ru/catalog/kleenyy-brus</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/blok-haus</loc>
+    <loc>https://prime-forest.ru/catalog/blok-haus</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/brus-obreznoy</loc>
+    <loc>https://prime-forest.ru/catalog/brus-obreznoy</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/vagonka</loc>
+    <loc>https://prime-forest.ru/catalog/vagonka</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/pogonazh</loc>
+    <loc>https://prime-forest.ru/catalog/pogonazh</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/mebelnyy-schit</loc>
+    <loc>https://prime-forest.ru/catalog/mebelnyy-schit</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/osb-i-orgalit</loc>
+    <loc>https://prime-forest.ru/catalog/osb-i-orgalit</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/doska-obreznaya</loc>
+    <loc>https://prime-forest.ru/catalog/doska-obreznaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/fanera</loc>
+    <loc>https://prime-forest.ru/catalog/fanera</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/lestnichnye-elementy</loc>
+    <loc>https://prime-forest.ru/catalog/lestnichnye-elementy</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/evrovagonka</loc>
+    <loc>https://prime-forest.ru/catalog/evrovagonka</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/brusok</loc>
+    <loc>https://prime-forest.ru/catalog/brusok</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/plintus</loc>
+    <loc>https://prime-forest.ru/catalog/plintus</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/ugolok</loc>
+    <loc>https://prime-forest.ru/catalog/ugolok</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/raskladka</loc>
+    <loc>https://prime-forest.ru/catalog/raskladka</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/nalichnik</loc>
+    <loc>https://prime-forest.ru/catalog/nalichnik</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/shtapik</loc>
+    <loc>https://prime-forest.ru/catalog/shtapik</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/balyasina</loc>
+    <loc>https://prime-forest.ru/catalog/balyasina</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/tetiva</loc>
+    <loc>https://prime-forest.ru/catalog/tetiva</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/catalog/poruchen</loc>
+    <loc>https://prime-forest.ru/catalog/poruchen</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-14h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-14h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h200h1000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h200h1000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-100h100h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-100h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-150h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-150h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-50h100h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-50h100h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-200h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-200h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/blok-haus-28h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/blok-haus-28h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-2-sort-100h100h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-2-sort-100h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/polovaya-doska-45h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/polovaya-doska-45h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/polovaya-doska-28h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/polovaya-doska-28h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-100h100h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-100h100h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/osp-osb-3-9h1250h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/osp-osb-3-9h1250h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-6h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-6h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-30-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-30-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h12-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h12-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h600h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h600h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h600h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h600h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h2400-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h2400-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-50h200h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-50h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/osp-osb-3-12h1250h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/osp-osb-3-12h1250h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/osp-osb-3-15h1250h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/osp-osb-3-15h1250h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/osp-osb-3-18h1250h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/osp-osb-3-18h1250h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/osp-osb-3-22h1250h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/osp-osb-3-22h1250h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-9h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-9h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h600h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h600h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-obreznoy-50h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-obreznoy-50h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-obreznoy-25h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-obreznoy-25h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-obreznoy-40h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-obreznoy-40h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-obreznoy-40h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-obreznoy-40h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-40h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-40h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/blok-haus-35h190h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/blok-haus-35h190h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/blok-haus-35h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/blok-haus-35h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h400h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h400h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-25h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-25h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-40h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-40h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-50h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-50h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-50h70h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-50h70h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/blok-haus-45h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/blok-haus-45h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-25h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-25h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/shtapik-15-mm</loc>
+    <loc>https://prime-forest.ru/products/shtapik-15-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h400h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h400h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/shtapik-10-mm</loc>
+    <loc>https://prime-forest.ru/products/shtapik-10-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-50h200h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-50h200h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-50h150h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-50h150h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-40h100h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-40h100h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/blok-haus-45h190h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/blok-haus-45h190h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-150h150h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-150h150h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-200h200h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-200h200h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-100h200h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-100h200h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-100h150h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-100h150h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-20h100h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-20h100h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-20h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-20h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-20h200h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-20h200h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-20h120h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-20h120h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-40h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-40h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-40h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-40h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-strogannaya-40h150h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/doska-strogannaya-40h150h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-50h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-50h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-30h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-30h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/dvp-orgalit-list-2140h1220h22mm-261m2-drevesno-voloknistaya-plita</loc>
+    <loc>https://prime-forest.ru/products/dvp-orgalit-list-2140h1220h22mm-261m2-drevesno-voloknistaya-plita</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-50h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-50h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h1200h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h1200h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-100h150h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-100h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h2700-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h2700-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-100h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-100h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-1-sort-150h150h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-1-sort-150h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h600h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h600h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-20h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-20h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-20-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-20-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-200h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-200h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-18h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-18h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-100h100h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-100h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-10h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-10h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-100h150h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-100h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-20h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-20h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-20h190h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-20h190h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-100h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-100h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h500h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h500h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-150h150h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-150h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-obreznoy-tu-150h200h6000</loc>
+    <loc>https://prime-forest.ru/products/brus-obreznoy-tu-150h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-20h20h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-20h20h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-40h60h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-40h60h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-10h30h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-10h30h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-40-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-40-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-25h190h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-25h190h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-28h190h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-28h190h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-50h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-50h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-50h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-50h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-50h200h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-50h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h200h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h200h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-25h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-25h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-80-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-80-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-90-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-90-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-100-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-100-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-40h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-40h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-obreznoy-25h50h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-obreznoy-25h50h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/imitatsiya-brusa-16h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/imitatsiya-brusa-16h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-70-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-70-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/polovaya-doska-35h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/polovaya-doska-35h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brus-strogannyy-150h200h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/brus-strogannyy-150h200h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-40h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-40h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h200h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h200h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h4-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h4-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h6-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h6-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-50-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-50-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/ugolok-60-mm</loc>
+    <loc>https://prime-forest.ru/products/ugolok-60-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h10-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h10-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h15-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h15-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h18-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h18-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fk-1525h1525h21-mm-neshlifovannaya</loc>
+    <loc>https://prime-forest.ru/products/fanera-fk-1525h1525h21-mm-neshlifovannaya</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-12h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-12h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-15h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-15h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h300h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h300h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h300h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h300h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-12h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-12h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-15h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-15h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-18h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-18h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-18h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-18h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-21h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-21h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-24h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-24h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-27h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-27h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h300h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h300h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h300h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h300h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h300h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h300h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-9h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-9h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h500h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h500h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h600h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h600h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h250h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h250h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h300h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h300h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-28h400h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-28h400h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h300h1200-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h300h1200-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h300h1000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h300h1000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h400h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h400h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h400h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h400h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h500h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h500h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h600h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h600h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h600h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h600h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h800h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h800h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h800h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h800h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-40h1000h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-40h1000h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/vagonka-shtil-14h140h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/vagonka-shtil-14h140h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-50h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-50h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-50h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-50h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-50h200h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-50h200h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-25h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-25h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-25h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-25h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-2-sort-40h100h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-2-sort-40h100h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-1-sort-40h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-1-sort-40h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/doska-obreznaya-tu-25h150h6000</loc>
+    <loc>https://prime-forest.ru/products/doska-obreznaya-tu-25h150h6000</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-10h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-10h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-35-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-35-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-40-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-40-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-45-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-45-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-50-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-50-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-55-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-55-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evroplintus-50-mm</loc>
+    <loc>https://prime-forest.ru/products/evroplintus-50-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evroplintus-60-mm</loc>
+    <loc>https://prime-forest.ru/products/evroplintus-60-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evroplintus-65-mm</loc>
+    <loc>https://prime-forest.ru/products/evroplintus-65-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-30-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-30-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-20-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-20-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-25-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-25-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/plintus-60-mm</loc>
+    <loc>https://prime-forest.ru/products/plintus-60-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/raskladka-50-mm</loc>
+    <loc>https://prime-forest.ru/products/raskladka-50-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-70-mm</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-70-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-70-mm-1</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-70-mm-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-90-mm</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-90-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-90-mm-1</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-90-mm-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-120-mm</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-120-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-120-mm-1</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-120-mm-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-140-mm</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-140-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/shtapik-20-mm</loc>
+    <loc>https://prime-forest.ru/products/shtapik-20-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/raskladka-20-mm</loc>
+    <loc>https://prime-forest.ru/products/raskladka-20-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/raskladka-30-mm</loc>
+    <loc>https://prime-forest.ru/products/raskladka-30-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/nalichnik-140-mm-1</loc>
+    <loc>https://prime-forest.ru/products/nalichnik-140-mm-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/balyasina-variant-3</loc>
+    <loc>https://prime-forest.ru/products/balyasina-variant-3</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/poruchen-derevyannaya-3000-mm</loc>
+    <loc>https://prime-forest.ru/products/poruchen-derevyannaya-3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/poruchen-derevyannaya-4000-mm</loc>
+    <loc>https://prime-forest.ru/products/poruchen-derevyannaya-4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stolb-nachalnyy-variant-1</loc>
+    <loc>https://prime-forest.ru/products/stolb-nachalnyy-variant-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stolb-nachalnyy-variant-2</loc>
+    <loc>https://prime-forest.ru/products/stolb-nachalnyy-variant-2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stolb-nachalnyy-variant-3</loc>
+    <loc>https://prime-forest.ru/products/stolb-nachalnyy-variant-3</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/tetiva-60h300h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/tetiva-60h300h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/tetiva-60h300h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/tetiva-60h300h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/tetiva-50h300h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/tetiva-50h300h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/tetiva-50h300h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/tetiva-50h300h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/balyasina-variant-1</loc>
+    <loc>https://prime-forest.ru/products/balyasina-variant-1</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/balyasina-variant-2</loc>
+    <loc>https://prime-forest.ru/products/balyasina-variant-2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stupen-40h300h1200-mm</loc>
+    <loc>https://prime-forest.ru/products/stupen-40h300h1200-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stupen-40h300h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/stupen-40h300h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stupen-40h300h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/stupen-40h300h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-80h80h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-80h80h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-80h80h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-80h80h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-90h90h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-90h90h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-100h100h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-100h100h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-100h100h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-100h100h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-20h30h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-20h30h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-30h30h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-30h30h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-laminirovannaya-21h1220h2440-mm</loc>
+    <loc>https://prime-forest.ru/products/fanera-laminirovannaya-21h1220h2440-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-20h40h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-20h40h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h6000-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h6000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/brusok-strogannyy-10h20h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/brusok-strogannyy-10h20h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/fanera-fsf-30h1220h2440-mm-shlifovannaya-sh2</loc>
+    <loc>https://prime-forest.ru/products/fanera-fsf-30h1220h2440-mm-shlifovannaya-sh2</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h400h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h400h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/mebelnyy-schit-18h600h4000-mm</loc>
+    <loc>https://prime-forest.ru/products/mebelnyy-schit-18h600h4000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h2000-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h2000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/evrovagonka-125h96h2500-mm</loc>
+    <loc>https://prime-forest.ru/products/evrovagonka-125h96h2500-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/raskladka-40-mm</loc>
+    <loc>https://prime-forest.ru/products/raskladka-40-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/stupen-40h300h1000-mm</loc>
+    <loc>https://prime-forest.ru/products/stupen-40h300h1000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:8000/products/kleenyy-brus-90h90h3000-mm</loc>
+    <loc>https://prime-forest.ru/products/kleenyy-brus-90h90h3000-mm</loc>
     <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
