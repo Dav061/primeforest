@@ -14,12 +14,12 @@ import { notifySuccess, notifyError } from "../utils/notifications";
 import { sendOrderEmail } from "../services/emailService";
 
 const PHONE_REGEX =
-  /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+  /^(\+7|7|8)?[\s-]?\(?[489][0-9]{2}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
 const API_URL = process.env.REACT_APP_API_URL || "https://prime-forest.ru";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
-  const { cartItems, clearCart, cart } = useContext(CartContext);
+  const { cartItems, clearCart, cart, refreshCart } = useContext(CartContext);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
@@ -31,6 +31,7 @@ const Checkout = () => {
   const [error, setError] = useState(null);
   const [cartProductsData, setCartProductsData] = useState([]);
 
+  // Загрузка данных о товарах из корзины
   useEffect(() => {
     if (cart?.items && cart.items.length > 0) {
       const products = cart.items.map((item) => ({
@@ -70,6 +71,40 @@ const Checkout = () => {
       fetchGuestProducts();
     }
   }, [cart, cartItems, user]);
+
+  // Обновление корзины при монтировании страницы
+  useEffect(() => {
+    if (user) {
+      refreshCart();
+    }
+  }, [user, refreshCart]);
+
+  // Обновление корзины при возврате на страницу (из корзины или другой вкладки)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user) {
+        refreshCart();
+        console.log(
+          "🔄 Обновление корзины при возврате на страницу оформления"
+        );
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && user) {
+        refreshCart();
+        console.log("🔄 Обновление корзины при возврате на вкладку");
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [user, refreshCart]);
 
   const calculateTotalPrice = () => {
     return cartProductsData.reduce((sum, item) => sum + item.total, 0);

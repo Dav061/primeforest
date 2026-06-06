@@ -135,9 +135,9 @@ const Navbar = () => {
           </div>
 
           <div className="right-section">
-            <a href="tel:+79990000629" className="call-button">
+            <a href="tel:+79999849269" className="call-button">
               <Phone size={12} />
-              <span>+7 (999) 000-06-29</span>
+              <span>+7 (999) 984-92-69</span>
             </a>
 
             <div className="nav-icons">

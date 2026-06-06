@@ -13,7 +13,7 @@ const Contacts = () => {
   }, []);
 
   const phoneNumbers = [
-    { href: "tel:+79990000629", display: "+7 (999) 000-06-29" },
+    { href: "tel:+79999849269", display: "+7 (999) 984-92-69" },
     { href: "tel:+79055983500", display: "+7 (905) 598-35-00" },
   ];
 
@@ -35,7 +35,7 @@ const Contacts = () => {
         <title>Контакты - Prime-Forest | Адрес, телефон, график работы</title>
         <meta
           name="description"
-          content="Контакты компании Prime-Forest в Москве. Адрес: Рублёвское шоссе, 151к2. Телефоны: +7 (999) 000-06-29, +7 (905) 598-35-00. График работы, WhatsApp, схема проезда."
+          content="Контакты компании Prime-Forest в Москве. Адрес: Рублёвское шоссе, 151к2. Телефоны: +7 (999) 984-92-69, +7 (905) 598-35-00. График работы, WhatsApp, схема проезда."
         />
       </HelmetProvider>
 
@@ -76,7 +76,7 @@ const Contacts = () => {
             <h2 className="contact-heading">WhatsApp</h2>
             <p className="contact-text">
               <a
-                href="https://wa.me/79990000629?text=Здравствуйте!%20Меня%20интересуют%20пиломатериалы"
+                href="https://wa.me/79999849269?text=Здравствуйте!%20Меня%20интересуют%20пиломатериалы"
                 target="_blank"
                 rel="noopener noreferrer"
               >

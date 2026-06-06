@@ -548,7 +548,7 @@ const MainPage = () => {
             <div className="contact-details">
               <div className="contact-detail">
                 <Phone size={20} />
-                <a href="tel:+79990000629">8 (999) 000-06-29</a>
+                <a href="tel:+79999849269">8 (999) 984-92-69</a>
               </div>
               <div className="contact-detail">
                 <Phone size={20} />
